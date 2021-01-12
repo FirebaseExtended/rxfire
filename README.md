@@ -16,9 +16,9 @@ Status: Beta
 
 ```bash
 # npm
-npm i rxfire firebase rxjs --save
+npm i rxfire@exp firebase@exp rxjs --save
 # yarn
-yarn add rxfire firebase rxjs
+yarn add rxfire@exp firebase@exp rxjs
 ```
 
 Make sure to install Firebase and RxJS individually as they are peer dependencies of RxFire.
@@ -26,14 +26,17 @@ Make sure to install Firebase and RxJS individually as they are peer dependencie
 ## Example use:
 
 ```ts
-import firebase from 'firebase/app';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection, where, query } from 'firebase/firestore';
 import { collectionData } from 'rxfire/firestore';
 import { tap } from 'rxjs/operators';
 
-const app = firebase.initializeApp({ /* config */ });
-const citiesRef = app.firestore().collection('cities');
-citiesRef.where('state', '==', 'CO');
+const app = initializeApp({ /* config */ });
+const firestore = getFirestore(app);
+const citiesRef = query(
+    collection(firestore, 'cities'),
+    where('state', '==', 'CO')
+);
 
 collectionData(citiesRef, 'id')
   .pipe(
@@ -49,22 +52,27 @@ RxJS provides multiple operators and creation methods for combining observable s
 The example below streams a list of "cities" from Firestore and then retrieves their image from a Cloud Storage bucket. Both tasks are asynchronous but RxJS makes it easy to combine these tasks together.
 
 ```ts
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
+import { getFirestore, collection, where, query } from 'firebase/firestore';
 import { collectionData } from 'rxfire/firestore';
 import { getDownloadURL } from 'rxfire/storage';
+import { combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-const app = firebase.initializeApp({ /* config */ });
-const citiesRef = app.firestore().collection('cities');
-citiesRef.where('state', '==', 'CO');
+const app = initializeApp({ /* config */ });
+const firestore = getFirestore(app);
+const storage = getStorage(app);
+const citiesRef = query(
+    collection(firestore, 'cities'),
+    where('state', '==', 'CO')
+);
 
 collectionData(citiesRef, 'id')
   .pipe(
     switchMap(cities => {
       return combineLatest(...cities.map(c => {
-        const ref = storage.ref(`/cities/${c.id}.png`);
+        const ref = ref(storage, `/cities/${c.id}.png`);
         return getDownloadURL(ref).pipe(map(imageURL => ({ imageURL, ...c })));
       }));
     })
@@ -79,12 +87,13 @@ collectionData(citiesRef, 'id')
 RxFire is a complementary library to Firebase. It is not meant to wrap the entire Firebase SDK. RxFire's purpose is to simplify async streams from Firebase. You need to import the Firebase SDK and initialize an app before using RxFire.
 
 ```ts
-import firebase from 'firebase/app';
-import 'firebase/storage'; // import only the features needed
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 import { getDownloadURL } from 'rxfire/storage';
 
-const app = firebase.initializeApp({ /* config */ });
-const ref = app.storage().ref('data.json');
+const app = initializeApp({ /* config */ });
+const storage = getStorage(app);
+const ref = ref(storage, 'data.json');
 
 // Now you can use RxFire!
 const url$ = getDownloadURL(ref);
@@ -104,12 +113,13 @@ import { } from 'rxfire/functions';
 RxFire is a set of functions. Most functions create observables and from there you can use regular RxJS operators. Some functions are custom operators. But at the end of the day, it's all just functions. This is important for **tree shaking**. Any unused functions are stripped from your final build if you use a module bundler like Webpack or Rollup.
 
 ```ts
-import firebase from 'firebase/app';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 import { getDownloadURL, put /* not used! */ } 'rxfire/storage';
 
-const app = firebase.initializeApp({ /* config */ });
-const ref = app.storage().ref('data.json');
+const app = initializeApp({ /* config */ });
+const storage = getStorage(app);
+const ref = ref(storage, 'data.json');
 
 const url$ = getDownloadURL(ref);
 ```
