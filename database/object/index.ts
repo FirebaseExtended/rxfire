@@ -16,10 +16,10 @@
  */
 
 import firebase from 'firebase';
-import { QueryChange, ListenEvent } from '../interfaces';
-import { fromRef } from '../fromRef';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {QueryChange, ListenEvent} from '../interfaces';
+import {fromRef} from '../fromRef';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 type Query = firebase.database.Query;
 /**
@@ -37,7 +37,7 @@ export function object(query: Query): Observable<QueryChange> {
  */
 export function objectVal<T>(query: Query, keyField?: string): Observable<T> {
   return fromRef(query, ListenEvent.value).pipe(
-    map(change => changeToData(change, keyField) as T)
+      map((change) => changeToData(change, keyField) as T),
   );
 }
 
@@ -51,6 +51,6 @@ export function changeToData(change: QueryChange, keyField?: string): {} {
 
   return {
     ...val,
-    ...(keyField ? { [keyField]: change.snapshot.key } : null)
+    ...(keyField ? {[keyField]: change.snapshot.key} : null),
   };
 }

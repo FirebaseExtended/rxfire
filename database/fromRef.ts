@@ -16,9 +16,9 @@
  */
 
 import firebase from 'firebase';
-import { Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { ListenEvent, QueryChange } from './interfaces';
+import {Observable} from 'rxjs';
+import {delay} from 'rxjs/operators';
+import {ListenEvent, QueryChange} from './interfaces';
 
 /**
  * Create an observable from a Database Reference or Database Query.
@@ -26,26 +26,26 @@ import { ListenEvent, QueryChange } from './interfaces';
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
 export function fromRef(
-  ref: firebase.database.Query,
-  event: ListenEvent
+    ref: firebase.database.Query,
+    event: ListenEvent,
 ): Observable<QueryChange> {
-  return new Observable<QueryChange>(subscriber => {
+  return new Observable<QueryChange>((subscriber) => {
     const fn = ref.on(
-      event,
-      (snapshot, prevKey) => {
-        subscriber.next({ snapshot, prevKey, event });
-      },
-      subscriber.error.bind(subscriber)
+        event,
+        (snapshot, prevKey) => {
+          subscriber.next({snapshot, prevKey, event});
+        },
+        subscriber.error.bind(subscriber),
     );
     return {
       unsubscribe() {
         ref.off(event, fn);
-      }
+      },
     };
   }).pipe(
-    // Ensures subscribe on observable is async. This handles
-    // a quirk in the SDK where on/once callbacks can happen
-    // synchronously.
-    delay(0)
+      // Ensures subscribe on observable is async. This handles
+      // a quirk in the SDK where on/once callbacks can happen
+      // synchronously.
+      delay(0),
   );
 }

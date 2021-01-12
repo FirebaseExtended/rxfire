@@ -16,9 +16,9 @@
  */
 
 import firebase from 'firebase/app';
-import { fromDocRef } from '../fromRef';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import {fromDocRef} from '../fromRef';
+import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 type DocumentReference = firebase.firestore.DocumentReference;
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
@@ -32,15 +32,15 @@ export function doc(ref: DocumentReference): Observable<DocumentSnapshot> {
  * @param query
  */
 export function docData<T>(
-  ref: DocumentReference,
-  idField?: string
+    ref: DocumentReference,
+    idField?: string,
 ): Observable<T> {
-  return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
+  return doc(ref).pipe(map((snap) => snapToData(snap, idField) as T));
 }
 
 export function snapToData(snapshot: DocumentSnapshot, idField?: string): {} {
   return {
     ...snapshot.data(),
-    ...(idField ? { [idField]: snapshot.id } : null)
+    ...(idField ? {[idField]: snapshot.id} : null),
   };
 }

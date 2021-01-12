@@ -1,12 +1,25 @@
 module.exports = {
-  extends: '../../config/.eslintrc.js',
-  parserOptions: {
-    project: 'tsconfig.json',
-    // to make vscode-eslint work with monorepo
-    // https://github.com/typescript-eslint/typescript-eslint/issues/251#issuecomment-463943250
-    tsconfigRootDir: __dirname
+  'env': {
+    'browser': true,
+    'es2021': true,
+    'node': true,
   },
-  rules: {
-    'import/no-extraneous-dependencies': 'off'
-  }
+  'extends': [
+    'google',
+  ],
+  'parser': '@typescript-eslint/parser',
+  'parserOptions': {
+    'ecmaVersion': 12,
+    'sourceType': 'module',
+  },
+  'plugins': [
+    '@typescript-eslint',
+  ],
+  'rules': {
+    'max-len': 0,
+    'require-jsdoc': 0,
+    'valid-jsdoc': 0,
+    // TODO figure out why argsIngnorePattern isn't working and set back to error
+    'no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
+  },
 };

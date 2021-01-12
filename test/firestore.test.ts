@@ -17,7 +17,7 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import { expect } from 'chai';
+import {expect} from 'chai';
 // app is used as namespaces to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import firebase from 'firebase/app';
@@ -28,9 +28,9 @@ import {
   sortedChanges,
   auditTrail,
   docData,
-  collectionData
+  collectionData,
 } from '../firestore';
-import { map, take, skip } from 'rxjs/operators';
+import {map, take, skip} from 'rxjs/operators';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 export const TEST_PROJECT = require('../../../config/project.json');
@@ -42,14 +42,14 @@ const createId = (): string => Math.random().toString(36).substring(5);
  * makes sure tests don't interfere with each other as they run.
  */
 const createRandomCol = (
-  firestore: firebase.firestore.Firestore
+    firestore: firebase.firestore.Firestore,
 ): firebase.firestore.CollectionReference => firestore.collection(createId());
 
 /**
  * Unwrap a snapshot but add the type property to the data object.
  */
 const unwrapChange = map((changes: firebase.firestore.DocumentChange[]) => {
-  return changes.map(c => ({ type: c.type, ...c.doc.data() }));
+  return changes.map((c) => ({type: c.type, ...c.doc.data()}));
 });
 
 /**
@@ -59,15 +59,15 @@ const unwrapChange = map((changes: firebase.firestore.DocumentChange[]) => {
 const seedTest = (firestore: firebase.firestore.Firestore): any => {
   const colRef = createRandomCol(firestore);
   const davidDoc = colRef.doc('david');
-  davidDoc.set({ name: 'David' });
+  davidDoc.set({name: 'David'});
   const shannonDoc = colRef.doc('shannon');
-  shannonDoc.set({ name: 'Shannon' });
+  shannonDoc.set({name: 'Shannon'});
   const expectedNames = ['David', 'Shannon'];
   const expectedEvents = [
-    { name: 'David', type: 'added' },
-    { name: 'Shannon', type: 'added' }
+    {name: 'David', type: 'added'},
+    {name: 'Shannon', type: 'added'},
   ];
-  return { colRef, davidDoc, shannonDoc, expectedNames, expectedEvents };
+  return {colRef, davidDoc, shannonDoc, expectedNames, expectedEvents};
 };
 
 describe('RxFire Firestore', () => {
@@ -86,7 +86,7 @@ describe('RxFire Firestore', () => {
    * offline.
    */
   beforeEach(() => {
-    app = firebase.initializeApp({ projectId: TEST_PROJECT.projectId });
+    app = firebase.initializeApp({projectId: TEST_PROJECT.projectId});
     firestore = app.firestore();
     firestore.disableNetwork();
   });
@@ -105,14 +105,14 @@ describe('RxFire Firestore', () => {
      * asserts that the two "people" are in the array.
      */
     it('should emit snapshots', (done: MochaDone) => {
-      const { colRef, expectedNames } = seedTest(firestore);
+      const {colRef, expectedNames} = seedTest(firestore);
 
       collection(colRef)
-        .pipe(map(docs => docs.map(doc => doc.data().name)))
-        .subscribe(names => {
-          expect(names).to.eql(expectedNames);
-          done();
-        });
+          .pipe(map((docs) => docs.map((doc) => doc.data().name)))
+          .subscribe((names) => {
+            expect(names).to.eql(expectedNames);
+            done();
+          });
     });
   });
 
@@ -125,18 +125,18 @@ describe('RxFire Firestore', () => {
      * result in an array item of "added" and then "modified".
      */
     it('should emit events as they occur', (done: MochaDone) => {
-      const { colRef, davidDoc } = seedTest(firestore);
+      const {colRef, davidDoc} = seedTest(firestore);
 
-      davidDoc.set({ name: 'David' });
+      davidDoc.set({name: 'David'});
       const firstChange = collectionChanges(colRef).pipe(take(1));
       const secondChange = collectionChanges(colRef).pipe(skip(1));
 
-      firstChange.subscribe(change => {
+      firstChange.subscribe((change) => {
         expect(change[0].type).to.eq('added');
-        davidDoc.update({ name: 'David!' });
+        davidDoc.update({name: 'David!'});
       });
 
-      secondChange.subscribe(change => {
+      secondChange.subscribe((change) => {
         expect(change[0].type).to.eq('modified');
         done();
       });
@@ -152,32 +152,32 @@ describe('RxFire Firestore', () => {
      * order.
      */
     it('should emit an array of sorted snapshots', (done: MochaDone) => {
-      const { colRef, davidDoc } = seedTest(firestore);
+      const {colRef, davidDoc} = seedTest(firestore);
 
       const addedChanges = sortedChanges(colRef, ['added']).pipe(unwrapChange);
 
       const modifiedChanges = sortedChanges(colRef).pipe(
-        unwrapChange,
-        skip(1),
-        take(1)
+          unwrapChange,
+          skip(1),
+          take(1),
       );
 
       let previousData: Array<{}>;
 
-      addedChanges.subscribe(data => {
+      addedChanges.subscribe((data) => {
         const expectedNames = [
-          { name: 'David', type: 'added' },
-          { name: 'Shannon', type: 'added' }
+          {name: 'David', type: 'added'},
+          {name: 'Shannon', type: 'added'},
         ];
         expect(data).to.eql(expectedNames);
         previousData = data;
-        davidDoc.update({ name: 'David!' });
+        davidDoc.update({name: 'David!'});
       });
 
-      modifiedChanges.subscribe(data => {
+      modifiedChanges.subscribe((data) => {
         const expectedNames = [
-          { name: 'David!', type: 'modified' },
-          { name: 'Shannon', type: 'added' }
+          {name: 'David!', type: 'modified'},
+          {name: 'Shannon', type: 'added'},
         ];
         expect(data).to.eql(expectedNames);
         expect(data === previousData).to.eql(false);
@@ -192,21 +192,21 @@ describe('RxFire Firestore', () => {
      * filters to 'modified'.
      */
     it('should filter by event type', (done: MochaDone) => {
-      const { colRef, davidDoc, expectedEvents } = seedTest(firestore);
+      const {colRef, davidDoc, expectedEvents} = seedTest(firestore);
 
       const addedChanges = sortedChanges(colRef, ['added']).pipe(unwrapChange);
       const modifiedChanges = sortedChanges(colRef, ['modified']).pipe(
-        unwrapChange
+          unwrapChange,
       );
 
-      addedChanges.subscribe(data => {
+      addedChanges.subscribe((data) => {
         // kick off the modifiedChanges observable
         expect(data).to.eql(expectedEvents);
-        davidDoc.update({ name: 'David!' });
+        davidDoc.update({name: 'David!'});
       });
 
-      modifiedChanges.subscribe(data => {
-        const expectedModifiedEvent = [{ name: 'David!', type: 'modified' }];
+      modifiedChanges.subscribe((data) => {
+        const expectedModifiedEvent = [{name: 'David!', type: 'modified'}];
         expect(data).to.eql(expectedModifiedEvent);
         done();
       });
@@ -221,20 +221,20 @@ describe('RxFire Firestore', () => {
      * modifies a "person" and makes sure that event is on the array as well.
      */
     it('should keep create a list of all changes', (done: MochaDone) => {
-      const { colRef, expectedEvents, davidDoc } = seedTest(firestore);
+      const {colRef, expectedEvents, davidDoc} = seedTest(firestore);
 
       const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
       const secondAudit = auditTrail(colRef).pipe(unwrapChange, skip(1));
 
-      firstAudit.subscribe(list => {
+      firstAudit.subscribe((list) => {
         expect(list).to.eql(expectedEvents);
-        davidDoc.update({ name: 'David!' });
+        davidDoc.update({name: 'David!'});
       });
 
-      secondAudit.subscribe(list => {
+      secondAudit.subscribe((list) => {
         const modifiedList = [
           ...expectedEvents,
-          { name: 'David!', type: 'modified' }
+          {name: 'David!', type: 'modified'},
         ];
         expect(list).to.eql(modifiedList);
         done();
@@ -248,17 +248,17 @@ describe('RxFire Firestore', () => {
      * event.
      */
     it('should filter the trail of events by event type', (done: MochaDone) => {
-      const { colRef, davidDoc } = seedTest(firestore);
+      const {colRef, davidDoc} = seedTest(firestore);
 
       const modifiedAudit = auditTrail(colRef, ['modified']).pipe(unwrapChange);
 
-      modifiedAudit.subscribe(updateList => {
-        const expectedEvents = [{ type: 'modified', name: 'David!' }];
+      modifiedAudit.subscribe((updateList) => {
+        const expectedEvents = [{type: 'modified', name: 'David!'}];
         expect(updateList).to.eql(expectedEvents);
         done();
       });
 
-      davidDoc.update({ name: 'David!' });
+      davidDoc.update({name: 'David!'});
     });
   });
 
@@ -270,20 +270,20 @@ describe('RxFire Firestore', () => {
      * modifies a "person" and makes sure that event is on the array as well.
      */
     it('should keep create a list of all changes', (done: MochaDone) => {
-      const { colRef, expectedEvents, davidDoc } = seedTest(firestore);
+      const {colRef, expectedEvents, davidDoc} = seedTest(firestore);
 
       const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
       const secondAudit = auditTrail(colRef).pipe(unwrapChange, skip(1));
 
-      firstAudit.subscribe(list => {
+      firstAudit.subscribe((list) => {
         expect(list).to.eql(expectedEvents);
-        davidDoc.update({ name: 'David!' });
+        davidDoc.update({name: 'David!'});
       });
 
-      secondAudit.subscribe(list => {
+      secondAudit.subscribe((list) => {
         const modifiedList = [
           ...expectedEvents,
-          { name: 'David!', type: 'modified' }
+          {name: 'David!', type: 'modified'},
         ];
         expect(list).to.eql(modifiedList);
         done();
@@ -294,17 +294,17 @@ describe('RxFire Firestore', () => {
      * This test seeds two "people" into the collection. The wrap operator then converts
      */
     it('should filter the trail of events by event type', (done: MochaDone) => {
-      const { colRef, davidDoc } = seedTest(firestore);
+      const {colRef, davidDoc} = seedTest(firestore);
 
       const modifiedAudit = auditTrail(colRef, ['modified']).pipe(unwrapChange);
 
-      modifiedAudit.subscribe(updateList => {
-        const expectedEvents = [{ type: 'modified', name: 'David!' }];
+      modifiedAudit.subscribe((updateList) => {
+        const expectedEvents = [{type: 'modified', name: 'David!'}];
         expect(updateList).to.eql(expectedEvents);
         done();
       });
 
-      davidDoc.update({ name: 'David!' });
+      davidDoc.update({name: 'David!'});
     });
   });
 
@@ -313,15 +313,15 @@ describe('RxFire Firestore', () => {
      * The `unwrap(id)` method will map a collection to its data payload and map the doc ID to a the specificed key.
      */
     it('collectionData should map a QueryDocumentSnapshot[] to an array of plain objects', (done: MochaDone) => {
-      const { colRef } = seedTest(firestore);
+      const {colRef} = seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
       const unwrapped = collectionData(colRef, 'userId');
 
-      unwrapped.subscribe(val => {
+      unwrapped.subscribe((val) => {
         const expectedDoc = {
           name: 'David',
-          userId: 'david'
+          userId: 'david',
         };
         expect(val).to.be.instanceof(Array);
         expect(val[0]).to.eql(expectedDoc);
@@ -330,15 +330,15 @@ describe('RxFire Firestore', () => {
     });
 
     it('docData should map a QueryDocumentSnapshot to a plain object', (done: MochaDone) => {
-      const { davidDoc } = seedTest(firestore);
+      const {davidDoc} = seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
       const unwrapped = docData(davidDoc, 'UID');
 
-      unwrapped.subscribe(val => {
+      unwrapped.subscribe((val) => {
         const expectedDoc = {
           name: 'David',
-          UID: 'david'
+          UID: 'david',
         };
         expect(val).to.eql(expectedDoc);
         done();

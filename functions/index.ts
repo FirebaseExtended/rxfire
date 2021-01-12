@@ -18,15 +18,15 @@
 // function is used as a namespace to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import firebase from 'firebase/app';
-import { from, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import {from, Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 export function httpsCallable<T, R>(
-  functions: firebase.functions.Functions,
-  name: string
-): (data: T) => Observable<R> {
+    functions: firebase.functions.Functions,
+    name: string,
+): (_data: T) => Observable<R> {
   const callable = functions.httpsCallable(name);
   return (data: T) => {
-    return from(callable(data)).pipe(map(r => r.data as R));
+    return from(callable(data)).pipe(map((r) => r.data as R));
   };
 }

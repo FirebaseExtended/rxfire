@@ -17,7 +17,8 @@
 
 import firebase from 'firebase';
 
-export enum ListenEvent {
+export const enum ListenEvent {
+  /* eslint-disable no-unused-vars */
   added = 'child_added',
   removed = 'child_removed',
   changed = 'child_changed',

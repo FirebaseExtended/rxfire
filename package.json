@@ -18,7 +18,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/firebase/firebase-js-sdk.git"
+    "url": "https://github.com/firebase/rxfire.git"
   },
   "scripts": {
     "lint": "eslint -c .eslintrc.js '**/*.ts' --ignore-path './.gitignore'",
@@ -36,17 +36,24 @@
     "tslib": "^1.11.1"
   },
   "peerDependencies": {
-    "firebase": ">=8.0.0",
-    "rxjs": "6.x.x"
+    "firebase": "^8.0.0",
+    "rxjs": "^6.0.0"
   },
   "devDependencies": {
-    "firebase": "8.2.2",
-    "rollup": "2.33.2",
-    "@rollup/plugin-commonjs": "15.1.0",
-    "@rollup/plugin-node-resolve": "9.0.0",
-    "rollup-plugin-typescript2": "0.29.0",
-    "rollup-plugin-uglify": "6.0.4",
-    "typescript": "4.0.5"
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
+    "eslint": "^7.17.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase": "^8.2.2",
+    "karma": "^5.2.3",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^2.33.2",
+    "rollup-plugin-typescript2": "^0.29.0",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rxjs": "^6.0.0",
+    "typescript": "^4.0.5"
   },
   "files": [
     "/auth/package.json",
