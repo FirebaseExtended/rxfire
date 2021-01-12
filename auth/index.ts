@@ -17,22 +17,20 @@
 
 // auth is used as a namespace to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import firebase from 'firebase';
-import {Observable, from, of} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
-
-type Auth = firebase.auth.Auth;
-type User = firebase.User;
+import { Auth, User } from '@firebase/auth-types';
+import { onAuthStateChanged, onIdTokenChanged, getIdToken } from '@firebase/auth';
+import { Observable, from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
 /**
  * Create an observable of authentication state. The observer is only
  * triggered on sign-in or sign-out.
  * @param auth firebase.auth.Auth
  */
-export function authState(auth: Auth): Observable<User> {
-  return new Observable((subscriber) => {
-    const unsubscribe = auth.onAuthStateChanged(subscriber);
-    return {unsubscribe};
+export function authState(auth: Auth): Observable<User|null> {
+  return new Observable(subscriber => {
+    const unsubscribe = onAuthStateChanged(auth, subscriber);
+    return { unsubscribe };
   });
 }
 
@@ -41,10 +39,10 @@ export function authState(auth: Auth): Observable<User> {
  * sign-out, and token refresh events
  * @param auth firebase.auth.Auth
  */
-export function user(auth: Auth): Observable<User> {
-  return new Observable((subscriber) => {
-    const unsubscribe = auth.onIdTokenChanged(subscriber);
-    return {unsubscribe};
+export function user(auth: Auth): Observable<User|null> {
+  return new Observable(subscriber => {
+    const unsubscribe = onIdTokenChanged(auth, subscriber);
+    return { unsubscribe };
   });
 }
 
@@ -55,6 +53,6 @@ export function user(auth: Auth): Observable<User> {
  */
 export function idToken(auth: Auth): Observable<string | null> {
   return user(auth).pipe(
-      switchMap((user) => (user ? from(user.getIdToken()) : of(null))),
+    switchMap(user => (user ? from(getIdToken(user)) : of(null)))
   );
 }

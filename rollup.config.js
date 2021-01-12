@@ -37,6 +37,9 @@ const plugins = [resolveModule(), commonjs()];
 
 const external = [
   ...Object.keys({ ...peerDependencies, ...dependencies }),
+  '@firebase/firestore',
+  '@firebase/auth',
+  '@firebase/functions',
   'rxjs/operators'
 ];
 
@@ -45,6 +48,9 @@ const globals = {
   rxjs: 'rxjs',
   tslib: 'tslib',
   ...Object.values(packages).reduce((acc, {name}) => (acc[name] = name.replace(/\//g, '.'), acc), {}),
+  '@firebase/firestore': 'firebase.firestore',
+  '@firebase/auth': 'firebase.auth',
+  '@firebase/functions': 'firebase.functions',
   'rxjs/operators': 'rxjs.operators',
 };
 

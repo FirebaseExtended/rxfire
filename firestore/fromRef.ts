@@ -15,44 +15,20 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase/app';
-import {Observable} from 'rxjs';
-
-type DocumentReference = firebase.firestore.DocumentReference;
-type SnapshotListenOptions = firebase.firestore.SnapshotListenOptions;
-type Query = firebase.firestore.Query;
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
-type QuerySnapshot = firebase.firestore.QuerySnapshot;
+// TODO figure out what is wrong with the types...
+import { onSnapshot, DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot } from '@firebase/firestore';
+import { Observable } from 'rxjs';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function _fromRef(
-    ref: any,
-    options: SnapshotListenOptions | undefined,
+export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;
+export function fromRef<T=DocumentData>(red: Query<T>, options?: SnapshotListenOptions): Observable<QuerySnapshot<T>>;
+export function fromRef(
+  ref: any,
+  options: SnapshotListenOptions | undefined
 ): Observable<any> {
   /* eslint-enable @typescript-eslint/no-explicit-any */
-  return new Observable((subscriber) => {
-    const unsubscribe = ref.onSnapshot(options || {}, subscriber);
-    return {unsubscribe};
+  return new Observable(subscriber => {
+    const unsubscribe = onSnapshot(ref, options || {}, subscriber);
+    return { unsubscribe };
   });
-}
-
-export function fromRef(
-    ref: DocumentReference | Query,
-    options?: SnapshotListenOptions,
-): Observable<{}> {
-  return _fromRef(ref, options);
-}
-
-export function fromDocRef(
-    ref: DocumentReference,
-    options?: SnapshotListenOptions,
-): Observable<DocumentSnapshot> {
-  return fromRef(ref, options) as Observable<DocumentSnapshot>;
-}
-
-export function fromCollectionRef(
-    ref: Query,
-    options?: SnapshotListenOptions,
-): Observable<QuerySnapshot> {
-  return fromRef(ref, options) as Observable<QuerySnapshot>;
 }

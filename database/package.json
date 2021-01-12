@@ -1,7 +1,0 @@
-{
-  "name": "rxfire/database",
-  "browser": "../dist/rxfire-database.js",
-  "main": "../dist/database/index.cjs.js",
-  "module": "../dist/database/index.esm.js",
-  "typings": "../dist/database/index.d.ts"
-}
