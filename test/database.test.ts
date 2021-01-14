@@ -17,24 +17,22 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import {expect} from 'chai';
 // app/database is used as namespaces to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import firebase from 'firebase';
-import {fromRef} from '../database/fromRef';
+import firebase from 'firebase/app';
+import 'firebase/database';
 import {
   list,
   ListenEvent,
   objectVal,
   listVal,
   QueryChange,
+  auditTrail,
+  fromRef,
 } from '../database';
 import {take, skip, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {auditTrail} from '../database/list/audit-trail';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-export const TEST_PROJECT = require('../../../config/project.json');
+import TEST_PROJECT from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
@@ -97,7 +95,7 @@ describe('RxFire Database', () => {
     database.goOffline();
   });
 
-  afterEach((done: MochaDone) => {
+  afterEach((done: jest.DoneCallback) => {
     app.delete().then(() => done());
   });
 
@@ -120,8 +118,8 @@ describe('RxFire Database', () => {
       obs
           .pipe(take(1))
           .subscribe((change) => {
-            expect(change.snapshot.exists()).to.equal(false);
-            expect(change.snapshot.val()).to.equal(null);
+            expect(change.snapshot.exists()).toBe(false);
+            expect(change.snapshot.val()).toBe(null);
           })
           .add(done);
     });
@@ -140,7 +138,7 @@ describe('RxFire Database', () => {
         count = count + 1;
         // hard coding count to one will fail if the unsub
         // doesn't actually unsub
-        expect(count).to.equal(1);
+        expect(count).toBe(1);
         done();
         sub.unsubscribe();
         itemRef.push({name: 'anotha one'});
@@ -161,12 +159,12 @@ describe('RxFire Database', () => {
         const sub = obs.subscribe((change) => {
           count = count + 1;
           const {event, snapshot} = change;
-          expect(event).to.equal(ListenEvent.added);
-          expect(snapshot.val()).to.eql(data[snapshot.key!]);
+          expect(event).toBe(ListenEvent.added);
+          expect(snapshot.val()).toEqual(data[snapshot.key!]);
           if (count === items.length) {
             done();
             sub.unsubscribe();
-            expect(sub.closed).to.equal(true);
+            expect(sub.closed).toBe(true);
           }
         });
       });
@@ -183,9 +181,9 @@ describe('RxFire Database', () => {
         const key = items[0].key;
         const sub = obs.subscribe((change) => {
           const {event, snapshot} = change;
-          expect(event).to.equal(ListenEvent.changed);
-          expect(snapshot.key).to.equal(key);
-          expect(snapshot.val()).to.eql({key, name});
+          expect(event).toBe(ListenEvent.changed);
+          expect(snapshot.key).toBe(key);
+          expect(snapshot.val()).toEqual({key, name});
           sub.unsubscribe();
           done();
         });
@@ -204,9 +202,9 @@ describe('RxFire Database', () => {
         const name = items[0].name;
         const sub = obs.subscribe((change) => {
           const {event, snapshot} = change;
-          expect(event).to.equal(ListenEvent.removed);
-          expect(snapshot.key).to.equal(key);
-          expect(snapshot.val()).to.eql({key, name});
+          expect(event).toBe(ListenEvent.removed);
+          expect(snapshot.key).toBe(key);
+          expect(snapshot.val()).toEqual({key, name});
           sub.unsubscribe();
           done();
         });
@@ -225,9 +223,9 @@ describe('RxFire Database', () => {
         const name = items[2].name;
         const sub = obs.subscribe((change) => {
           const {event, snapshot} = change;
-          expect(event).to.equal(ListenEvent.moved);
-          expect(snapshot.key).to.equal(key);
-          expect(snapshot.val()).to.eql({key, name});
+          expect(event).toBe(ListenEvent.moved);
+          expect(snapshot.key).toBe(key);
+          expect(snapshot.val()).toEqual({key, name});
           sub.unsubscribe();
           done();
         });
@@ -245,11 +243,11 @@ describe('RxFire Database', () => {
         const obs = fromRef(itemRef, ListenEvent.value);
         const sub = obs.subscribe((change) => {
           const {event, snapshot} = change;
-          expect(event).to.equal(ListenEvent.value);
-          expect(snapshot.val()).to.eql(data);
+          expect(event).toBe(ListenEvent.value);
+          expect(snapshot.val()).toEqual(data);
           done();
           sub.unsubscribe();
-          expect(sub.closed).to.equal(true);
+          expect(sub.closed).toBe(true);
         });
       });
 
@@ -268,7 +266,7 @@ describe('RxFire Database', () => {
             child = snap.val();
             return true;
           });
-          expect(child).to.eql(items[0]);
+          expect(child).toEqual(items[0]);
           done();
         });
       });
@@ -296,7 +294,7 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((changes) => {
               const data = changes.map((change) => change.snapshot.val());
-              expect(data).to.eql(items);
+              expect(data).toEqual(items);
             })
             .add(done);
 
@@ -317,7 +315,7 @@ describe('RxFire Database', () => {
             .pipe(skip(1), take(1))
             .subscribe((changes) => {
               const data = changes.map((change) => change.snapshot.val());
-              expect(data[3]).to.eql({name: 'anotha one'});
+              expect(data[3]).toEqual({name: 'anotha one'});
             })
             .add(done);
         aref.set(itemsObj);
@@ -335,9 +333,9 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((changes) => {
               const names = changes.map((change) => change.snapshot.val().name);
-              expect(names[0]).to.eql('one');
-              expect(names[1]).to.eql('two');
-              expect(names[2]).to.eql('zero');
+              expect(names[0]).toBe('one');
+              expect(names[1]).toBe('two');
+              expect(names[2]).toBe('zero');
             })
             .add(done);
         aref.set(itemsObj);
@@ -356,10 +354,10 @@ describe('RxFire Database', () => {
             .pipe(skip(1), take(1))
             .subscribe((changes) => {
               const names = changes.map((change) => change.snapshot.val().name);
-              expect(names[0]).to.eql('anotha one');
-              expect(names[1]).to.eql('one');
-              expect(names[2]).to.eql('two');
-              expect(names[3]).to.eql('zero');
+              expect(names[0]).toBe('anotha one');
+              expect(names[1]).toBe('one');
+              expect(names[2]).toBe('two');
+              expect(names[3]).toBe('zero');
             })
             .add(done);
         aref.set(itemsObj);
@@ -378,8 +376,8 @@ describe('RxFire Database', () => {
             .pipe(skip(1), take(1))
             .subscribe((changes) => {
               const names = changes.map((change) => change.snapshot.val().name);
-              expect(names[0]).to.eql('zero');
-              expect(names[1]).to.eql('zero');
+              expect(names[0]).toBe('zero');
+              expect(names[1]).toBe('zero');
             })
             .add(done);
         aref.set(itemsObj);
@@ -398,7 +396,7 @@ describe('RxFire Database', () => {
             .pipe(skip(1), take(1))
             .subscribe((changes) => {
               const data = changes.map((change) => change.snapshot.val());
-              expect(data.length).to.eql(items.length - 1);
+              expect(data.length).toBe(items.length - 1);
             })
             .add(done);
         app.database().goOnline();
@@ -418,7 +416,7 @@ describe('RxFire Database', () => {
             .pipe(skip(1), take(1))
             .subscribe((changes) => {
               const data = changes.map((change) => change.snapshot.val());
-              expect(data[1].name).to.eql('lol');
+              expect(data[1].name).toBe('lol');
             })
             .add(done);
         app.database().goOnline();
@@ -440,7 +438,7 @@ describe('RxFire Database', () => {
               const data = changes.map((change) => change.snapshot.val());
               // We moved the first item to the last item, so we check that
               // the new result is now the last result
-              expect(data[data.length - 1]).to.eql(items[0]);
+              expect(data[data.length - 1]).toEqual(items[0]);
             })
             .add(done);
         app.database().goOnline();
@@ -461,7 +459,7 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((actions) => {
               const data = actions.map((a) => a.snapshot.val());
-              expect(data).to.eql(items);
+              expect(data).toEqual(items);
             })
             .add(done);
         ref.set(itemsObj);
@@ -477,7 +475,7 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((actions) => {
               const data = actions.map((a) => a.snapshot.val());
-              expect(data).to.eql(items);
+              expect(data).toEqual(items);
             })
             .add(sub);
         ref.set(itemsObj);
@@ -496,7 +494,7 @@ describe('RxFire Database', () => {
                   .pipe(take(1))
                   .subscribe((actions) => {
                     const data = actions.map((a) => a.snapshot.val());
-                    expect(data).to.eql(items);
+                    expect(data).toEqual(items);
                   })
                   .add(done);
             });
@@ -515,7 +513,7 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((actions) => {
               const data = actions.map((a) => a.snapshot.val());
-              expect(data).to.eql(items);
+              expect(data).toEqual(items);
             })
             .add(done);
         ref.set(itemsObj);
@@ -538,7 +536,7 @@ describe('RxFire Database', () => {
               const data = actions.map((a) => a.snapshot.val());
               const copy = [...items];
               copy[0].name = name;
-              expect(data).to.eql(copy);
+              expect(data).toEqual(copy);
             })
             .add(done);
         app.database().goOnline();
@@ -556,7 +554,7 @@ describe('RxFire Database', () => {
         list(aref)
             .pipe(take(1))
             .subscribe((data) => {
-              expect(data.length).to.eql(0);
+              expect(data.length).toBe(0);
             })
             .add(done);
       });
@@ -584,12 +582,12 @@ describe('RxFire Database', () => {
               count = count + 1;
               // the first time should all be 'added'
               if (count === 1) {
-                expect(Object.keys(data).length).to.eql(3);
+                expect(Object.keys(data).length).toBe(3);
                 namefilter$.next(-1);
               }
               // on the second round, we should have filtered out everything
               if (count === 2) {
-                expect(Object.keys(data).length).to.eql(0);
+                expect(Object.keys(data).length).toBe(0);
               }
             })
             .add(done);
@@ -629,7 +627,7 @@ describe('RxFire Database', () => {
       const {changes} = prepareAuditTrail();
       changes.subscribe((actions) => {
         const data = actions.map((a) => a.snapshot.val());
-        expect(data).to.eql(items);
+        expect(data).toEqual(items);
         done();
       });
     });
@@ -646,7 +644,7 @@ describe('RxFire Database', () => {
     /**
      * The `listVal` function should map a query to an array of objects
      */
-    it('listVal should map a query to an array of objects', (done: MochaDone) => {
+    it('listVal should map a query to an array of objects', (done: jest.DoneCallback) => {
       const itemRef = ref(rando());
       const data = {testKey: {hello: 'world'}};
       itemRef.set(data);
@@ -654,9 +652,9 @@ describe('RxFire Database', () => {
       const obs = listVal<any>(itemRef, 'KEY').pipe(take(1));
 
       obs.subscribe((val) => {
-        expect(val).to.be.instanceOf(Array);
-        expect(val[0].KEY).to.equal('testKey');
-        expect(val[0].hello).to.equal('world');
+        expect(val).toBeInstanceOf(Array);
+        expect(val[0].KEY).toBe('testKey');
+        expect(val[0].hello).toBe('world');
         done();
       });
     });
@@ -664,14 +662,14 @@ describe('RxFire Database', () => {
     /**
      * The `objectVal` function should map a query to its object val
      */
-    it('objectVal should map a reference or query to its value', (done: MochaDone) => {
+    it('objectVal should map a reference or query to its value', (done: jest.DoneCallback) => {
       const itemRef = ref(rando());
       itemRef.set(itemsObj);
       const obs = objectVal(itemRef).pipe(take(1));
 
       obs.subscribe((val) => {
-        expect(val).to.be.instanceOf(Object);
-        expect(val).to.deep.equal(itemsObj);
+        expect(val).toBeInstanceOf(Object);
+        expect(val).toEqual(itemsObj);
         done();
       });
     });

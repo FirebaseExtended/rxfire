@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { resolve, dirname, relative } from 'path';
+import { resolve, dirname, relative, join } from 'path';
 import resolveModule from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
@@ -48,16 +48,17 @@ const globals = {
   'rxjs/operators': 'rxjs.operators',
 };
 
-const componentBuilds = Object.keys(packages)
+export default Object.keys(packages)
   .map(component => {
     const baseContents = packages[component];
     const { name, browser, main, module, typings } = baseContents;
     // rewrite the paths for dist folder
     // TODO error if any of these don't match convention
-    baseContents.browser = relative(resolve('dist', component), resolve(component, browser));
-    baseContents.main = relative(resolve('dist', component), resolve(component, main));
-    baseContents.module = relative(resolve('dist', component), resolve(component, module));
-    baseContents.typings = relative(resolve('dist', component), resolve(component, typings));
+    const outputFolder = join('dist', component);
+    baseContents.browser = relative(outputFolder, resolve(component, browser));
+    baseContents.main = relative(outputFolder, resolve(component, main));
+    baseContents.module = relative(outputFolder, resolve(component, module));
+    baseContents.typings = relative(outputFolder, resolve(component, typings));
     if (component === '.') {
       baseContents.scripts = {};
       delete baseContents.files;
@@ -82,7 +83,7 @@ const componentBuilds = Object.keys(packages)
         plugins: [
           ...plugins,
           typescript(),
-          generatePackageJson({ outputFolder: `dist/${component}`, baseContents }),
+          generatePackageJson({ outputFolder, baseContents }),
         ],
         external
       },
@@ -104,7 +105,4 @@ const componentBuilds = Object.keys(packages)
         external
       },
     ];
-  })
-  .reduce((a, b) => a.concat(b), []);
-
-export default [...componentBuilds];
+  }).flat();

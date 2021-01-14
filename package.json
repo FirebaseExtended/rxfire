@@ -33,11 +33,8 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:rollup": "rollup -c",
     "dev": "rollup -c -w",
-    "prepare": "yarn build",
-    "test": "run-p lint test:browser",
-    "test:ci": "node ../../scripts/run_tests_in_ci.js -s test:browser",
-    "test:browser": "karma start --single-run",
-    "test:browser:debug": "karma start --browsers=Chrome --auto-watch"
+    "test": "run-p lint test:ci",
+    "test:ci": "jest"
   },
   "dependencies": {
     "tslib": "^1.11.1"
@@ -47,16 +44,21 @@
     "rxjs": "^6.0.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.10",
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.12.7",
     "@rollup/plugin-commonjs": "^15.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^8.1.0",
+    "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
+    "babel-jest": "^26.6.3",
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
     "firebase": "^8.2.2",
     "glob": "^7.1.6",
-    "karma": "^5.2.3",
+    "jest": "^26.6.3",
     "npm-run-all": "^4.1.5",
     "rollup": "^2.33.2",
     "rollup-plugin-generate-package-json": "^3.2.0",

@@ -25,7 +25,7 @@
       "../node_modules/@types"
     ],
     "outDir": "dist",
-    "noEmit": false
+    "noEmit": false,
   },
   "exclude": [
     "dist/**/*",
