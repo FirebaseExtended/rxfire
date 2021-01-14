@@ -1,8 +1,4 @@
 node_modules
 dist
-
 /*.log
-/rxfire*.js
-/rxfire*.map
-/rxfire*.gz
-/rxfire*.tgz
+/rxfire-*.tgz

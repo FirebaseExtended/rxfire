@@ -1,6 +1,7 @@
 {
   "name": "rxfire/functions",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "typings": "dist/functions/index.d.ts"
+  "browser": "../dist/rxfire-functions.js",
+  "main": "../dist/functions/index.cjs.js",
+  "module": "../dist/functions/index.esm.js",
+  "typings": "../dist/functions/index.d.ts"
 }

@@ -15,95 +15,94 @@
  * limitations under the License.
  */
 
-import { resolve } from 'path';
+import { resolve, dirname, relative } from 'path';
 import resolveModule from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescriptPlugin from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import { uglify } from 'rollup-plugin-uglify';
-import typescript from 'typescript';
-import pkg from './package.json';
+import { peerDependencies, dependencies } from './package.json';
+import { sync as globSync } from 'glob';
+import { readFileSync } from 'fs';
+import generatePackageJson from 'rollup-plugin-generate-package-json';
 
-import authPkg from './auth/package.json';
-import storagePkg from './storage/package.json';
-import functionsPkg from './functions/package.json';
-import firestorePkg from './firestore/package.json';
-import databasePkg from './database/package.json';
-
-const pkgsByName = {
-  auth: authPkg,
-  storage: storagePkg,
-  functions: functionsPkg,
-  firestore: firestorePkg,
-  database: databasePkg
-};
+const packageJsonPaths = globSync('**/package.json', { ignore: ['node_modules/**', 'dist/**'] });
+const packages = packageJsonPaths.reduce((acc, path) => {
+  const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
+  const component = dirname(path);
+  acc[component] = pkg;
+  return acc;
+}, {});
 
 const plugins = [resolveModule(), commonjs()];
 
 const external = [
-  ...Object.keys({ ...pkg.peerDependencies, ...pkg.dependencies }),
+  ...Object.keys({ ...peerDependencies, ...dependencies }),
   'rxjs/operators'
 ];
 
-/**
- * Global UMD Build
- */
-const GLOBAL_NAME = 'rxfire';
+const globals = {
+  //rxfire: GLOBAL_NAME,
+  rxjs: 'rxjs',
+  tslib: 'tslib',
+  ...Object.values(packages).reduce((acc, {name}) => (acc[name] = name.replace(/\//g, '.'), acc), {}),
+  'rxjs/operators': 'rxjs.operators',
+};
 
-const components = ['auth', 'storage', 'functions', 'firestore', 'database'];
-const componentBuilds = components
+const componentBuilds = Object.keys(packages)
   .map(component => {
-    const pkg = pkgsByName[component];
+    const baseContents = packages[component];
+    const { name, browser, main, module, typings } = baseContents;
+    // rewrite the paths for dist folder
+    // TODO error if any of these don't match convention
+    baseContents.browser = relative(resolve('dist', component), resolve(component, browser));
+    baseContents.main = relative(resolve('dist', component), resolve(component, main));
+    baseContents.module = relative(resolve('dist', component), resolve(component, module));
+    baseContents.typings = relative(resolve('dist', component), resolve(component, typings));
+    if (component === '.') {
+      baseContents.scripts = {};
+      delete baseContents.files;
+      baseContents.devDependencies = {};
+      baseContents.private = false;
+    }
     return [
       {
         input: `${component}/index.ts`,
         output: [
           {
-            file: resolve(component, pkg.main),
+            file: resolve(component, main),
             format: 'cjs',
             sourcemap: true
           },
           {
-            file: resolve(component, pkg.module),
+            file: resolve(component, module),
             format: 'es',
             sourcemap: true
           }
         ],
         plugins: [
           ...plugins,
-          typescriptPlugin({
-            typescript
-          })
+          typescript(),
+          generatePackageJson({ outputFolder: `dist/${component}`, baseContents }),
         ],
         external
       },
       {
         input: `${component}/index.ts`,
         output: {
-          file: `rxfire-${component}.js`,
+          file: `dist/${name.replace(/\//g, '-')}.js`,
           format: 'iife',
           sourcemap: true,
           extend: true,
-          name: GLOBAL_NAME,
-          globals: {
-            rxfire: GLOBAL_NAME,
-            rxjs: 'rxjs',
-            'rxjs/operators': 'rxjs.operators'
-          }
+          name: globals[baseContents.name],
+          globals,
         },
         plugins: [
           ...plugins,
-          typescriptPlugin({
-            typescript,
-            tsconfigOverride: {
-              compilerOptions: {
-                declaration: false
-              }
-            }
-          }),
-          uglify()
+          typescript(),
+          uglify(),
         ],
         external
-      }
+      },
     ];
   })
   .reduce((a, b) => a.concat(b), []);

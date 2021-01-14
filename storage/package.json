@@ -1,6 +1,7 @@
 {
   "name": "rxfire/storage",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "typings": "dist/storage/index.d.ts"
+  "browser": "../dist/rxfire-storage.js",
+  "main": "../dist/storage/index.cjs.js",
+  "module": "../dist/storage/index.esm.js",
+  "typings": "../dist/storage/index.d.ts"
 }
