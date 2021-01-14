@@ -28,7 +28,7 @@ import {
   auditTrail,
   docData,
   collectionData,
-} from '../firestore';
+} from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import TEST_PROJECT from './config';
 

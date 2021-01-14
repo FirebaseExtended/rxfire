@@ -22,7 +22,6 @@ import {validateEventsArray} from '../utils';
 import {fromRef} from '../fromRef';
 import {switchMap, scan, distinctUntilChanged, map} from 'rxjs/operators';
 import {changeToData} from '../object';
-export {auditTrail} from './audit-trail';
 
 type Query = firebase.database.Query;
 

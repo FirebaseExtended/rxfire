@@ -29,7 +29,7 @@ import {
   QueryChange,
   auditTrail,
   fromRef,
-} from '../database';
+} from '../dist/database';
 import {take, skip, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import TEST_PROJECT from './config';

@@ -33,8 +33,7 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:rollup": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "run-p lint test:ci",
-    "test:ci": "jest"
+    "test": "jest"
   },
   "dependencies": {
     "tslib": "^1.11.1"

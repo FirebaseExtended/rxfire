@@ -18,4 +18,5 @@
 export * from './fromRef';
 export * from './interfaces';
 export * from './list';
+export * from './list/audit-trail';
 export * from './object';
