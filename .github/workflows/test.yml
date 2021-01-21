@@ -103,24 +103,24 @@ jobs:
         run: |
           mv rxfire-${{ github.run_id }} dist
           yarn test
-#
-#  publish:
-#    runs-on: ubuntu-latest
-#    name: Publish (NPM)
-#    needs: ['test', 'headless']
-#    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
-#    steps:
-#      - name: Setup node
-#        uses: actions/setup-node@v2-beta
-#        with:
-#          node-version: '14'
-#          registry-url: 'https://registry.npmjs.org'
-#      - name: 'Download Artifacts'
-#        uses: actions/download-artifact@v2
-#      - name: Publish
-#        run: |
-#          cd ./rxfire-${{ github.run_id }}
-#          chmod +x publish.sh
-#          ./publish.sh
-#        env:
-#          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish (NPM)
+    needs: ['test']
+    if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'release' }}
+    steps:
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: '14'
+          registry-url: 'https://wombat-dressing-room.appspot.com'
+      - name: 'Download Artifacts'
+        uses: actions/download-artifact@v2
+      - name: Publish
+        run: |
+          cd ./rxfire-${{ github.run_id }}
+          chmod +x publish.sh
+          ./publish.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
