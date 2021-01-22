@@ -19,8 +19,6 @@
 
 // app is used as namespaces to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 import {
   collection,
   collectionChanges,
@@ -31,6 +29,9 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import TEST_PROJECT from './config';
+import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, disableNetwork, doc, setDoc, DocumentChange, collection as vanillaCollection } from '@firebase/firestore';
+import { FirebaseApp } from '@firebase/app-types';
+import { initializeApp, deleteApp } from '@firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
 
@@ -39,13 +40,13 @@ const createId = (): string => Math.random().toString(36).substring(5);
  * makes sure tests don't interfere with each other as they run.
  */
 const createRandomCol = (
-    firestore: firebase.firestore.Firestore,
-): firebase.firestore.CollectionReference => firestore.collection(createId());
+    firestore: FirebaseFirestore,
+): CollectionReference => vanillaCollection(firestore, createId());
 
 /**
  * Unwrap a snapshot but add the type property to the data object.
  */
-const unwrapChange = map((changes: firebase.firestore.DocumentChange[]) => {
+const unwrapChange = map((changes: DocumentChange[]) => {
   return changes.map((c) => ({type: c.type, ...c.doc.data()}));
 });
 
@@ -53,12 +54,12 @@ const unwrapChange = map((changes: firebase.firestore.DocumentChange[]) => {
  * Create an environment for the tests to run in. The information is returned
  * from the function for use within the test.
  */
-const seedTest = (firestore: firebase.firestore.Firestore): any => {
+const seedTest = (firestore: FirebaseFirestore) => {
   const colRef = createRandomCol(firestore);
-  const davidDoc = colRef.doc('david');
-  davidDoc.set({name: 'David'});
-  const shannonDoc = colRef.doc('shannon');
-  shannonDoc.set({name: 'Shannon'});
+  const davidDoc = doc(colRef, 'david');
+  setDoc(davidDoc, {name: 'David'});
+  const shannonDoc = doc(colRef, 'shannon');
+  setDoc(shannonDoc, {name: 'Shannon'});
   const expectedNames = ['David', 'Shannon'];
   const expectedEvents = [
     {name: 'David', type: 'added'},
@@ -68,8 +69,8 @@ const seedTest = (firestore: firebase.firestore.Firestore): any => {
 };
 
 describe('RxFire Firestore', () => {
-  let app: firebase.app.App;
-  let firestore: firebase.firestore.Firestore;
+  let app: FirebaseApp;
+  let firestore: FirebaseFirestore;
 
   /**
    * Each test runs inside it's own app instance and the app
@@ -83,13 +84,13 @@ describe('RxFire Firestore', () => {
    * offline.
    */
   beforeEach(() => {
-    app = firebase.initializeApp({projectId: TEST_PROJECT.projectId});
-    firestore = app.firestore();
-    firestore.disableNetwork();
+    app = initializeApp({projectId: TEST_PROJECT.projectId});
+    firestore = getFirestore(app);
+    disableNetwork(firestore);
   });
 
   afterEach((done: jest.DoneCallback) => {
-    app.delete().then(() => done());
+    deleteApp(app).then(() => done());
   });
 
   describe('collection', () => {
@@ -124,13 +125,13 @@ describe('RxFire Firestore', () => {
     it('should emit events as they occur', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      davidDoc.set({name: 'David'});
+      setDoc(davidDoc, {name: 'David'});
       const firstChange = collectionChanges(colRef).pipe(take(1));
       const secondChange = collectionChanges(colRef).pipe(skip(1));
 
       firstChange.subscribe((change) => {
         expect(change[0].type).toBe('added');
-        davidDoc.update({name: 'David!'});
+        updateDoc(davidDoc, {name: 'David!'});
       });
 
       secondChange.subscribe((change) => {
@@ -168,7 +169,7 @@ describe('RxFire Firestore', () => {
         ];
         expect(data).toEqual(expectedNames);
         previousData = data;
-        davidDoc.update({name: 'David!'});
+        updateDoc(davidDoc, {name: 'David!'});
       });
 
       modifiedChanges.subscribe((data) => {
@@ -199,7 +200,7 @@ describe('RxFire Firestore', () => {
       addedChanges.subscribe((data) => {
         // kick off the modifiedChanges observable
         expect(data).toEqual(expectedEvents);
-        davidDoc.update({name: 'David!'});
+        updateDoc(davidDoc, {name: 'David!'});
       });
 
       modifiedChanges.subscribe((data) => {
@@ -225,7 +226,7 @@ describe('RxFire Firestore', () => {
 
       firstAudit.subscribe((list) => {
         expect(list).toEqual(expectedEvents);
-        davidDoc.update({name: 'David!'});
+        updateDoc(davidDoc, {name: 'David!'});
       });
 
       secondAudit.subscribe((list) => {
@@ -255,7 +256,7 @@ describe('RxFire Firestore', () => {
         done();
       });
 
-      davidDoc.update({name: 'David!'});
+      updateDoc(davidDoc, {name: 'David!'});
     });
   });
 
@@ -274,7 +275,7 @@ describe('RxFire Firestore', () => {
 
       firstAudit.subscribe((list) => {
         expect(list).toEqual(expectedEvents);
-        davidDoc.update({name: 'David!'});
+        updateDoc(davidDoc, {name: 'David!'});
       });
 
       secondAudit.subscribe((list) => {
@@ -301,7 +302,7 @@ describe('RxFire Firestore', () => {
         done();
       });
 
-      davidDoc.update({name: 'David!'});
+      updateDoc(davidDoc, {name: 'David!'});
     });
   });
 
