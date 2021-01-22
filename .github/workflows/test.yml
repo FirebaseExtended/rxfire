@@ -26,9 +26,9 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-8-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-exp-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-8-node_modules-
+            ${{ runner.os }}-14-exp-node_modules-
             ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -59,9 +59,8 @@ jobs:
     strategy:
       matrix:
         node: ["10", "12", "14"]
-        firebase: ["7", "8"]
       fail-fast: false
-    name: Test Firebase v${{ matrix.firebase }} on Node.js ${{ matrix.node }}
+    name: Test Firebase 0.900 on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -75,9 +74,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-exp-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-exp-node_modules-
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -91,7 +90,6 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-          yarn add firebase@^${{ matrix.firebase }}.0 --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
