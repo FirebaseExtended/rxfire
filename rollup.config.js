@@ -30,7 +30,6 @@ const packages = packageJsonPaths.reduce((acc, path) => {
   const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
   const component = dirname(path);
   acc[component] = pkg;
-  console.log(component);
   return acc;
 }, {});
 
@@ -41,6 +40,7 @@ const external = [
   'firebase/firestore',
   'firebase/auth',
   'firebase/functions',
+  'firebase/storage',
   'rxjs/operators'
 ];
 
@@ -52,6 +52,7 @@ const globals = {
   'firebase/firestore': 'firebase.firestore',
   'firebase/auth': 'firebase.auth',
   'firebase/functions': 'firebase.functions',
+  'firebase/storage': 'firebase.storage',
   'rxjs/operators': 'rxjs.operators',
 };
 
