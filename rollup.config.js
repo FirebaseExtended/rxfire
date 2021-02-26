@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ const packages = packageJsonPaths.reduce((acc, path) => {
   const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
   const component = dirname(path);
   acc[component] = pkg;
+  console.log(component);
   return acc;
 }, {});
 
@@ -37,9 +38,9 @@ const plugins = [resolveModule(), commonjs()];
 
 const external = [
   ...Object.keys({ ...peerDependencies, ...dependencies }),
-  '@firebase/firestore',
-  '@firebase/auth',
-  '@firebase/functions',
+  'firebase/firestore',
+  'firebase/auth',
+  'firebase/functions',
   'rxjs/operators'
 ];
 
@@ -48,9 +49,9 @@ const globals = {
   rxjs: 'rxjs',
   tslib: 'tslib',
   ...Object.values(packages).reduce((acc, {name}) => (acc[name] = name.replace(/\//g, '.'), acc), {}),
-  '@firebase/firestore': 'firebase.firestore',
-  '@firebase/auth': 'firebase.auth',
-  '@firebase/functions': 'firebase.functions',
+  'firebase/firestore': 'firebase.firestore',
+  'firebase/auth': 'firebase.auth',
+  'firebase/functions': 'firebase.functions',
   'rxjs/operators': 'rxjs.operators',
 };
 

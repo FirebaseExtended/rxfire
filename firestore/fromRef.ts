@@ -16,8 +16,9 @@
  */
 
 // TODO figure out what is wrong with the types...
-import { onSnapshot, DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot } from '@firebase/firestore';
+import { onSnapshot } from 'firebase/firestore';
 import { Observable } from 'rxjs';
+import { DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot } from './interfaces';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;

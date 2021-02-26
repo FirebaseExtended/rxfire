@@ -29,9 +29,8 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import TEST_PROJECT from './config';
-import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, disableNetwork, doc, setDoc, DocumentChange, collection as vanillaCollection } from '@firebase/firestore';
-import { FirebaseApp } from '@firebase/app-types';
-import { initializeApp, deleteApp } from '@firebase/app';
+import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, disableNetwork, doc, setDoc, DocumentChange, collection as vanillaCollection } from 'firebase/firestore';
+import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
 

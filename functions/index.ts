@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 
 // function is used as a namespace to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Functions, HttpsCallableOptions } from '@firebase/functions-types';
-import { httpsCallable as vanillaHttpsCallable } from '@firebase/functions';
+import { httpsCallable as vanillaHttpsCallable } from 'firebase/functions';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+type Functions = import('firebase/functions').Functions;
+type HttpsCallableOptions = import('firebase/functions').HttpsCallableOptions;
 
 export function httpsCallable<T, R>(
   functions: Functions,

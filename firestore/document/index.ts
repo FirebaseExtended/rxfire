@@ -16,7 +16,7 @@
  */
 
 // TODO fix the import
-import { DocumentReference, DocumentSnapshot } from '@firebase/firestore';
+import { DocumentReference, DocumentSnapshot } from '../interfaces';
 import { fromRef } from '../fromRef';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
