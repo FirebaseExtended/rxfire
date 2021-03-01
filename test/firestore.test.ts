@@ -1,6 +1,10 @@
 /**
+ * @jest-environment node
+ */
+
+/**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +33,7 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import TEST_PROJECT from './config';
-import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, disableNetwork, doc, setDoc, DocumentChange, collection as vanillaCollection } from 'firebase/firestore';
+import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, useFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -40,7 +44,7 @@ const createId = (): string => Math.random().toString(36).substring(5);
  */
 const createRandomCol = (
     firestore: FirebaseFirestore,
-): CollectionReference => vanillaCollection(firestore, createId());
+): CollectionReference => baseCollection(firestore, createId());
 
 /**
  * Unwrap a snapshot but add the type property to the data object.
@@ -85,7 +89,7 @@ describe('RxFire Firestore', () => {
   beforeEach(() => {
     app = initializeApp({projectId: TEST_PROJECT.projectId});
     firestore = getFirestore(app);
-    disableNetwork(firestore);
+    useFirestoreEmulator(firestore, 'localhost', 8080);
   });
 
   afterEach((done: jest.DoneCallback) => {
