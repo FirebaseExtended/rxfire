@@ -33,7 +33,9 @@
     "build:types": "tsc --emitDeclarationOnly",
     "build:rollup": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "firebase emulators:exec jest --only firestore"
+    "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
+    "test": "firebase emulators:exec jest --only firestore,database",
+    "test:debug": "yarn echo:chrome && firebase emulators:exec ./test-debug.sh --only firestore,database"
   },
   "peerDependencies": {
     "firebase": "^0.900.15",
