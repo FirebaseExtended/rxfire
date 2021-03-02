@@ -79,17 +79,6 @@ describe('RxFire Database', () => {
   /**
    * Each test runs inside it's own app instance and the app
    * is deleted after the test runs.
-   *
-   * Database tests run "offline" to reduce "flakeyness".
-   *
-   * Each test is responsible for seeding and removing data. Helper
-   * functions are useful if the process becomes brittle or tedious.
-   * Note that removing is less necessary since the tests are run
-   * offline.
-   *
-   * Note: Database tests do not run exactly the same offline as
-   * they do online. Querying can act differently, tests must
-   * account for this.
    */
   beforeEach(() => {
     app = initializeApp({

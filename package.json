@@ -34,8 +34,8 @@
     "build:rollup": "rollup -c",
     "dev": "rollup -c -w",
     "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
-    "test": "firebase emulators:exec jest --only firestore,database",
-    "test:debug": "yarn echo:chrome && firebase emulators:exec ./test-debug.sh --only firestore,database"
+    "test": "firebase emulators:exec jest --only firestore,database,auth",
+    "test:debug": "yarn echo:chrome && firebase emulators:exec ./test-debug.sh --only firestore,database,auth"
   },
   "peerDependencies": {
     "firebase": "^0.900.15",
