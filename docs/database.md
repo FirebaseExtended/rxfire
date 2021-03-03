@@ -8,20 +8,20 @@ The `object()` function creates an observable that emits object changes.
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `object()`                               |
-| **params**      | `database.Reference`                     |
+| **params**      | `import('firebase/database').Reference`  |
 | **import path** | `rxfire/database`                        |
 | **return**      | `Observable<QueryChange>`                |
 
 #### TypeScript Example
 ```ts
 import { object } from 'rxfire/database';
-import { database, initializeApp } from 'firebase';
-import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.database();
+const db = getDatabase(app);
 const ref = db.ref('users/david');
 
 // Seed the database
@@ -48,20 +48,20 @@ The `list()` function creates an observable that emits a sorted array for each c
 |                 |                                                       |
 |-----------------|-------------------------------------------------------|
 | **function**    | `list()`                                              |
-| **params**      | ref: `database.Reference` or `database.Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
 | **import path** | `rxfire/database`                                     |
 | **return**      | `Observable<QueryChange[]>`                           |
 
 #### TypeScript Example
 ```ts
 import { list, ListenEvent } from 'rxfire/database';
-import { database } from 'firebase';
-import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.database();
+const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database
@@ -100,20 +100,20 @@ The `stateChanges()` function creates an observable that emits each time a chang
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `stateChanges()`                                     |
-| **params**      | ref: `database.Reference` or `database.Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
 | **import path** | `rxfire/database`                                    |
 | **return**      | `Observable<QueryChange>`                          |
 
 #### TypeScript Example
 ```ts
 import { stateChanges, ListenEvent } from 'rxfire/database';
-import { database } from 'firebase';
-import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.database();
+const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database
@@ -152,20 +152,20 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `auditTrail()`                                       |
-| **params**      | ref: `database.Reference` or `database.Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
 | **import path** | `rxfire/database`                                    |
 | **return**      | `Observable<QueryChange[]>`                          |
 
 #### TypeScript Example
 ```ts
 import { auditTrail, ListenEvent } from 'rxfire/database';
-import { database } from 'firebase';
-import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.database();
+const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database
@@ -208,21 +208,21 @@ The `fromRef()` function creates an observable that emits reference changes.
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `fromRef()`                              |
-| **params**      | ref: `database.Reference` or `database.Query`, event: `ListenEvent` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, event: `ListenEvent` |
 | **import path** | `rxfire/database`                        |
 | **return**      | `Observable<QueryChange>`                |
 
 #### TypeScript Example
 ```ts
 import { fromRef, ListenEvent } from 'rxfire/database';
-import { database, initializeApp } from 'firebase';
-import 'firebase/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
 import { merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.database();
+const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database

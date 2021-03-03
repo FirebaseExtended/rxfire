@@ -17,10 +17,12 @@
 
 // auth is used as a namespace to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Auth, User } from '@firebase/auth-types';
-import { onAuthStateChanged, onIdTokenChanged, getIdToken } from '@firebase/auth';
+import { Auth } from 'firebase/auth';
+import { onAuthStateChanged, onIdTokenChanged, getIdToken } from 'firebase/auth';
 import { Observable, from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+
+type User = import('firebase/auth').User;
 
 /**
  * Create an observable of authentication state. The observer is only
