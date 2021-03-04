@@ -16,7 +16,7 @@
       "es2017.object",
       "es2017.string"
     ],
-    "module": "ES2015",
+    "module": "ES2020",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
