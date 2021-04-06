@@ -1,0 +1,7 @@
+{
+  "name": "rxfire/performance",
+  "browser": "../dist/rxfire-performance.js",
+  "main": "../dist/performance/index.cjs.js",
+  "module": "../dist/performance/index.esm.js",
+  "typings": "../dist/performance/index.d.ts"
+}

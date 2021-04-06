@@ -8,23 +8,24 @@ The `fromTask()` function creates an observable that emits progress changes.
 |                 |                                            |
 |-----------------|--------------------------------------------|
 | **function**    | `fromTask()`                               |
-| **params**      | `storage.UploadTask`                       |
+| **params**      | `import('firebase/storage').UploadTask`                       |
 | **import path** | `rxfire/storage`                           |
 | **return**      | `Observable<firestore.UploadTaskSnapshot>` |
 
 #### TypeScript Example
 ```ts
 import { fromTask } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadString } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
-const davidRef = storage.ref('users/david.png');
+const storage = getStorage(app);
+const davidRef = ref(storage, 'users/david.png');
 
 // Upload a transparent 1x1 pixel image
-const task = davidRef.putString('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+const BASE_64_PIXEL = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const task = uploadString(davidRef, BASE_64_PIXEL, 'base64');
 
 fromTask(task)
   .subscribe(snap => { console.log(snap.bytesTransferred); });
@@ -36,23 +37,24 @@ The `percentage()` function creates an observable that emits percentage of the u
 |                 |                                            |
 |-----------------|--------------------------------------------|
 | **function**    | `percentage()`                             |
-| **params**      | `storage.UploadTask`                       |
+| **params**      | `import('firebase/storage').UploadTask`                       |
 | **import path** | `rxfire/storage`                           |
 | **return**      | `Observable<number>`                       |
 
 #### TypeScript Example
 ```ts
 import { percentage } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadString } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
-const davidRef = storage.ref('users/david.png');
+const storage = getStorage(app);
+const davidRef = ref(storage, 'users/david.png');
 
 // Upload a transparent 1x1 pixel image
-const task = davidRef.putString('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64');
+const BASE_64_PIXEL = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+const task = uploadString(davidRef, BASE_64_PIXEL, 'base64');
 
 percentage(task)
   .subscribe(action => { console.log(action.progress, action.snapshot); });
@@ -66,22 +68,22 @@ The `getDownloadURL()` function creates an observable that emits the URL of the 
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `getDownloadURL()`                       |
-| **params**      | `storage.Reference`                      |
+| **params**      | `import('firebase/storage').StorageReference`                      |
 | **import path** | `rxfire/storage`                         |
 | **return**      | `Observable<string>`                     |
 
 #### TypeScript Example
 ```ts
 import { getDownloadURL } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
+const storage = getStorage(app);
 
 // Assume this exists
-const davidRef = storage.ref('users/david.png');
+const davidRef = ref(storage, 'users/david.png');
 
 getDownloadURL(davidRef)
   .subscribe(url => { console.log(url) });
@@ -93,80 +95,80 @@ The `getMetadata()` function creates an observable that emits the URL of the fil
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `getMetadata()`                          |
-| **params**      | `storage.Reference`                      |
+| **params**      | `import('firebase/storage').StorageReference`                      |
 | **import path** | `rxfire/storage`                         |
 | **return**      | `Observable<Object>`                     |
 
 #### TypeScript Example
 ```ts
 import { getMetadata } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
+const storage = getStorage(app);
 
 // Assume this exists
-const davidRef = storage.ref('users/david.png');
+const davidRef = ref(storage, 'users/david.png');
 
 getMetadata(davidRef)
   .subscribe(meta => { console.log(meta) });
 ```
 
-### `put()`
-The `put()` function creates an observable that emits the upload progress of a file.
+### `uploadBytesResumable()`
+The `uploadBytesResumable()` function creates an observable that emits the upload progress of a file. **Breaking change**: Renamed from `put()` in previous API. 
 
 |                 |                                          |
 |-----------------|------------------------------------------|
-| **function**    | `put()`                                  |
-| **params**      | ref: `storage.Reference`, data: `any`, metadata?: `storage.UploadMetadata`                |
+| **function**    | `uploadBytesResumable()`                                  |
+| **params**      | ref: `import('firebase/storage').StorageReference`, data: `any`, metadata?: `import('firebase/storage').UploadMetadata`                |
 | **import path** | `rxfire/storage`                         |
-| **return**      | `Observable<storage.UploadTaskSnapshot>` |
+| **return**      | `Observable<import('firebase/storage').UploadTaskSnapshot>` |
 
 #### TypeScript Example
 ```ts
-import { put } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { uploadBytesResumable } from 'rxfire/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
-const dataRef = storage.ref('users/david.json');
+const storage = getStorage(app);
+const dataRef = ref(storage, 'users/david.json');
 
 const blob = new Blob(
   [JSON.stringify({ name: 'david'}, null, 2)], 
   { type : 'application/json' }
 );
 
-put(davidRef, blob, { type : 'application/json' })
+uploadBytesResumable(davidRef, blob, { type : 'application/json' })
   .subscribe(snap => { console.log(snap.bytesTransferred) });
 ```
 
-### `putString()`
-The `putString()` function creates an observable that emits the upload progress of a file.
+### `uploadString()`
+The `uploadString()` function creates an observable that emits the upload progress of a file. **Breaking change**: Renamed from `putString()` in previous API. 
 
 |                 |                                          |
 |-----------------|------------------------------------------|
-| **function**    | `putString()`                                  |
-| **params**      | ref: `storage.Reference`, data: `string`, metadata?: `storage.UploadMetadata`                |
+| **function**    | `uploadString()`                                  |
+| **params**      | ref: `import('firebase/storage').StorageReference`, data: `string`, metadata?: `import('firebase/storage').UploadMetadata`                |
 | **import path** | `rxfire/storage`                         |
-| **return**      | `Observable<storage.UploadTaskSnapshot>` |
+| **return**      | `Observable<import('firebase/storage').UploadTaskSnapshot>` |
 
 #### TypeScript Example
 ```ts
-import { putString } from 'rxfire/storage';
-import firebase from 'firebase';
-import 'firebase/storage';
+import { uploadString } from 'rxfire/storage';
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref } from 'firebase/storage';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const storage = app.storage();
-const davidRef = storage.ref('users/david.png');
+const storage = getStorage(app);
+const davidRef = ref('users/david.png');
 
 const base64 = 'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-putString(davidRef, base64, { type : 'application/json' })
+uploadString(davidRef, base64, { type : 'application/json' })
   .subscribe(snap => { console.log(snap.bytesTransferred) });
 ```

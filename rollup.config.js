@@ -43,7 +43,8 @@ const external = [
   'firebase/storage',
   'firebase/database',
   'firebase/remote-config',
-  'rxjs/operators',
+  'firebase/performance',
+  'rxjs/operators'
 ];
 
 const globals = {
@@ -57,6 +58,7 @@ const globals = {
   'firebase/storage': 'firebase.storage',
   'firebase/database': 'firebase.database',
   'firebase/remote-config': 'firebase.remote-config',
+  'firebase/performance': 'firebase.performance',
   'rxjs/operators': 'rxjs.operators',
 };
 
