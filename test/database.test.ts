@@ -674,14 +674,27 @@ describe('RxFire Database', () => {
       });
     });
 
-    it('objectVal should behave the same as snap.val() when an object doesn\'t exist', (done: MochaDone) => {
+    it('objectVal should behave the same as snap.val() when an object doesn\'t exist', (done) => {
       const nonExistentRef = ref('nonexistent');
       nonExistentRef.set(null);
       const obs = objectVal(nonExistentRef);
 
       nonExistentRef.on('value', (snap) => {
         obs.subscribe((val) => {
-          expect(val).to.deep.equal(snap.val());
+          expect(val).toEqual(snap.val());
+          done();
+        });
+      });
+    });
+
+    it('listVal should behave the same as snap.val() when a list doesn\'t exist', (done) => {
+      const nonExistentRef = ref('nonexistent');
+      nonExistentRef.set(null);
+      const obs = listVal(nonExistentRef);
+
+      nonExistentRef.on('value', (snap) => {
+        obs.subscribe((val) => {
+          expect(val).toEqual(snap.val());
           done();
         });
       });
