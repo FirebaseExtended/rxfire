@@ -38,7 +38,15 @@ export function docData<T>(
   return doc(ref).pipe(map((snap) => snapToData(snap, idField) as T));
 }
 
-export function snapToData(snapshot: DocumentSnapshot, idField?: string): {} {
+export function snapToData(
+    snapshot: DocumentSnapshot,
+    idField?: string,
+): {} | undefined {
+  // match the behavior of the JS SDK when the snapshot doesn't exist
+  if (!snapshot.exists) {
+    return snapshot.data();
+  }
+
   return {
     ...snapshot.data(),
     ...(idField ? {[idField]: snapshot.id} : null),

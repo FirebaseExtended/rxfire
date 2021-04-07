@@ -341,5 +341,20 @@ describe('RxFire Firestore', () => {
         done();
       });
     });
+
+    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done: MochaDone) => {
+      const {colRef} = seedTest(firestore);
+
+      const nonExistentDoc: firestore.DocumentReference = colRef.doc('jeff');
+
+      const unwrapped = docData(nonExistentDoc);
+
+      nonExistentDoc.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).to.eql(snap.data());
+          done();
+        });
+      });
+    });
   });
 });
