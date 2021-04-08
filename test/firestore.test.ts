@@ -351,7 +351,7 @@ describe('RxFire Firestore', () => {
 
       nonExistentDoc.onSnapshot((snap) => {
         unwrapped.subscribe((val) => {
-          expect(val).to.eql(snap.data());
+          expect(val).toEqual(snap.data());
           done();
         });
       });
