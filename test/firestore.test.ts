@@ -342,7 +342,7 @@ describe('RxFire Firestore', () => {
       });
     });
 
-    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done: MochaDone) => {
+    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
       const {colRef} = seedTest(firestore);
 
       const nonExistentDoc: firestore.DocumentReference = colRef.doc('jeff');
@@ -352,6 +352,19 @@ describe('RxFire Firestore', () => {
       nonExistentDoc.onSnapshot((snap) => {
         unwrapped.subscribe((val) => {
           expect(val).toEqual(snap.data());
+          done();
+        });
+      });
+    });
+
+    it('collectionData matches the result of querySnapShot.data() when the document doesn\'t exist', (done) => {
+      const nonExistentCollection = firestore.collection('I-DO-NOT-EXIST');
+
+      const unwrapped = collectionData(nonExistentCollection);
+
+      nonExistentCollection.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).toEqual(snap.docs);
           done();
         });
       });
