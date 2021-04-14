@@ -65,9 +65,19 @@ export function list(
  * @param query object ref or query
  * @param keyField map the object key to a specific field
  */
-export function listVal<T>(query: Query, keyField?: string): Observable<T[]> {
+export function listVal<T>(
+    query: Query,
+    keyField?: string,
+): Observable<T[] | null> {
   return list(query).pipe(
-      map((arr) => arr.map((change) => changeToData(change, keyField) as T)),
+      map((arr) => {
+        // in case the list doesn't exist, match the RTDB SDK's default behavior
+        if (arr.length === 0) {
+          return null;
+        }
+
+        return arr.map((change) => changeToData(change, keyField) as T);
+      }),
   );
 }
 
