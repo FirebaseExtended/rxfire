@@ -45,7 +45,7 @@ export function changeToData(change: QueryChange, keyField?: string): {} {
   const val = change.snapshot.val();
 
   // match the behavior of the JS SDK when the snapshot doesn't exist
-  if (change.snapshot.exists() === false) {
+  if (!change.snapshot.exists()) {
     return val;
   }
 
