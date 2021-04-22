@@ -346,7 +346,7 @@ describe('RxFire Firestore', () => {
       const {colRef} = seedTest(firestore);
 
       const nonExistentDoc: firestore.DocumentReference = colRef.doc(
-          'I-AM-A-DOC-THAT-DOES-NOT-EXIST',
+          createId(),
       );
 
       const unwrapped = docData(nonExistentDoc);
@@ -360,9 +360,7 @@ describe('RxFire Firestore', () => {
     });
 
     it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
-      const nonExistentCollection = firestore.collection(
-          'I-AM-A-COLLECTION-THAT-DOES-NOT-EXIST',
-      );
+      const nonExistentCollection = firestore.collection(createId());
 
       const unwrapped = collectionData(nonExistentCollection);
 
