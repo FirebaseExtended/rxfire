@@ -10,6 +10,16 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.ems.js",
+    "./auth": "./dist/auth/index.esm.js",
+    "./database": "./dist/database/index.esm.js",
+    "./firestore": "./dist/firestore/index.esm.js",
+    "./functions": "./dist/functions/index.esm.js",
+    "./performance": "./dist/performance/index.esm.js",
+    "./remote-config": "./dist/remote-config/index.esm.js",
+    "./storage": "./dist/storage/index.esm.js"
+  },
   "sideEffects": false,
   "keywords": [
     "authentication",
@@ -54,7 +64,7 @@
     "babel-jest": "^26.6.3",
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
-    "firebase": "^0.900.15",
+    "firebase": "9.0.0-beta.1",
     "firebase-tools": "^9.5.0",
     "glob": "^7.1.6",
     "jest": "^26.6.3",

@@ -21,6 +21,7 @@ import { validateEventsArray } from '../utils';
 import { fromRef } from '../fromRef';
 import { switchMap, scan, distinctUntilChanged, map } from 'rxjs/operators';
 import { changeToData } from '../object';
+import { get as databaseGet } from 'firebase/database';
 
 export function stateChanges(
   query: Query,
@@ -31,8 +32,8 @@ export function stateChanges(
   return merge(...childEvent$);
 }
 
-function fromOnce(query: Query): Observable<QueryChange> {
-  return from(query.once(ListenEvent.value)).pipe(
+function get(query: Query): Observable<QueryChange> {
+  return from(databaseGet(query)).pipe(
     map(snapshot => {
       const event = ListenEvent.value;
       return { snapshot, prevKey: null, event };
@@ -45,7 +46,7 @@ export function list(
   events?: ListenEvent[]
 ): Observable<QueryChange[]> {
   const eventsList = validateEventsArray(events);
-  return fromOnce(query).pipe(
+  return get(query).pipe(
     switchMap(change => {
       const childEvent$ = [of(change)];
       for (const event of eventsList) {

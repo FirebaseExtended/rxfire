@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 
 type RemoteConfig = import('firebase/remote-config').RemoteConfig;
-type RemoteConfigValue = import('firebase/remote-config').ValueType;
+type RemoteConfigValue = import('firebase/remote-config').Value;
 
 import { 
   ensureInitialized, 

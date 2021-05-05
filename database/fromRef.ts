@@ -17,7 +17,8 @@
 
 import { Observable } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { ListenEvent, QueryChange } from './interfaces';
+import { ListenEvent, QueryChange, ListenerMethods } from './interfaces';
+import { off } from 'firebase/database';
 
 /**
  * Create an observable from a Database Reference or Database Query.
@@ -29,8 +30,8 @@ export function fromRef(
   event: ListenEvent
 ): Observable<QueryChange> {
   return new Observable<QueryChange>(subscriber => {
-    const fn = ref.on(
-      event,
+    const fn = ListenerMethods[event](
+      ref,
       (snapshot, prevKey) => {
         subscriber.next({ snapshot, prevKey, event });
       },
@@ -38,7 +39,7 @@ export function fromRef(
     );
     return {
       unsubscribe() {
-        ref.off(event, fn);
+        off(ref, event, fn);
       }
     };
   }).pipe(
