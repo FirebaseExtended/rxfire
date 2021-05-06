@@ -29,9 +29,9 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-exp-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-beta-7-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-exp-node_modules-
+            ${{ runner.os }}-14-beta-7-node_modules-
             ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -61,9 +61,11 @@ jobs:
     needs: build
     strategy:
       matrix:
-        node: ["10", "12", "14"]
+        node: ["12", "14", "16"]
+        firebase: ["beta"]
+        rxjs: ["6", "7"]
       fail-fast: false
-    name: Test Firebase 0.900 on Node.js ${{ matrix.node }}
+    name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -77,9 +79,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-exp-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-exp-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -93,6 +95,7 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
+          yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:

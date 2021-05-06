@@ -24,7 +24,22 @@
 // app/database is used as namespaces to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { initializeApp, FirebaseApp, deleteApp, getApp } from 'firebase/app';
-import { Database, getDatabase, Reference } from 'firebase/database';
+import {
+  FirebaseDatabase,
+  getDatabase,
+  Reference,
+  ref,
+  set,
+  useDatabaseEmulator,
+  push,
+  remove,
+  child,
+  update,
+  setPriority,
+  query,
+  orderByChild,
+  equalTo,
+} from 'firebase/database';
 import {
   list,
   ListenEvent,
@@ -55,10 +70,10 @@ const batch = (
 
 describe('RxFire Database', () => {
   let app: FirebaseApp;
-  let database: Database;
+  let database: FirebaseDatabase;
 
   const builtRef = (path: string): Reference => {
-    return getDatabase(getApp()).ref(path);
+    return ref(getDatabase(getApp()), path);
   };
 
   function prepareList(
@@ -86,7 +101,7 @@ describe('RxFire Database', () => {
       databaseURL: TEST_PROJECT.databaseURL
     });
     database = getDatabase(app);
-    database.useEmulator("localhost", 9000);
+    useDatabaseEmulator(database, "localhost", 9000);
   });
 
   afterEach(done => {
@@ -107,7 +122,7 @@ describe('RxFire Database', () => {
      */
     it('it should should handle non-existence', done => {
       const itemRef = builtRef(rando());
-      itemRef.set({});
+      set(itemRef, {});
       const obs = fromRef(itemRef, ListenEvent.value);
       obs
         .pipe(take(1))
@@ -125,7 +140,7 @@ describe('RxFire Database', () => {
      */
     it('it should listen and then unsubscribe', done => {
       const itemRef = builtRef(rando());
-      itemRef.set(itemsObj);
+      set(itemRef, itemsObj);
       const obs = fromRef(itemRef, ListenEvent.value);
       let count = 0;
       const sub = obs.subscribe(_ => {
@@ -135,7 +150,7 @@ describe('RxFire Database', () => {
         expect(count).toEqual(1);
         done();
         sub.unsubscribe();
-        itemRef.push({ name: 'anotha one' });
+        push(itemRef, { name: 'anotha one' });
       });
     });
 
@@ -147,7 +162,7 @@ describe('RxFire Database', () => {
       it('should stream back a child_added event', (done: any) => {
         const itemRef = builtRef(rando());
         const data = itemsObj;
-        itemRef.set(data);
+        set(itemRef, data);
         const obs = fromRef(itemRef, ListenEvent.added);
         let count = 0;
         const sub = obs.subscribe(change => {
@@ -169,7 +184,7 @@ describe('RxFire Database', () => {
        */
       it('should stream back a child_changed event', (done: any) => {
         const itemRef = builtRef(rando());
-        itemRef.set(itemsObj);
+        set(itemRef, itemsObj);
         const obs = fromRef(itemRef, ListenEvent.changed);
         const name = 'look at what you made me do';
         const key = items[0].key;
@@ -181,7 +196,7 @@ describe('RxFire Database', () => {
           sub.unsubscribe();
           done();
         });
-        itemRef.child(key).update({ name });
+        update(child(itemRef, key), { name });
       });
 
       /**
@@ -190,7 +205,7 @@ describe('RxFire Database', () => {
        */
       it('should stream back a child_removed event', (done: any) => {
         const itemRef = builtRef(rando());
-        itemRef.set(itemsObj);
+        set(itemRef, itemsObj);
         const obs = fromRef(itemRef, ListenEvent.removed);
         const key = items[0].key;
         const name = items[0].name;
@@ -202,7 +217,7 @@ describe('RxFire Database', () => {
           sub.unsubscribe();
           done();
         });
-        itemRef.child(key).remove();
+        remove(child(itemRef, key));
       });
 
       /**
@@ -211,7 +226,7 @@ describe('RxFire Database', () => {
        */
       it('should stream back a child_moved event', (done: any) => {
         const itemRef = builtRef(rando());
-        itemRef.set(itemsObj);
+        set(itemRef, itemsObj);
         const obs = fromRef(itemRef, ListenEvent.moved);
         const key = items[2].key;
         const name = items[2].name;
@@ -223,7 +238,7 @@ describe('RxFire Database', () => {
           sub.unsubscribe();
           done();
         });
-        itemRef.child(key).setPriority(-100, () => {});
+        setPriority(child(itemRef, key), -100);
       });
 
       /**
@@ -233,7 +248,7 @@ describe('RxFire Database', () => {
       it('should stream back a value event', (done: any) => {
         const itemRef = builtRef(rando());
         const data = itemsObj;
-        itemRef.set(data);
+        set(itemRef, data);
         const obs = fromRef(itemRef, ListenEvent.value);
         const sub = obs.subscribe(change => {
           const { event, snapshot } = change;
@@ -251,9 +266,9 @@ describe('RxFire Database', () => {
        */
       it('should stream back query results', (done: any) => {
         const itemRef = builtRef(rando());
-        itemRef.set(itemsObj);
-        const query = itemRef.orderByChild('name').equalTo(items[0].name);
-        const obs = fromRef(query, ListenEvent.value);
+        set(itemRef, itemsObj);
+        const q = query(itemRef, orderByChild('name'), equalTo(items[0].name));
+        const obs = fromRef(q, ListenEvent.value);
         obs.subscribe(change => {
           let child;
           change.snapshot.forEach(snap => {
@@ -292,7 +307,7 @@ describe('RxFire Database', () => {
           })
           .add(done);
 
-        someRef.set(itemsObj);
+        set(someRef, itemsObj);
       });
 
       /**
@@ -312,8 +327,8 @@ describe('RxFire Database', () => {
             expect(data[3]).toEqual({ name: 'anotha one' });
           })
           .add(done);
-        aref.set(itemsObj);
-        aref.push({ name: 'anotha one' });
+        set(aref, itemsObj);
+        push(aref, { name: 'anotha one' });
       });
 
       /**
@@ -322,7 +337,7 @@ describe('RxFire Database', () => {
        */
       it('should stream in order events', done => {
         const aref = builtRef(rando());
-        const obs = list(aref.orderByChild('name'), [ListenEvent.added]);
+        const obs = list(query(aref, orderByChild('name')), [ListenEvent.added]);
         obs
           .pipe(take(1))
           .subscribe(changes => {
@@ -332,7 +347,7 @@ describe('RxFire Database', () => {
             expect(names[2]).toEqual('zero');
           })
           .add(done);
-        aref.set(itemsObj);
+        set(aref, itemsObj);
       });
 
       /**
@@ -343,7 +358,7 @@ describe('RxFire Database', () => {
        */
       it('should stream in order events w/child_added', done => {
         const aref = builtRef(rando());
-        const obs = list(aref.orderByChild('name'), [ListenEvent.added]);
+        const obs = list(query(aref, orderByChild('name')), [ListenEvent.added]);
         obs
           .pipe(skip(1), take(1))
           .subscribe(changes => {
@@ -354,8 +369,9 @@ describe('RxFire Database', () => {
             expect(names[3]).toEqual('zero');
           })
           .add(done);
-        aref.set(itemsObj);
-        aref.push({ name: 'anotha one' });
+        set(aref, itemsObj);
+        console.log(aref.toString(), itemsObj);
+        push(aref, { name: 'anotha one' });
       });
 
       /**
@@ -363,7 +379,7 @@ describe('RxFire Database', () => {
        */
       it('should stream events filtering', done => {
         const aref = builtRef(rando());
-        const obs = list(aref.orderByChild('name').equalTo('zero'), [
+        const obs = list(query(aref, orderByChild('name'), equalTo('zero')), [
           ListenEvent.added
         ]);
         obs
@@ -374,8 +390,8 @@ describe('RxFire Database', () => {
             expect(names[1]).toEqual('zero');
           })
           .add(done);
-        aref.set(itemsObj);
-        aref.push({ name: 'zero' });
+        set(aref, itemsObj);
+        push(aref, { name: 'zero' });
       });
 
       /**
@@ -387,8 +403,8 @@ describe('RxFire Database', () => {
         const aref = builtRef(rando());
 
         function setUp() {
-          aref.set(itemsObj);
-          aref.child(items[0].key).remove();
+          set(aref, itemsObj);
+          remove(child(aref, items[0].key));
         }
 
         function listen() {
@@ -420,8 +436,8 @@ describe('RxFire Database', () => {
           })
           .add(done);
         
-        aref.set(itemsObj).then(() => {
-          aref.child(items[1].key).update({ name: 'lol' });
+        set(aref, itemsObj).then(() => {
+          update(child(aref, items[1].key), { name: 'lol' });
         });
       });
 
@@ -441,8 +457,8 @@ describe('RxFire Database', () => {
             done();
           });
         
-        aref.set(itemsObj).then(() => {
-          aref.child(items[0].key).setPriority('a', () => {});
+        set(aref, itemsObj).then(() => {
+          setPriority(child(aref, items[0].key), 'a');
         });
       });
 
@@ -461,7 +477,7 @@ describe('RxFire Database', () => {
             expect(data).toEqual(items);
           })
           .add(done);
-        ref.set(itemsObj);
+        set(ref, itemsObj);
       });
 
       /**
@@ -469,15 +485,24 @@ describe('RxFire Database', () => {
        */
       it('should handle multiple subscriptions (hot)', done => {
         const { snapChanges, ref } = prepareList();
-        const sub = snapChanges.subscribe(() => {}).add(done);
+        let firstFired = false;
         snapChanges
           .pipe(take(1))
           .subscribe(actions => {
-            const data = actions.map(a => a.snapshot.val());
+            firstFired = true;
+            const data = actions.map((a) => a.snapshot.val());
             expect(data).toEqual(items);
-          })
-          .add(sub);
-        ref.set(itemsObj);
+          }
+        );
+        snapChanges
+          .pipe(take(1))
+          .subscribe(actions => {
+              const data = actions.map((a) => a.snapshot.val());
+              expect(data).toEqual(items);
+              expect(firstFired).toBeTruthy();
+              done();
+          });
+        set(ref, itemsObj);
       });
 
       /**
@@ -497,7 +522,7 @@ describe('RxFire Database', () => {
               })
               .add(done);
           });
-        ref.set(itemsObj);
+        set(ref, itemsObj);
       });
 
       /**
@@ -515,7 +540,7 @@ describe('RxFire Database', () => {
             expect(data).toEqual(items);
           })
           .add(done);
-        ref.set(itemsObj);
+        set(ref, itemsObj);
       });
 
       /**
@@ -539,8 +564,8 @@ describe('RxFire Database', () => {
           })
           .add(done);
         
-        ref.set(itemsObj).then(() => {
-          ref.child(items[0].key).update({ name });
+        set(ref, itemsObj).then(() => {
+          update(child(ref, items[0].key), { name });
         });
       });
 
@@ -549,7 +574,7 @@ describe('RxFire Database', () => {
        */
       it('should handle empty sets', done => {
         const aref = builtRef(rando());
-        aref.set({});
+        set(aref, {});
         list(aref)
           .pipe(take(1))
           .subscribe(data => {
@@ -566,12 +591,12 @@ describe('RxFire Database', () => {
         let count = 0;
         const namefilter$ = new BehaviorSubject<number | null>(null);
         const aref = builtRef(rando());
-        aref.set(itemsObj);
+        set(aref, itemsObj);
         namefilter$
           .pipe(
             switchMap(name => {
               const filteredRef = name
-                ? aref.child('name').equalTo(name)
+                ? query(aref, orderByChild('name'), equalTo(name))
                 : aref;
               return list(filteredRef);
             }),
@@ -611,7 +636,7 @@ describe('RxFire Database', () => {
     } {
       const { events, skipnumber } = opts;
       const aref = builtRef(rando());
-      aref.set(itemsObj);
+      set(aref, itemsObj);
       const changes = auditTrail(aref, events);
       return {
         changes: changes.pipe(skip(skipnumber)),
@@ -646,7 +671,7 @@ describe('RxFire Database', () => {
     it('listVal should map a query to an array of objects', (done) => {
       const itemRef = builtRef(rando());
       const data = { testKey: { hello: 'world' } };
-      itemRef.set(data);
+      set(itemRef, data);
 
       const obs = listVal<any>(itemRef, 'KEY').pipe(take(1));
 
@@ -663,7 +688,7 @@ describe('RxFire Database', () => {
      */
     it('objectVal should map a reference or query to its value', (done) => {
       const itemRef = builtRef(rando());
-      itemRef.set(itemsObj);
+      set(itemRef, itemsObj);
       const obs = objectVal(itemRef).pipe(take(1));
 
       obs.subscribe(val => {

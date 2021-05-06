@@ -19,7 +19,7 @@ import { onChildAdded, onChildChanged, onChildMoved, onChildRemoved, onValue } f
 
 export type Query = import('firebase/database').Query;
 
-export const enum ListenEvent {
+export enum ListenEvent {
   added = 'child_added',
   removed = 'child_removed',
   changed = 'child_changed',

@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "0.500.0",
+  "version": "6.0.0",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -47,9 +47,12 @@
     "test": "firebase emulators:exec jest --only firestore,database,auth",
     "test:debug": "yarn echo:chrome && firebase emulators:exec ./test-debug.sh --only firestore,database,auth"
   },
+  "dependencies": {
+    "tslib": "^2.2.0"
+  },
   "peerDependencies": {
-    "firebase": "^0.900.15",
-    "rxjs": "^6.0.0"
+    "firebase": "9.0.0-beta.1",
+    "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
@@ -72,9 +75,9 @@
     "rollup": "^2.33.2",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rollup-plugin-uglify": "^6.0.4",
-    "rxjs": "^6.0.0",
-    "tslib": "^2.1.0",
-    "typescript": "^4.0.5"
+    "rxjs": "^7.0.0",
+    "tslib": "^2.2.0",
+    "typescript": "^4.2.4"
   },
   "files": [
     "dist/**/*"
