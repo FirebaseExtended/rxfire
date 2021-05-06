@@ -470,14 +470,25 @@ describe('RxFire Database', () => {
        */
       it('should handle multiple subscriptions (hot)', (done) => {
         const {snapChanges, ref} = prepareList();
-        const sub = snapChanges.subscribe(() => {}).add(done);
+        let firstFired = false;
         snapChanges
             .pipe(take(1))
-            .subscribe((actions) => {
-              const data = actions.map((a) => a.snapshot.val());
-              expect(data).toEqual(items);
-            })
-            .add(sub);
+            .subscribe(actions => {
+                firstFired = true;
+                const data = actions.map((a) => a.snapshot.val());
+                console.log('first', data);
+                expect(data).toEqual(items);
+              }
+            );
+        snapChanges
+            .pipe(take(1))
+            .subscribe(actions => {
+                const data = actions.map((a) => a.snapshot.val());
+                expect(data).toEqual(items);
+                expect(firstFired).toBeTruthy();
+                done();
+              }
+            );
         ref.set(itemsObj);
       });
 
