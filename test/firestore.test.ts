@@ -341,5 +341,35 @@ describe('RxFire Firestore', () => {
         done();
       });
     });
+
+    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
+      const {colRef} = seedTest(firestore);
+
+      const nonExistentDoc: firestore.DocumentReference = colRef.doc(
+          createId(),
+      );
+
+      const unwrapped = docData(nonExistentDoc);
+
+      nonExistentDoc.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).toEqual(snap.data());
+          done();
+        });
+      });
+    });
+
+    it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
+      const nonExistentCollection = firestore.collection(createId());
+
+      const unwrapped = collectionData(nonExistentCollection);
+
+      nonExistentCollection.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).toEqual(snap.docs);
+          done();
+        });
+      });
+    });
   });
 });

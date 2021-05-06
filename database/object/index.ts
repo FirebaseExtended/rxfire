@@ -44,6 +44,11 @@ export function objectVal<T>(query: Query, keyField?: string): Observable<T> {
 export function changeToData(change: QueryChange, keyField?: string): {} {
   const val = change.snapshot.val();
 
+  // match the behavior of the JS SDK when the snapshot doesn't exist
+  if (!change.snapshot.exists()) {
+    return val;
+  }
+
   // val can be a primitive type
   if (typeof val !== 'object') {
     return val;

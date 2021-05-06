@@ -556,18 +556,17 @@ describe('RxFire Database', () => {
         });
       });
 
-      /**
-       * This test checks that empty sets are processed.
-       */
-      it('should handle empty sets', (done) => {
-        const aref = ref(rando());
-        aref.set({});
-        list(aref)
-            .pipe(take(1))
-            .subscribe((data) => {
-              expect(data.length).toBe(0);
-            })
-            .add(done);
+      it('matches the output of the JS SDK when a set doesn\'t exist', (done) => {
+        const nonExistentRef = ref(rando());
+        nonExistentRef.set(null);
+        const obs = list(nonExistentRef);
+
+        nonExistentRef.on('value', (snap) => {
+          obs.subscribe((data) => {
+            expect(data).toEqual(snap.val());
+            done();
+          });
+        });
       });
 
       /**
@@ -598,7 +597,7 @@ describe('RxFire Database', () => {
               }
               // on the second round, we should have filtered out everything
               if (count === 2) {
-                expect(Object.keys(data).length).toBe(0);
+                expect(data).toBeNull();
               }
             })
             .add(done);
@@ -682,6 +681,32 @@ describe('RxFire Database', () => {
         expect(val).toBeInstanceOf(Object);
         expect(val).toEqual(itemsObj);
         done();
+      });
+    });
+
+    it('objectVal should behave the same as snap.val() when an object doesn\'t exist', (done) => {
+      const nonExistentRef = ref(rando());
+      nonExistentRef.set(null);
+      const obs = objectVal(nonExistentRef);
+
+      nonExistentRef.on('value', (snap) => {
+        obs.subscribe((val) => {
+          expect(val).toEqual(snap.val());
+          done();
+        });
+      });
+    });
+
+    it('listVal should behave the same as snap.val() when a list doesn\'t exist', (done) => {
+      const nonExistentRef = ref(rando());
+      nonExistentRef.set(null);
+      const obs = listVal(nonExistentRef);
+
+      nonExistentRef.on('value', (snap) => {
+        obs.subscribe((val) => {
+          expect(val).toEqual(snap.val());
+          done();
+        });
       });
     });
   });

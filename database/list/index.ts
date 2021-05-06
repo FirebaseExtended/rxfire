@@ -50,6 +50,11 @@ export function list(
   const eventsList = validateEventsArray(events);
   return fromOnce(query).pipe(
       switchMap((change) => {
+        // in case the list doesn't exist, match the RTDB SDK's default behavior
+        if (!change.snapshot.exists()) {
+          return of(change.snapshot.val());
+        }
+
         const childEvent$ = [of(change)];
         for (const event of eventsList) {
           childEvent$.push(fromRef(query, event));
@@ -65,9 +70,19 @@ export function list(
  * @param query object ref or query
  * @param keyField map the object key to a specific field
  */
-export function listVal<T>(query: Query, keyField?: string): Observable<T[]> {
+export function listVal<T>(
+    query: Query,
+    keyField?: string,
+): Observable<T[] | null> {
   return list(query).pipe(
-      map((arr) => arr.map((change) => changeToData(change, keyField) as T)),
+      map((arr) => {
+        // result can be null if query returns no data
+        if (arr === null) {
+          return arr;
+        }
+
+        return arr.map((change) => changeToData(change, keyField) as T);
+      }),
   );
 }
 
