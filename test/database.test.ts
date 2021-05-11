@@ -476,7 +476,6 @@ describe('RxFire Database', () => {
             .subscribe(actions => {
                 firstFired = true;
                 const data = actions.map((a) => a.snapshot.val());
-                console.log('first', data);
                 expect(data).toEqual(items);
               }
             );

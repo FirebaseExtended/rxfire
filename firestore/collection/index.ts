@@ -16,15 +16,29 @@
  */
 
 import firebase from 'firebase/app';
-import {fromCollectionRef} from '../fromRef';
-import {Observable, MonoTypeOperatorFunction} from 'rxjs';
-import {map, filter, scan, distinctUntilChanged} from 'rxjs/operators';
-import {snapToData} from '../document';
+import { fromCollectionRef } from '../fromRef';
+import {
+  Observable,
+  MonoTypeOperatorFunction,
+  OperatorFunction,
+  pipe,
+  UnaryFunction
+} from 'rxjs';
+import {
+  map,
+  filter,
+  scan,
+  distinctUntilChanged,
+  startWith,
+  pairwise
+} from 'rxjs/operators';
+import { snapToData } from '../document';
 
 type DocumentChangeType = firebase.firestore.DocumentChangeType;
 type DocumentChange = firebase.firestore.DocumentChange;
 type Query = firebase.firestore.Query;
 type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
+type QuerySnapshot = firebase.firestore.QuerySnapshot;
 
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
@@ -34,7 +48,7 @@ const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
  * in specified events array, it will not be emitted.
  */
 const filterEvents = (
-    events?: DocumentChangeType[],
+  events?: DocumentChangeType[]
 ): MonoTypeOperatorFunction<DocumentChange[]> =>
   filter((changes: DocumentChange[]) => {
     let hasChange = false;
@@ -49,21 +63,14 @@ const filterEvents = (
   });
 
 /**
- * Create an operator that filters out empty changes. We provide the
- * ability to filter on events, which means all changes can be filtered out.
- * This creates an empty array and would be incorrect to emit.
- */
-const filterEmpty = filter((changes: DocumentChange[]) => changes.length > 0);
-
-/**
  * Splice arguments on top of a sliced array, to break top-level ===
  * this is useful for change-detection
  */
 function sliceAndSplice<T>(
-    original: T[],
-    start: number,
-    deleteCount: number,
-    ...args: T[]
+  original: T[],
+  start: number,
+  deleteCount: number,
+  ...args: T[]
 ): T[] {
   const returnArray = original.slice();
   returnArray.splice(start, deleteCount, ...args);
@@ -76,8 +83,8 @@ function sliceAndSplice<T>(
  * @param change
  */
 function processIndividualChange(
-    combined: DocumentChange[],
-    change: DocumentChange,
+  combined: DocumentChange[],
+  change: DocumentChange
 ): DocumentChange[] {
   switch (change.type) {
     case 'added':
@@ -129,11 +136,11 @@ function processIndividualChange(
  * @param events
  */
 function processDocumentChanges(
-    current: DocumentChange[],
-    changes: DocumentChange[],
-    events: DocumentChangeType[] = ALL_EVENTS,
+  current: DocumentChange[],
+  changes: DocumentChange[],
+  events: DocumentChangeType[] = ALL_EVENTS
 ): DocumentChange[] {
-  changes.forEach((change) => {
+  changes.forEach(change => {
     // skip unwanted change types
     if (events.indexOf(change.type) > -1) {
       current = processIndividualChange(current, change);
@@ -143,18 +150,90 @@ function processDocumentChanges(
 }
 
 /**
+ * Create an operator that allows you to compare the current emission with
+ * the prior, even on first emission (where prior is undefined).
+ */
+const windowwise = <T = unknown>() =>
+  pipe(
+    startWith(undefined),
+    pairwise() as OperatorFunction<T | undefined, [T | undefined, T]>
+  );
+
+/**
+ * Given two snapshots does their metadata match?
+ * @param a
+ * @param b
+ */
+const metaDataEquals = <T extends QuerySnapshot | QueryDocumentSnapshot>(
+  a: T,
+  b: T
+) => JSON.stringify(a.metadata) === JSON.stringify(b.metadata);
+
+/**
+ * Create an operator that filters out empty changes. We provide the
+ * ability to filter on events, which means all changes can be filtered out.
+ * This creates an empty array and would be incorrect to emit.
+ */
+const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
+  Observable<T[]>,
+  Observable<T[]>
+> =>
+  pipe(
+    windowwise(),
+    filter(([prior, current]) => current.length > 0 || prior === undefined),
+    map(([_, current]) => current)
+  );
+
+/**
  * Return a stream of document changes on a query. These results are not in sort order but in
  * order of occurence.
  * @param query
  */
 export function collectionChanges(
-    query: Query,
-    events: DocumentChangeType[] = ALL_EVENTS,
+  query: Query,
+  events: DocumentChangeType[] = ALL_EVENTS
 ): Observable<DocumentChange[]> {
-  return fromCollectionRef(query).pipe(
-      map((snapshot) => snapshot.docChanges()),
-      filterEvents(events),
-      filterEmpty,
+  return fromCollectionRef(query, { includeMetadataChanges: true }).pipe(
+    windowwise(),
+    map(([priorSnapshot, currentSnapshot]) => {
+      const docChanges = currentSnapshot.docChanges();
+      if (priorSnapshot && !metaDataEquals(priorSnapshot, currentSnapshot)) {
+        // the metadata has changed, docChanges() doesn't return metadata events, so let's
+        // do it ourselves by scanning over all the docs and seeing if the metadata has changed
+        // since either this docChanges() emission or the prior snapshot
+        currentSnapshot.docs.forEach((currentDocSnapshot, currentIndex) => {
+          const currentDocChange = docChanges.find(c =>
+            c.doc.ref.isEqual(currentDocSnapshot.ref)
+          );
+          if (currentDocChange) {
+            // if the doc is in the current changes and the metadata hasn't changed this doc
+            if (metaDataEquals(currentDocChange.doc, currentDocSnapshot)) {
+              return;
+            }
+          } else {
+            // if there is a prior doc and the metadata hasn't changed skip this doc
+            const priorDocSnapshot = priorSnapshot?.docs.find(d =>
+              d.ref.isEqual(currentDocSnapshot.ref)
+            );
+            if (
+              priorDocSnapshot &&
+              metaDataEquals(priorDocSnapshot, currentDocSnapshot)
+            ) {
+              return;
+            }
+          }
+          docChanges.push({
+            oldIndex: currentIndex,
+            newIndex: currentIndex,
+            type: 'modified',
+            doc: currentDocSnapshot
+          });
+        });
+      }
+      return docChanges;
+    }),
+    filterEvents(events),
+    filterEmptyUnlessFirst()
   );
 }
 
@@ -163,7 +242,9 @@ export function collectionChanges(
  * @param query
  */
 export function collection(query: Query): Observable<QueryDocumentSnapshot[]> {
-  return fromCollectionRef(query).pipe(map((changes) => changes.docs));
+  return fromCollectionRef(query, { includeMetadataChanges: true }).pipe(
+    map(changes => changes.docs)
+  );
 }
 
 /**
@@ -171,16 +252,16 @@ export function collection(query: Query): Observable<QueryDocumentSnapshot[]> {
  * @param query
  */
 export function sortedChanges(
-    query: Query,
-    events?: DocumentChangeType[],
+  query: Query,
+  events?: DocumentChangeType[]
 ): Observable<DocumentChange[]> {
   return collectionChanges(query, events).pipe(
-      scan(
-          (current: DocumentChange[], changes: DocumentChange[]) =>
-            processDocumentChanges(current, changes, events),
-          [],
-      ),
-      distinctUntilChanged(),
+    scan(
+      (current: DocumentChange[], changes: DocumentChange[]) =>
+        processDocumentChanges(current, changes, events),
+      []
+    ),
+    distinctUntilChanged()
   );
 }
 
@@ -189,11 +270,11 @@ export function sortedChanges(
  * to docChanges() but it collects each event in an array over time.
  */
 export function auditTrail(
-    query: Query,
-    events?: DocumentChangeType[],
+  query: Query,
+  events?: DocumentChangeType[]
 ): Observable<DocumentChange[]> {
   return collectionChanges(query, events).pipe(
-      scan((current, action) => [...current, ...action], [] as DocumentChange[]),
+    scan((current, action) => [...current, ...action], [] as DocumentChange[])
   );
 }
 
@@ -202,12 +283,12 @@ export function auditTrail(
  * @param query
  */
 export function collectionData<T>(
-    query: Query,
-    idField?: string,
+  query: Query,
+  idField?: string
 ): Observable<T[]> {
   return collection(query).pipe(
-      map((arr) => {
-        return arr.map((snap) => snapToData(snap, idField) as T);
-      }),
+    map(arr => {
+      return arr.map(snap => snapToData(snap, idField) as T);
+    })
   );
 }
