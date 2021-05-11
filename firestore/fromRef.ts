@@ -18,11 +18,12 @@
 import firebase from 'firebase/app';
 import {Observable} from 'rxjs';
 
-type DocumentReference = firebase.firestore.DocumentReference;
+type DocumentReference<T=DocumentData> = firebase.firestore.DocumentReference<T>;
 type SnapshotListenOptions = firebase.firestore.SnapshotListenOptions;
-type Query = firebase.firestore.Query;
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
-type QuerySnapshot = firebase.firestore.QuerySnapshot;
+type Query<T=DocumentData> = firebase.firestore.Query<T>;
+type DocumentData = firebase.firestore.DocumentData;
+type DocumentSnapshot<T=DocumentData> = firebase.firestore.DocumentSnapshot<T>;
+type QuerySnapshot<T=DocumentData> = firebase.firestore.QuerySnapshot<T>;
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function _fromRef(
@@ -36,23 +37,31 @@ function _fromRef(
   });
 }
 
-export function fromRef(
-    ref: DocumentReference | Query,
-    options?: SnapshotListenOptions,
-): Observable<{}> {
+export function fromRef<T=DocumentData>(
+  ref: Query<T>,
+  options?: SnapshotListenOptions
+): Observable<QuerySnapshot<T>>;
+export function fromRef<T=DocumentData>(
+  ref: DocumentReference<T>,
+  options?: SnapshotListenOptions
+): Observable<DocumentSnapshot<T>>;
+export function fromRef<T=DocumentData>(
+  ref: DocumentReference<T> | Query<T>,
+  options?: SnapshotListenOptions,
+) {
   return _fromRef(ref, options);
 }
 
-export function fromDocRef(
-    ref: DocumentReference,
+export function fromDocRef<T=DocumentData>(
+    ref: DocumentReference<T>,
     options?: SnapshotListenOptions,
-): Observable<DocumentSnapshot> {
-  return fromRef(ref, options) as Observable<DocumentSnapshot>;
+) {
+  return fromRef(ref, options);
 }
 
-export function fromCollectionRef(
-    ref: Query,
+export function fromCollectionRef<T>(
+    ref: Query<T>,
     options?: SnapshotListenOptions,
-): Observable<QuerySnapshot> {
-  return fromRef(ref, options) as Observable<QuerySnapshot>;
+) {
+  return fromRef(ref, options);
 }
