@@ -24,6 +24,7 @@ type Reference = firebase.storage.Reference;
 type UploadMetadata = firebase.storage.UploadMetadata;
 type StringFormat = firebase.storage.StringFormat;
 type UploadTask = firebase.storage.UploadTask;
+type Data = Blob | Uint8Array | ArrayBuffer;
 
 export function fromTask(
     task: firebase.storage.UploadTask,
@@ -49,8 +50,7 @@ export function getMetadata(ref: Reference): Observable<any> {
 
 export function put(
     ref: Reference,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any,
+    data: Data,
     metadata?: UploadMetadata,
 ): Observable<UploadTaskSnapshot> {
   return fromTask(ref.put(data, metadata));
