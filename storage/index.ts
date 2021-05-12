@@ -41,11 +41,11 @@ export function fromTask(
     task.then(
       snapshot => {
         progress(snapshot);
-        complete();
+        setTimeout(() => complete(), 0);
       },
       e => {
         progress(task.snapshot);
-        error(e);
+        setTimeout(() => error(e), 0);
       }
     );
     // the unsubscribe method returns by storage isn't typed in the
