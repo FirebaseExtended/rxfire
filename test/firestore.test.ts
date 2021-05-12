@@ -75,12 +75,10 @@ describe('RxFire Firestore', () => {
    * Each test runs inside it's own app instance and the app
    * is deleted after the test runs.
    *
-   * Firestore tests run "offline" to reduce "flakeyness".
-   *
    * Each test is responsible for seeding and removing data. Helper
    * functions are useful if the process becomes brittle or tedious.
    * Note that removing is less necessary since the tests are run
-   * offline.
+   * against the emulator
    */
   beforeEach(() => {
     app = firebase.initializeApp(TEST_PROJECT, createId());
@@ -342,11 +340,11 @@ describe('RxFire Firestore', () => {
       });
     });
 
-/*
- * TODO(jamesdaniels)
- * Having trouble gettings these test green with the emulators
- * FIRESTORE (8.5.0) INTERNAL ASSERTION FAILED: Unexpected state
- */
+    /**
+     * TODO(jamesdaniels)
+     * Having trouble gettings these test green with the emulators
+     * FIRESTORE (8.5.0) INTERNAL ASSERTION FAILED: Unexpected state
+     */
 
     it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
       

@@ -28,6 +28,15 @@ describe('RxFire Functions', () => {
   let app: firebase.app.App;
   let functions: firebase.functions.Functions;
 
+  /**
+   * Each test runs inside it's own app instance and the app
+   * is deleted after the test runs.
+   *
+   * Each test is responsible for seeding and removing data. Helper
+   * functions are useful if the process becomes brittle or tedious.
+   * Note that removing is less necessary since the tests are run
+   * against the emulator.
+   */
   beforeEach(() => {
     app = firebase.initializeApp(TEST_PROJECT, rando());
     functions = app.functions();
