@@ -24,9 +24,10 @@ type Reference = firebase.storage.Reference;
 type UploadMetadata = firebase.storage.UploadMetadata;
 type StringFormat = firebase.storage.StringFormat;
 type UploadTask = firebase.storage.UploadTask;
+type Data = Blob | Uint8Array | ArrayBuffer;
 
 export function fromTask(
-  task: firebase.storage.UploadTask
+  task: UploadTask
 ): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const progress = (snap: UploadTaskSnapshot): void => subscriber.next(snap);
@@ -72,9 +73,8 @@ export function getMetadata(ref: Reference): Observable<any> {
 
 export function put(
   ref: Reference,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
-  metadata?: UploadMetadata
+  data: Data,
+  metadata?: UploadMetadata,
 ): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const task = ref.put(data, metadata);
