@@ -93,6 +93,7 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
           yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
+          cd test/functions && yarn install --frozen-lockfile --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:
