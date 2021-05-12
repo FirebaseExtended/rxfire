@@ -29,7 +29,7 @@ type User = firebase.User;
  * triggered on sign-in or sign-out.
  * @param auth firebase.auth.Auth
  */
-export function authState(auth: Auth): Observable<User> {
+export function authState(auth: Auth): Observable<User | null> {
   return new Observable((subscriber) => {
     const unsubscribe = auth.onAuthStateChanged(subscriber);
     return {unsubscribe};
@@ -41,7 +41,7 @@ export function authState(auth: Auth): Observable<User> {
  * sign-out, and token refresh events
  * @param auth firebase.auth.Auth
  */
-export function user(auth: Auth): Observable<User> {
+export function user(auth: Auth): Observable<User | null> {
   return new Observable((subscriber) => {
     const unsubscribe = auth.onIdTokenChanged(subscriber);
     return {unsubscribe};
