@@ -25,7 +25,7 @@ import { sync as globSync } from 'glob';
 import { readFileSync } from 'fs';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
-const packageJsonPaths = globSync('**/package.json', { ignore: ['node_modules/**', 'dist/**'] });
+const packageJsonPaths = globSync('**/package.json', { ignore: ['node_modules/**', 'dist/**', 'test/**'] });
 const packages = packageJsonPaths.reduce((acc, path) => {
   const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
   const component = dirname(path);
