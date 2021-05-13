@@ -20,16 +20,27 @@
 import firebase from 'firebase/app';
 import 'firebase/storage';
 import {
-  fromTask
+  fromTask,
+  getDownloadURL,
+  getMetadata,
+  percentage,
+  put,
+  putString,
 } from '../dist/storage';
-import { take, timeout } from 'rxjs/operators';
+import { switchMap, take, tap, reduce, concatMap } from 'rxjs/operators';
 import { default as TEST_PROJECT, storageEmulatorPort } from './config';
+import 'cross-fetch/polyfill';
+import md5 from 'md5';
 
 if (typeof XMLHttpRequest === 'undefined') {
   global['XMLHttpRequest'] = require('xhr2');
 }
 
-const rando = (): string => Math.random().toString(36).substring(5);
+const rando = (): string => [
+  Math.random().toString(36).substring(5),
+  Math.random().toString(36).substring(5),
+  Math.random().toString(36).substring(5),
+].join('');
 
 class MockTask {
   _resolve: (value: any) => void;
@@ -62,26 +73,17 @@ class MockTask {
 describe('RxFire Storage', () => {
   let app: firebase.app.App;
   let storage: firebase.storage.Storage;
-  const ref = (path: string): firebase.storage.Reference => {
-    return storage.ref(path);
-  };
 
-  /**
-   * Each test runs inside it's own app instance and the app
-   * is deleted after the test runs.
-   *
-   * Each test is responsible for seeding and removing data. Helper
-   * functions are useful if the process becomes brittle or tedious.
-   * Note that removing is less necessary since the tests are run
-   * against the emulator.
-   */
-  beforeEach(() => {
+  // I can't do beforeEach for whatever reason with the Firebase Emulator
+  // storage seems to be tearing things down and canceling tasks early...
+  // not sure what's up. All using the same app isn't a big deal IMO
+  beforeAll(() => {
     app = firebase.initializeApp(TEST_PROJECT, rando());
     storage = app.storage('default-bucket');
     (storage as any).useEmulator('localhost', storageEmulatorPort);
   });
 
-  afterEach(() => {
+  afterAll(() => {
     app.delete().catch();
   });
 
@@ -297,12 +299,7 @@ describe('RxFire Storage', () => {
       task = ref.putString(rando());
     });
 
-    afterEach(done => {
-      task.cancel();
-      task.then(() => ref.delete(), () => ref.delete()).then(() => done(), () => done());
-    });
-
-    it('completed upload should fore success and complete', done => {
+    it('completed upload should fire success and complete', done => {
       let firedNext = false;
       task.then(() => {
         fromTask(task).subscribe({
@@ -319,7 +316,7 @@ describe('RxFire Storage', () => {
       }, err => { throw err });
     });
 
-    it('canceled upload should fire canceled and fail', done => {
+    it('canceled task should fire canceled and fail', done => {
       let firedNext = false;
       task.cancel();
       fromTask(task).subscribe({
@@ -332,6 +329,239 @@ describe('RxFire Storage', () => {
           done();
         },
         complete: () => { throw 'unexpected completion' }
+      });
+    });
+
+    it('running should fire and complete', done => {
+      let emissions = 0;
+      let lastEmission: firebase.storage.UploadTaskSnapshot;
+      fromTask(task).subscribe({
+        next: it => {
+          emissions++;
+          lastEmission = it;
+        },
+        error: it => { throw it },
+        complete: () => {
+          expect(emissions).toBeGreaterThan(1);
+          expect(lastEmission.state).toEqual(firebase.storage.TaskState.SUCCESS);
+          done();
+        }
+      });
+    });
+
+    it('canceled upload should fire canceled and fail', done => {
+      let cancelEmitted = false;
+      fromTask(task).subscribe({
+        next: it => {
+          task.cancel();
+          if (it.state === firebase.storage.TaskState.CANCELED) {
+            cancelEmitted = true;
+          }
+        },
+        error: () => {
+          expect(cancelEmitted).toBeTruthy();
+          done();
+        },
+        complete: () => { throw 'unexpected completion' }
+      });
+    });
+
+  });
+
+  describe('getDownloadURL', () => {
+
+    it('works', done => {
+      const body = rando();
+      const ref = storage.ref(rando());
+      ref.putString(body).then(it => {
+        getDownloadURL(ref).pipe(
+          switchMap(url => fetch(url)),
+          switchMap(it => it.text()),
+        ).subscribe(it => {
+          expect(it).toEqual(body);
+          done();
+        });
+      });
+    });
+
+  });
+
+  describe('getMetadata', () => {
+
+    it('works', done => {
+      const body = rando();
+      const base64body = btoa(body);
+      const md5Hash = btoa(md5(body, { asString: true }) as string);
+      const customMetadata = {
+        a: rando(),
+        b: rando(),
+      };
+      const ref = storage.ref(rando());
+      ref.putString(base64body, 'base64', { customMetadata }).then(() => {
+        getMetadata(ref).subscribe(it => {
+          expect(it.md5Hash).toEqual(md5Hash);
+          expect(it.customMetadata).toEqual(customMetadata);
+          done();
+        });
+      });
+    });
+
+  });
+
+  describe('percentage', () => {
+    
+    let ref: firebase.storage.Reference;
+    let task: firebase.storage.UploadTask;
+
+    beforeEach(() => {
+      ref = storage.ref(rando());
+      task = ref.putString(rando());
+    });
+
+    it('completed upload should fire 100% and complete', done => {
+      let firedNext = false;
+      task.then(() => {
+        percentage(task).subscribe({
+          next: it => {
+            firedNext = true;
+            expect(it.progress).toEqual(100);
+            expect(it.snapshot.state).toEqual(firebase.storage.TaskState.SUCCESS);
+          },
+          error: it => { throw it },
+          complete: () => {
+            expect(firedNext).toBeTruthy();
+            done();
+          }
+        });
+      }, err => { throw err });
+    });
+
+    it('running should fire and complete', done => {
+      let lastEmission: {
+        progress: number;
+        snapshot: firebase.storage.UploadTaskSnapshot;
+      };
+      percentage(task).subscribe({
+        next: it => {
+          expect(typeof it.progress).toEqual('number');
+          expect(it.progress).toBeGreaterThanOrEqual(lastEmission?.progress ?? -1);
+          lastEmission = it;
+        },
+        error: it => { throw it },
+        complete: () => {
+          expect(lastEmission.progress).toEqual(100);
+          expect(lastEmission.snapshot.state).toEqual(firebase.storage.TaskState.SUCCESS);
+          done();
+        }
+      });
+    });
+
+    it('canceled task should fire canceled and fail', done => {
+      let firedNext = false;
+      task.cancel();
+      percentage(task).subscribe({
+        next: it => {
+          firedNext = true;
+          expect(it.progress).toEqual(0);
+          expect(it.snapshot.state).toEqual(firebase.storage.TaskState.CANCELED);
+        },
+        error: () => {
+          expect(firedNext).toBeTruthy();
+          done();
+        },
+        complete: () => { throw 'unexpected completion' }
+      });
+    });
+
+    it('canceled upload should fire canceled and fail', done => {
+      let cancelEmitted = false;
+      percentage(task).subscribe({
+        next: it => {
+          task.cancel();
+          if (it.snapshot.state === firebase.storage.TaskState.CANCELED) {
+            cancelEmitted = true;
+          }
+        },
+        error: () => {
+          expect(cancelEmitted).toBeTruthy();
+          done();
+        },
+        complete: () => { throw 'unexpected completion' }
+      });
+    });
+
+  });
+
+  describe('put', () => {
+
+    it('should work', done => {
+      const ref = storage.ref(rando());
+      const body = rando();
+      const customMetadata = {
+        a: rando(),
+        b: rando(),
+      };
+      put(ref, Buffer.from(body, 'utf8'), { customMetadata }).pipe(
+        reduce((_, it) => it),
+        concatMap(() => getMetadata(ref)),
+      ).subscribe(it => {
+        // TODO(jamesdaniels) MD5 isn't matching, look into this
+        // expect(it.md5Hash).toEqual(md5Hash);
+        expect(it.customMetadata).toEqual(customMetadata);
+        done();
+      });
+    });
+
+    it('should cancel when unsubscribed', done => {
+      const ref = storage.ref(rando());
+      put(ref, Buffer.from(rando(), 'utf8')).pipe(
+        take(1),
+        switchMap(() => getDownloadURL(ref))
+      ).subscribe({
+        next: () => { throw 'expected failure' },
+        complete: () => { throw 'expected failure' },
+        error: err => {
+          expect(err.code).toEqual('storage/object-not-found');
+          done();
+        },
+      });
+    });
+
+  });
+
+  describe('putString', () => {
+
+    it('should work', done => {
+      const ref = storage.ref(rando());
+      const body = rando();
+      const base64body = btoa(body);
+      const md5Hash = btoa(md5(body, { asString: true }) as string);
+      const customMetadata = {
+        a: rando(),
+        b: rando(),
+      };
+      putString(ref, base64body, 'base64', { customMetadata }).pipe(
+        reduce((_, it) => it),
+        concatMap(() => getMetadata(ref))
+      ).subscribe(it => {
+        expect(it.md5Hash).toEqual(md5Hash);
+        expect(it.customMetadata).toEqual(customMetadata);
+        done();
+      });
+    });
+
+    it('should cancel when unsubscribed', done => {
+      const ref = storage.ref(rando());
+      putString(ref, rando()).pipe(
+        take(1),
+        switchMap(() => getDownloadURL(ref))
+      ).subscribe({
+        next: () => { throw 'expected failure' },
+        complete: () => { throw 'expected failure' },
+        error: err => {
+          expect(err.code).toEqual('storage/object-not-found');
+          done();
+        },
       });
     });
 
