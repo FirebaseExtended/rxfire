@@ -352,7 +352,7 @@ describe('RxFire Firestore', () => {
       
       const {colRef} = seedTest(firestore);
 
-      const nonExistentDoc: firestore.DocumentReference = colRef.doc(
+      const nonExistentDoc: firebase.firestore.DocumentReference = colRef.doc(
           createId(),
       );
 

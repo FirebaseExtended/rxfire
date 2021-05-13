@@ -25,14 +25,20 @@ type DocumentData = firebase.firestore.DocumentData;
 type DocumentSnapshot<T=DocumentData> = firebase.firestore.DocumentSnapshot<T>;
 type QuerySnapshot<T=DocumentData> = firebase.firestore.QuerySnapshot<T>;
 
+const DEFAULT_OPTIONS = { includeMetadataChanges: false };
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function _fromRef(
     ref: any,
-    options: SnapshotListenOptions | undefined,
+    options: SnapshotListenOptions=DEFAULT_OPTIONS,
 ): Observable<any> {
   /* eslint-enable @typescript-eslint/no-explicit-any */
   return new Observable((subscriber) => {
-    const unsubscribe = ref.onSnapshot(options || {}, subscriber);
+    const unsubscribe = ref.onSnapshot(options, {
+      next: subscriber.next.bind(subscriber),
+      error: subscriber.error.bind(subscriber),
+      complete: subscriber.complete.bind(subscriber),
+    });
     return {unsubscribe};
   });
 }
