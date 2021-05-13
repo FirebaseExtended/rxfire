@@ -31,7 +31,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/firebase/rxfire.git"
+    "url": "https://github.com/firebaseextended/rxfire.git"
   },
   "scripts": {
     "lint": "eslint -c .eslintrc.js '**/*.ts' --ignore-path './.gitignore'",
