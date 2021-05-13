@@ -80,8 +80,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
+      - name: test/functions node_modules cache
+        id: functions_node_modules_cache
+        uses: actions/cache@v2
+        with:
+          path: ./test/functions/node_modules
+          key: ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-${{ hashFiles('test/functions/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-
       - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
         with:
           path: ~/.npm-packages-offline-cache
@@ -93,6 +101,12 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
           yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
+      - name: Install test/functions deps
+        if: steps.functions_node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          cd test/functions
+          yarn install --frozen-lockfile --prefer-offline
       - name: Firebase emulator cache
         uses: actions/cache@v2
         with:

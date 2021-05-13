@@ -20,10 +20,11 @@ import { fromDocRef } from '../fromRef';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-type DocumentReference = firebase.firestore.DocumentReference;
-type DocumentSnapshot = firebase.firestore.DocumentSnapshot;
+type DocumentData = firebase.firestore.DocumentData;
+type DocumentReference<T> = firebase.firestore.DocumentReference<T>;
+type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
 
-export function doc(ref: DocumentReference): Observable<DocumentSnapshot> {
+export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return fromDocRef(ref, { includeMetadataChanges: true });
 }
 
@@ -31,14 +32,17 @@ export function doc(ref: DocumentReference): Observable<DocumentSnapshot> {
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T>(
-  ref: DocumentReference,
-  idField?: string
+export function docData<T=DocumentData>(
+    ref: DocumentReference<T>,
+    idField?: string,
 ): Observable<T> {
   return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
 }
 
-export function snapToData(snapshot: DocumentSnapshot, idField?: string): {} | undefined {
+export function snapToData<T=DocumentData>(
+    snapshot: DocumentSnapshot<T>,
+    idField?: string,
+): {} | undefined {
   // match the behavior of the JS SDK when the snapshot doesn't exist
   if (!snapshot.exists) {
     return snapshot.data();

@@ -35,10 +35,11 @@ import {
 import { snapToData } from '../document';
 
 type DocumentChangeType = firebase.firestore.DocumentChangeType;
-type DocumentChange = firebase.firestore.DocumentChange;
-type Query = firebase.firestore.Query;
-type QueryDocumentSnapshot = firebase.firestore.QueryDocumentSnapshot;
-type QuerySnapshot = firebase.firestore.QuerySnapshot;
+type DocumentData = firebase.firestore.DocumentData;
+type DocumentChange<T> = firebase.firestore.DocumentChange<T>;
+type Query<T> = firebase.firestore.Query<T>;
+type QueryDocumentSnapshot<T> = firebase.firestore.QueryDocumentSnapshot<T>;
+type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
 
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
@@ -47,10 +48,10 @@ const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
  * are specified by the event filter. If the document change type is not
  * in specified events array, it will not be emitted.
  */
-const filterEvents = (
-  events?: DocumentChangeType[]
-): MonoTypeOperatorFunction<DocumentChange[]> =>
-  filter((changes: DocumentChange[]) => {
+const filterEvents = <T>(
+    events?: DocumentChangeType[],
+): MonoTypeOperatorFunction<DocumentChange<T>[]> =>
+  filter((changes: DocumentChange<T>[]) => {
     let hasChange = false;
     for (let i = 0; i < changes.length; i++) {
       const change = changes[i];
@@ -82,10 +83,10 @@ function sliceAndSplice<T>(
  * @param combined
  * @param change
  */
-function processIndividualChange(
-  combined: DocumentChange[],
-  change: DocumentChange
-): DocumentChange[] {
+function processIndividualChange<T>(
+    combined: DocumentChange<T>[],
+    change: DocumentChange<T>,
+): DocumentChange<T>[] {
   switch (change.type) {
     case 'added':
       if (
@@ -135,12 +136,12 @@ function processIndividualChange(
  * @param changes
  * @param events
  */
-function processDocumentChanges(
-  current: DocumentChange[],
-  changes: DocumentChange[],
-  events: DocumentChangeType[] = ALL_EVENTS
-): DocumentChange[] {
-  changes.forEach(change => {
+function processDocumentChanges<T>(
+    current: DocumentChange<T>[],
+    changes: DocumentChange<T>[],
+    events: DocumentChangeType[] = ALL_EVENTS,
+): DocumentChange<T>[] {
+  changes.forEach((change) => {
     // skip unwanted change types
     if (events.indexOf(change.type) > -1) {
       current = processIndividualChange(current, change);
@@ -164,9 +165,9 @@ const windowwise = <T = unknown>() =>
  * @param a
  * @param b
  */
-const metaDataEquals = <T extends QuerySnapshot | QueryDocumentSnapshot>(
-  a: T,
-  b: T
+const metaDataEquals = <T,R extends QuerySnapshot<T> | QueryDocumentSnapshot<T>>(
+  a: R,
+  b: R
 ) => JSON.stringify(a.metadata) === JSON.stringify(b.metadata);
 
 /**
@@ -189,10 +190,10 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
  * order of occurence.
  * @param query
  */
-export function collectionChanges(
-  query: Query,
+export function collectionChanges<T=DocumentData>(
+  query: Query<T>,
   events: DocumentChangeType[] = ALL_EVENTS
-): Observable<DocumentChange[]> {
+): Observable<DocumentChange<T>[]> {
   return fromCollectionRef(query, { includeMetadataChanges: true }).pipe(
     windowwise(),
     map(([priorSnapshot, currentSnapshot]) => {
@@ -241,27 +242,25 @@ export function collectionChanges(
  * Return a stream of document snapshots on a query. These results are in sort order.
  * @param query
  */
-export function collection(query: Query): Observable<QueryDocumentSnapshot[]> {
-  return fromCollectionRef(query, { includeMetadataChanges: true }).pipe(
-    map(changes => changes.docs)
-  );
+export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
+  return fromCollectionRef<T>(query, { includeMetadataChanges: true }).pipe(map((changes) => changes.docs));
 }
 
 /**
  * Return a stream of document changes on a query. These results are in sort order.
  * @param query
  */
-export function sortedChanges(
-  query: Query,
-  events?: DocumentChangeType[]
-): Observable<DocumentChange[]> {
+export function sortedChanges<T=DocumentData>(
+    query: Query<T>,
+    events?: DocumentChangeType[],
+): Observable<DocumentChange<T>[]> {
   return collectionChanges(query, events).pipe(
-    scan(
-      (current: DocumentChange[], changes: DocumentChange[]) =>
-        processDocumentChanges(current, changes, events),
-      []
-    ),
-    distinctUntilChanged()
+      scan(
+          (current: DocumentChange<T>[], changes: DocumentChange<T>[]) =>
+            processDocumentChanges<T>(current, changes, events),
+          [],
+      ),
+      distinctUntilChanged(),
   );
 }
 
@@ -269,12 +268,12 @@ export function sortedChanges(
  * Create a stream of changes as they occur it time. This method is similar
  * to docChanges() but it collects each event in an array over time.
  */
-export function auditTrail(
-  query: Query,
-  events?: DocumentChangeType[]
-): Observable<DocumentChange[]> {
-  return collectionChanges(query, events).pipe(
-    scan((current, action) => [...current, ...action], [] as DocumentChange[])
+export function auditTrail<T=DocumentData>(
+    query: Query<T>,
+    events?: DocumentChangeType[],
+): Observable<DocumentChange<T>[]> {
+  return collectionChanges<T>(query, events).pipe(
+      scan((current, action) => [...current, ...action], [] as DocumentChange<T>[]),
   );
 }
 
@@ -282,9 +281,9 @@ export function auditTrail(
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
  * @param query
  */
-export function collectionData<T>(
-  query: Query,
-  idField?: string
+export function collectionData<T=DocumentData>(
+    query: Query<T>,
+    idField?: string,
 ): Observable<T[]> {
   return collection(query).pipe(
     map(arr => {
