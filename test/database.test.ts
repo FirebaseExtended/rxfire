@@ -17,8 +17,6 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-// app/database is used as namespaces to access types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import firebase from 'firebase/app';
 import 'firebase/database';
 import {
@@ -32,7 +30,7 @@ import {
 } from '../dist/database';
 import {take, skip, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
-import TEST_PROJECT from './config';
+import { default as TEST_PROJECT, databaseEmulatorPort } from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
@@ -51,7 +49,6 @@ describe('RxFire Database', () => {
   let app: firebase.app.App;
   let database: firebase.database.Database;
   const ref = (path: string): firebase.database.Reference => {
-    app!.database().goOffline();
     return app!.database().ref(path);
   };
 
@@ -74,29 +71,19 @@ describe('RxFire Database', () => {
    * Each test runs inside it's own app instance and the app
    * is deleted after the test runs.
    *
-   * Database tests run "offline" to reduce "flakeyness".
-   *
    * Each test is responsible for seeding and removing data. Helper
    * functions are useful if the process becomes brittle or tedious.
    * Note that removing is less necessary since the tests are run
-   * offline.
-   *
-   * Note: Database tests do not run exactly the same offline as
-   * they do online. Querying can act differently, tests must
-   * account for this.
+   * against the emulator.
    */
   beforeEach(() => {
-    app = firebase.initializeApp({
-      apiKey: TEST_PROJECT.apiKey,
-      projectId: TEST_PROJECT.projectId,
-      databaseURL: TEST_PROJECT.databaseURL,
-    });
+    app = firebase.initializeApp(TEST_PROJECT, rando());
     database = app.database();
-    database.goOffline();
+    database.useEmulator('localhost', databaseEmulatorPort);
   });
 
-  afterEach((done: jest.DoneCallback) => {
-    app.delete().then(() => done());
+  afterEach(() => {
+    app.delete().catch();
   });
 
   describe('fromRef', () => {
@@ -476,7 +463,6 @@ describe('RxFire Database', () => {
             .subscribe(actions => {
                 firstFired = true;
                 const data = actions.map((a) => a.snapshot.val());
-                console.log('first', data);
                 expect(data).toEqual(items);
               }
             );
