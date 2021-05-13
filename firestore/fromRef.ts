@@ -25,12 +25,12 @@ type DocumentData = firebase.firestore.DocumentData;
 type DocumentSnapshot<T=DocumentData> = firebase.firestore.DocumentSnapshot<T>;
 type QuerySnapshot<T=DocumentData> = firebase.firestore.QuerySnapshot<T>;
 
-const DFEFAULT_OPTIONS = { includeMetadataChanges: false };
+const DEFAULT_OPTIONS = { includeMetadataChanges: false };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function _fromRef(
     ref: any,
-    options: SnapshotListenOptions=DFEFAULT_OPTIONS,
+    options: SnapshotListenOptions=DEFAULT_OPTIONS,
 ): Observable<any> {
   /* eslint-enable @typescript-eslint/no-explicit-any */
   return new Observable((subscriber) => {
