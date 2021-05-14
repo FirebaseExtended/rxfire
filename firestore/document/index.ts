@@ -34,15 +34,15 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  */
 export function docData<T=DocumentData>(
     ref: DocumentReference<T>,
-    idField?: string,
+    idField?: keyof T,
 ): Observable<T> {
   return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
 }
 
 export function snapToData<T=DocumentData>(
     snapshot: DocumentSnapshot<T>,
-    idField?: string,
-): {} | undefined {
+    idField?: keyof T,
+): T | undefined {
   // match the behavior of the JS SDK when the snapshot doesn't exist
   if (!snapshot.exists) {
     return snapshot.data();
@@ -50,5 +50,5 @@ export function snapToData<T=DocumentData>(
   return {
     ...snapshot.data(),
     ...(idField ? { [idField]: snapshot.id } : null)
-  };
+  } as T;
 }
