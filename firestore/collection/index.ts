@@ -185,6 +185,14 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
     map(([_, current]) => current)
   );
 
+type SnapshotListenOptions = firebase.firestore.SnapshotListenOptions;
+type Options = {
+  events?: DocumentChangeType[],
+  snapshotListenOptions?: SnapshotListenOptions,
+};
+
+const DEFAULT_SNAPSHOT_LISTEN_OPTIONS = { includeMetadataChanges: true};
+
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
  * order of occurence.
@@ -192,9 +200,11 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
  */
 export function collectionChanges<T=DocumentData>(
   query: Query<T>,
-  events: DocumentChangeType[] = ALL_EVENTS
+  options: Options = {}
 ): Observable<DocumentChange<T>[]> {
-  return fromCollectionRef(query, { includeMetadataChanges: true }).pipe(
+  const events = options.events || ALL_EVENTS;
+  const snapshotListenOptions = options.snapshotListenOptions ?? DEFAULT_SNAPSHOT_LISTEN_OPTIONS;
+  return fromCollectionRef(query, snapshotListenOptions).pipe(
     windowwise(),
     map(([priorSnapshot, currentSnapshot]) => {
       const docChanges = currentSnapshot.docChanges();
@@ -242,8 +252,9 @@ export function collectionChanges<T=DocumentData>(
  * Return a stream of document snapshots on a query. These results are in sort order.
  * @param query
  */
-export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
-  return fromCollectionRef<T>(query, { includeMetadataChanges: true }).pipe(map((changes) => changes.docs));
+export function collection<T=DocumentData>(query: Query<T>, options?: SnapshotListenOptions): Observable<QueryDocumentSnapshot<T>[]> {
+  const snapshotListenOptions = options ?? DEFAULT_SNAPSHOT_LISTEN_OPTIONS;
+  return fromCollectionRef<T>(query, snapshotListenOptions).pipe(map((changes) => changes.docs));
 }
 
 /**
@@ -252,9 +263,10 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  */
 export function sortedChanges<T=DocumentData>(
     query: Query<T>,
-    events?: DocumentChangeType[],
+    options: Options = {}
 ): Observable<DocumentChange<T>[]> {
-  return collectionChanges(query, events).pipe(
+  const events = options.events || ALL_EVENTS
+  return collectionChanges(query, options).pipe(
       scan(
           (current: DocumentChange<T>[], changes: DocumentChange<T>[]) =>
             processDocumentChanges<T>(current, changes, events),
@@ -270,12 +282,14 @@ export function sortedChanges<T=DocumentData>(
  */
 export function auditTrail<T=DocumentData>(
     query: Query<T>,
-    events?: DocumentChangeType[],
+    options: Options = {}
 ): Observable<DocumentChange<T>[]> {
-  return collectionChanges<T>(query, events).pipe(
+  return collectionChanges<T>(query, options).pipe(
       scan((current, action) => [...current, ...action], [] as DocumentChange<T>[]),
   );
 }
+
+type StringPropertyNames<T> = { [K in keyof T]: T[K] extends string ? K : never }[keyof T];
 
 /**
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
@@ -283,11 +297,14 @@ export function auditTrail<T=DocumentData>(
  */
 export function collectionData<T=DocumentData>(
     query: Query<T>,
-    idField?: string,
-): Observable<T[]> {
-  return collection(query).pipe(
+    options: {
+      idField?: StringPropertyNames<T>,
+      snapshotListenOptions?: SnapshotListenOptions,
+    } = {}
+) {
+  return collection(query, options.snapshotListenOptions).pipe(
     map(arr => {
-      return arr.map(snap => snapToData(snap, idField) as T);
+      return arr.map(snap => snapToData(snap, options.idField)!);
     })
   );
 }
