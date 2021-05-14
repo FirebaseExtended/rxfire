@@ -39,6 +39,7 @@ import {
   query,
   orderByChild,
   equalTo,
+  get,
 } from 'firebase/database';
 import {
   list,
@@ -51,9 +52,7 @@ import {
 } from '../dist/database';
 import { take, skip, switchMap } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import TEST_PROJECT from './config';
+import { default as TEST_PROJECT, databaseEmulatorPort } from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
@@ -73,7 +72,7 @@ describe('RxFire Database', () => {
   let database: FirebaseDatabase;
 
   const builtRef = (path: string): Reference => {
-    return ref(getDatabase(getApp()), path);
+    return ref(database, path);
   };
 
   function prepareList(
@@ -96,16 +95,13 @@ describe('RxFire Database', () => {
    * is deleted after the test runs.
    */
   beforeEach(() => {
-    app = initializeApp({
-      projectId: TEST_PROJECT.projectId,
-      databaseURL: TEST_PROJECT.databaseURL
-    });
+    app = initializeApp(TEST_PROJECT, rando());
     database = getDatabase(app);
-    useDatabaseEmulator(database, "localhost", 9000);
+    useDatabaseEmulator(database, "localhost", databaseEmulatorPort);
   });
 
-  afterEach(done => {
-    deleteApp(app).then(() => done());
+  afterEach(() => {
+    deleteApp(app).catch();
   });
 
   describe('fromRef', () => {
@@ -694,6 +690,32 @@ describe('RxFire Database', () => {
       obs.subscribe(val => {
         expect(val).toEqual(itemsObj);
         done();
+      });
+    });
+
+    it('objectVal should behave the same as snap.val() when an object doesn\'t exist', (done) => {
+      const nonExistentRef = builtRef(rando());
+      set(nonExistentRef, null);
+      const obs = objectVal(nonExistentRef);
+
+      get(nonExistentRef).then((snap) => {
+        obs.subscribe((val) => {
+          expect(val).toEqual(snap.val());
+          done();
+        });
+      });
+    });
+
+    it('listVal should behave the same as snap.val() when a list doesn\'t exist', (done) => {
+      const nonExistentRef = builtRef(rando());
+      set(nonExistentRef, null);
+      const obs = listVal(nonExistentRef);
+
+      get(nonExistentRef).then((snap) => {
+        obs.subscribe((val) => {
+          expect(val).toEqual(snap.val());
+          done();
+        });
       });
     });
   });

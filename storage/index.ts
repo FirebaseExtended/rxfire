@@ -5,7 +5,7 @@ import {
   uploadString as _uploadString,
 } from 'firebase/storage';
 import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { debounceTime, map, shareReplay } from 'rxjs/operators';
 
 type UploadTaskSnapshot = import('firebase/storage').UploadTaskSnapshot;
 type StorageReference = import('firebase/storage').StorageReference;
@@ -21,9 +21,32 @@ export function fromTask(
     const progress = (snap: UploadTaskSnapshot): void => subscriber.next(snap);
     const error = (e: Error): void => subscriber.error(e);
     const complete = (): void => subscriber.complete();
-    task.on('state_changed', progress, error, complete);
-    return () => task.cancel();
-  });
+    // emit the current state of the task
+    progress(task.snapshot);
+    // emit progression of the task
+    const unsubscribeFromOnStateChanged = task.on('state_changed', progress);
+    // use the promise form of task, to get the last success snapshot
+    task.then(
+      snapshot => {
+        progress(snapshot);
+        setTimeout(() => complete(), 0);
+      },
+      e => {
+        progress(task.snapshot);
+        setTimeout(() => error(e), 0);
+      }
+    );
+    // the unsubscribe method returns by storage isn't typed in the
+    // way rxjs expects, Function vs () => void, so wrap it
+    return function unsubscribe() {
+      unsubscribeFromOnStateChanged();
+    };
+  }).pipe(
+    // since we're emitting first the current snapshot and then progression
+    // it's possible that we could double fire synchronously; namely when in
+    // a terminal state (success, error, canceled). Debounce to address.
+    debounceTime(0)
+  );
 }
 
 export function getDownloadURL(ref: StorageReference): Observable<string> {
@@ -33,17 +56,19 @@ export function getDownloadURL(ref: StorageReference): Observable<string> {
 // TODO: fix storage typing in firebase, then apply the same fix here
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getMetadata(ref: StorageReference): Observable<any> {
-  return from(getMetadata(ref));
+  return from(_getMetadata(ref));
 }
 
 // MARK: Breaking change (renaming put to uploadBytesResumable)
 export function uploadBytesResumable(
   ref: StorageReference,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any,
+  data: Blob | Uint8Array | ArrayBuffer,
   metadata?: UploadMetadata
 ): Observable<UploadTaskSnapshot> {
-  return fromTask(_uploadBytesResumable(ref, data, metadata));
+  return new Observable<UploadTaskSnapshot>(subscriber => {
+    const task = _uploadBytesResumable(ref, data, metadata);
+    return fromTask(task).subscribe(subscriber).add(task.cancel);
+  }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 }
 
 // MARK: Breaking change (renaming put to uploadString)

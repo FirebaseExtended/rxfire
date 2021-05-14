@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import config from './config';
+import { default as config, authEmulatorPort } from './config';
 import { initializeApp, FirebaseApp, deleteApp } from 'firebase/app';
 import { getAuth, Auth, useAuthEmulator, signInAnonymously } from 'firebase/auth';
 import { authState } from '../dist/auth';
@@ -28,11 +28,11 @@ describe('RxFire Auth', () => {
   beforeEach(() => {
     app = initializeApp(config);
     auth = getAuth(app);
-    useAuthEmulator(auth, "http://localhost:9099");
+    useAuthEmulator(auth, `http://localhost:${authEmulatorPort}`);
   });
 
-  afterEach(done => {
-    deleteApp(app).then(() => done());
+  afterEach(() => {
+    deleteApp(app).catch();
   });
 
   describe('Authentication state', () => {

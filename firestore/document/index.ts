@@ -16,27 +16,34 @@
  */
 
 // TODO fix the import
-import { DocumentReference, DocumentSnapshot } from '../interfaces';
+import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
 import { fromRef } from '../fromRef';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-export function doc(ref: DocumentReference): Observable<DocumentSnapshot> {
-  return fromRef(ref);
+export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
+  return fromRef(ref, { includeMetadataChanges: true });
 }
 
 /**
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T>(
-  ref: DocumentReference,
+export function docData<T=DocumentData>(
+  ref: DocumentReference<T>,
   idField?: string
 ): Observable<T> {
   return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
 }
 
-export function snapToData(snapshot: DocumentSnapshot, idField?: string): {} {
+export function snapToData<T=DocumentData>(
+    snapshot: DocumentSnapshot<T>,
+    idField?: string,
+): {} | undefined {
+  // match the behavior of the JS SDK when the snapshot doesn't exist
+  if (!snapshot.exists) {
+    return snapshot.data();
+  }
   return {
     ...snapshot.data(),
     ...(idField ? { [idField]: snapshot.id } : null)

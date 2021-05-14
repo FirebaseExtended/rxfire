@@ -32,7 +32,7 @@ import {
   collectionData,
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
-import TEST_PROJECT from './config';
+import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
 import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, useFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
@@ -79,21 +79,19 @@ describe('RxFire Firestore', () => {
    * Each test runs inside it's own app instance and the app
    * is deleted after the test runs.
    *
-   * Firestore tests run "offline" to reduce "flakeyness".
-   *
    * Each test is responsible for seeding and removing data. Helper
    * functions are useful if the process becomes brittle or tedious.
    * Note that removing is less necessary since the tests are run
-   * offline.
+   * against the emulator
    */
   beforeEach(() => {
-    app = initializeApp({projectId: TEST_PROJECT.projectId});
+    app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    useFirestoreEmulator(firestore, 'localhost', 8080);
+    useFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
   });
 
-  afterEach((done: jest.DoneCallback) => {
-    deleteApp(app).then(() => done());
+  afterEach(() => {
+    deleteApp(app).catch();
   });
 
   describe('collection', () => {
@@ -345,5 +343,48 @@ describe('RxFire Firestore', () => {
         done();
       });
     });
+
+    /**
+     * TODO(jamesdaniels)
+     * Having trouble gettings these test green with the emulators
+     * FIRESTORE (8.5.0) INTERNAL ASSERTION FAILED: Unexpected state
+     */
+
+    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
+      
+      pending('Not working against the emulator');
+      
+      const {colRef} = seedTest(firestore);
+
+      const nonExistentDoc: firebase.firestore.DocumentReference = colRef.doc(
+          createId(),
+      );
+
+      const unwrapped = docData(nonExistentDoc);
+
+      nonExistentDoc.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).toEqual(snap.data());
+          done();
+        });
+      });
+    });
+
+    it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
+      
+      pending('Not working against the emulator');
+      
+      const nonExistentCollection = firestore.collection(createId());
+
+      const unwrapped = collectionData(nonExistentCollection);
+
+      nonExistentCollection.onSnapshot((snap) => {
+        unwrapped.subscribe((val) => {
+          expect(val).toEqual(snap.docs);
+          done();
+        });
+      });
+    });
+
   });
 });
