@@ -289,7 +289,10 @@ export function auditTrail<T=DocumentData>(
   );
 }
 
-type StringPropertyNames<T> = { [K in keyof T]: T[K] extends string ? K : never }[keyof T];
+type DocumentReference = firebase.firestore.DocumentReference;
+type SnapshotMetadata = firebase.firestore.SnapshotMetadata;
+
+type KeysExtending<T, K> = { [L in keyof T]: T[L] extends K ? L : never }[keyof T];
 
 /**
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
@@ -298,7 +301,10 @@ type StringPropertyNames<T> = { [K in keyof T]: T[K] extends string ? K : never 
 export function collectionData<T=DocumentData>(
     query: Query<T>,
     options: {
-      idField?: StringPropertyNames<T>,
+      idField?: KeysExtending<T, string>,
+      // We could add additional mappings like so:
+      referenceField?: KeysExtending<T, DocumentReference>,
+      metadataField?: KeysExtending<T, SnapshotMetadata>,
       snapshotListenOptions?: SnapshotListenOptions,
     } = {}
 ) {
