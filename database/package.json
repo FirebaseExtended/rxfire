@@ -1,6 +1,6 @@
 {
   "name": "rxfire/database",
-  "browser": "../dist/rxfire-database.js",
+  "browser": "../dist/database/index.esm.js",
   "main": "../dist/database/index.cjs.js",
   "module": "../dist/database/index.esm.js",
   "typings": "../dist/database/index.d.ts"
