@@ -19,7 +19,6 @@ import { resolve, dirname, relative, join } from 'path';
 import resolveModule from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
-import { uglify } from 'rollup-plugin-uglify';
 import { peerDependencies, dependencies } from './package.json';
 import { sync as globSync } from 'glob';
 import { readFileSync } from 'fs';
@@ -84,7 +83,7 @@ const globals = {
 export default Object.keys(packages)
   .map(component => {
     const baseContents = packages[component];
-    const { name, browser, main, module, typings } = baseContents;
+    const { browser, main, module, typings } = baseContents;
     // rewrite the paths for dist folder
     // TODO error if any of these don't match convention
     const outputFolder = join('dist', component);
@@ -117,23 +116,6 @@ export default Object.keys(packages)
           ...plugins,
           typescript(),
           generatePackageJson({ outputFolder, baseContents }),
-        ],
-        external
-      },
-      {
-        input: `${component}/index.ts`,
-        output: {
-          file: `dist/${name.replace(/\//g, '-')}.js`,
-          format: 'iife',
-          sourcemap: true,
-          extend: true,
-          name: globals[baseContents.name],
-          globals,
-        },
-        plugins: [
-          ...plugins,
-          typescript(),
-          uglify(),
         ],
         external
       },
