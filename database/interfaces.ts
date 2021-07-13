@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase';
+import { onChildAdded, onChildChanged, onChildMoved, onChildRemoved, onValue } from 'firebase/database';
+
+export type Query = import('firebase/database').Query;
 
 export enum ListenEvent {
-  /* eslint-disable no-unused-vars */
   added = 'child_added',
   removed = 'child_removed',
   changed = 'child_changed',
@@ -27,7 +28,15 @@ export enum ListenEvent {
 }
 
 export interface QueryChange {
-  snapshot: firebase.database.DataSnapshot;
+  snapshot: import('firebase/database').DataSnapshot;
   prevKey: string | null | undefined;
   event: ListenEvent;
 }
+
+export const ListenerMethods = Object.freeze({
+  [ListenEvent.added]: onChildAdded,
+  [ListenEvent.removed]: onChildRemoved,
+  [ListenEvent.changed]: onChildChanged,
+  [ListenEvent.moved]: onChildMoved,
+  [ListenEvent.value]: onValue,
+});

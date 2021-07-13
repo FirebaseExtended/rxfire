@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,20 @@ const plugins = [resolveModule(), commonjs()];
 
 const external = [
   ...Object.keys({ ...peerDependencies, ...dependencies }),
+  'firebase/firestore',
+  'firebase/auth',
+  'firebase/functions',
+  'firebase/storage',
+  'firebase/database',
+  'firebase/remote-config',
+  'firebase/performance',
+  '@firebase/firestore',
+  '@firebase/auth',
+  '@firebase/functions',
+  '@firebase/storage',
+  '@firebase/database',
+  '@firebase/remote-config',
+  '@firebase/performance',
   'rxjs/operators'
 ];
 
@@ -49,6 +63,20 @@ const globals = {
   rxjs: 'rxjs',
   tslib: 'tslib',
   ...Object.values(packages).reduce((acc, {name}) => (acc[name] = name.replace(/\//g, '.'), acc), {}),
+  'firebase/firestore': 'firebase.firestore',
+  'firebase/auth': 'firebase.auth',
+  'firebase/functions': 'firebase.functions',
+  'firebase/storage': 'firebase.storage',
+  'firebase/database': 'firebase.database',
+  'firebase/remote-config': 'firebase.remote-config',
+  'firebase/performance': 'firebase.performance',
+  '@firebase/firestore': 'firebase.firestore',
+  '@firebase/auth': 'firebase.auth',
+  '@firebase/functions': 'firebase.functions',
+  '@firebase/storage': 'firebase.storage',
+  '@firebase/database': 'firebase.database',
+  '@firebase/remote-config': 'firebase.remote-config',
+  '@firebase/performance': 'firebase.performance',
   'rxjs/operators': 'rxjs.operators',
 };
 

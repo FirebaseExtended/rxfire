@@ -5,23 +5,23 @@
 ### `authState()`
 The `authState()` function creates an observable that emits authentication changes such as a logged out or logged in state.
 
-|                 |                                          |
-|-----------------|------------------------------------------|
-| **function**    | `authState()`                            |
-| **params**      | `auth.Auth`                              |
-| **import path** | `rxfire/auth`                            |
-| **return**      | `Observable<firebase.User>`              |
+|                 |                                             |
+|-----------------|---------------------------------------------|
+| **function**    | `authState()`                               |
+| **params**      | `import('firebase/auth').Auth`              |
+| **import path** | `rxfire/auth`                               |
+| **return**      | `Observable<import('firebase/auth').User>`  |
 
 #### TypeScript Example
 ```ts
 import { authState } from 'rxfire/auth';
-import { auth, initializeApp } from 'firebase';
-import 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { filter } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const auth = app.auth();
+const auth = getAuth();
 authState(auth).subscribe(user => {
   console.log(user, ' will be null if logged out');
 });
@@ -34,23 +34,23 @@ loggedIn$.subscribe(user => { console.log(user); });
 ### `user()`
 The `user()` function creates an observable that emits authentication changes such as a logged out, logged in, and token refresh state. The token refresh emissions is what makes `user()` different from `authState()`.
 
-|                 |                                          |
-|-----------------|------------------------------------------|
-| **function**    | `user()`                                 |
-| **params**      | `auth.Auth`                              |
-| **import path** | `rxfire/auth`                            |
-| **return**      | `Observable<firebase.User>`              |
+|                 |                                             |
+|-----------------|---------------------------------------------|
+| **function**    | `user()`                                    |
+| **params**      | `import('firebase/auth').Auth`              |
+| **import path** | `rxfire/auth`                               |
+| **return**      | `Observable<import('firebase/auth').User>`  |
 
 #### TypeScript Example
 ```ts
 import { user } from 'rxfire/auth';
-import { auth, initializeApp } from 'firebase';
-import 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { filter } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const auth = app.auth();
+const auth = getAuth();
 user(auth).subscribe(u => { console.log(u); );
 ```
 
@@ -59,20 +59,20 @@ The `idToken()` function creates an observable that emits the `idToken` refreshe
 
 |                 |                                          |
 |-----------------|------------------------------------------|
-| **function**    | `idToken()`                                 |
-| **params**      | `auth.Auth`                              |
+| **function**    | `idToken()`                              |
+| **params**      | `import('firebase/auth').Auth`           |
 | **import path** | `rxfire/auth`                            |
-| **return**      | `Observable<string\|null>`              |
+| **return**      | `Observable<string|null>`                |
 
 #### TypeScript Example
 ```ts
 import { idToken } from 'rxfire/auth';
-import { auth, initializeApp } from 'firebase';
-import 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { filter } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const auth = app.auth();
+const auth = getAuth();
 idToken(auth).subscribe(token => { console.log(token); );
 ```

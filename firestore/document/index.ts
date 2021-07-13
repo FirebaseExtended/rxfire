@@ -15,17 +15,14 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase/app';
-import { fromDocRef } from '../fromRef';
+// TODO fix the import
+import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
+import { fromRef } from '../fromRef';
 import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-type DocumentData = firebase.firestore.DocumentData;
-type DocumentReference<T> = firebase.firestore.DocumentReference<T>;
-type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
-
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
-  return fromDocRef(ref, { includeMetadataChanges: true });
+  return fromRef(ref, { includeMetadataChanges: true });
 }
 
 /**
@@ -33,8 +30,8 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * @param query
  */
 export function docData<T=DocumentData>(
-    ref: DocumentReference<T>,
-    idField?: string,
+  ref: DocumentReference<T>,
+  idField?: string
 ): Observable<T> {
   return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
 }

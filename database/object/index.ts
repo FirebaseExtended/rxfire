@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,11 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase';
-import {QueryChange, ListenEvent} from '../interfaces';
-import {fromRef} from '../fromRef';
-import {Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { fromRef } from '../fromRef';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-type Query = firebase.database.Query;
 /**
  * Get the snapshot changes of an object
  * @param query
@@ -37,7 +35,7 @@ export function object(query: Query): Observable<QueryChange> {
  */
 export function objectVal<T>(query: Query, keyField?: string): Observable<T> {
   return fromRef(query, ListenEvent.value).pipe(
-      map((change) => changeToData(change, keyField) as T),
+    map(change => changeToData(change, keyField) as T)
   );
 }
 
@@ -56,6 +54,6 @@ export function changeToData(change: QueryChange, keyField?: string): {} {
 
   return {
     ...val,
-    ...(keyField ? {[keyField]: change.snapshot.key} : null),
+    ...(keyField ? { [keyField]: change.snapshot.key } : null)
   };
 }

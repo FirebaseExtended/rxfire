@@ -1,0 +1,12 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": true,
+    "$a": {
+      ".indexOn": ["name"],
+      "$b": {
+        ".indexOn": ["name"]
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -16,6 +16,8 @@
     "./database": "./dist/database/index.esm.js",
     "./firestore": "./dist/firestore/index.esm.js",
     "./functions": "./dist/functions/index.esm.js",
+    "./performance": "./dist/performance/index.esm.js",
+    "./remote-config": "./dist/remote-config/index.esm.js",
     "./storage": "./dist/storage/index.esm.js"
   },
   "sideEffects": false,
@@ -42,13 +44,15 @@
     "build:rollup": "rollup -c",
     "build:docs": "cp README.md ./dist/ && cp -r ./docs ./dist/",
     "dev": "rollup -c -w",
-    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec --project=rxfire-test-c497c \"jest\""
+    "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
+    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec jest --project=rxfire-test-c497c",
+    "test:debug": "yarn echo:chrome && FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
   },
   "dependencies": {
     "tslib": "^1.9.0 || ~2.1.0"
   },
   "peerDependencies": {
-    "firebase": "^8.0.0",
+    "firebase": ">=9.0.0-beta.6",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
@@ -65,7 +69,7 @@
     "cross-fetch": "^3.1.4",
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
-    "firebase": "^8.6.1",
+    "firebase": ">=9.0.0-beta.6",
     "firebase-tools": "^9.10.2",
     "glob": "^7.1.6",
     "jest": "^26.6.3",
