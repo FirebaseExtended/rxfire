@@ -23,6 +23,7 @@ import { Observable } from 'rxjs';
 type DocumentData = firebase.firestore.DocumentData;
 type DocumentReference<T> = firebase.firestore.DocumentReference<T>;
 type DocumentSnapshot<T> = firebase.firestore.DocumentSnapshot<T>;
+type SnapshotOptions = firebase.firestore.SnapshotOptions;
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return fromDocRef(ref, { includeMetadataChanges: true });
@@ -35,20 +36,22 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
 export function docData<T=DocumentData>(
     ref: DocumentReference<T>,
     idField?: string,
+    snapshotOptions?: SnapshotOptions,
 ): Observable<T> {
-  return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
+  return doc(ref).pipe(map(snap => snapToData(snap, idField, snapshotOptions) as T));
 }
 
 export function snapToData<T=DocumentData>(
     snapshot: DocumentSnapshot<T>,
     idField?: string,
+    snapshotOptions?: SnapshotOptions,
 ): {} | undefined {
   // match the behavior of the JS SDK when the snapshot doesn't exist
   if (!snapshot.exists) {
-    return snapshot.data();
+    return snapshot.data(snapshotOptions);
   }
   return {
-    ...snapshot.data(),
+    ...snapshot.data(snapshotOptions),
     ...(idField ? { [idField]: snapshot.id } : null)
   };
 }

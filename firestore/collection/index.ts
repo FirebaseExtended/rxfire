@@ -40,6 +40,7 @@ type DocumentChange<T> = firebase.firestore.DocumentChange<T>;
 type Query<T> = firebase.firestore.Query<T>;
 type QueryDocumentSnapshot<T> = firebase.firestore.QueryDocumentSnapshot<T>;
 type QuerySnapshot<T> = firebase.firestore.QuerySnapshot<T>;
+type SnapshotOptions = firebase.firestore.SnapshotOptions;
 
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
@@ -284,10 +285,11 @@ export function auditTrail<T=DocumentData>(
 export function collectionData<T=DocumentData>(
     query: Query<T>,
     idField?: string,
+    snapshotOptions?: SnapshotOptions,
 ): Observable<T[]> {
   return collection(query).pipe(
     map(arr => {
-      return arr.map(snap => snapToData(snap, idField) as T);
+      return arr.map(snap => snapToData(snap, idField, snapshotOptions) as T);
     })
   );
 }
