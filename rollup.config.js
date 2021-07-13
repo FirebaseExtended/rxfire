@@ -86,7 +86,8 @@ export default Object.keys(packages)
         ],
         plugins: [
           ...plugins,
-          typescript(),
+          // TS sourceMaps conflict with Rollup sourceMaps
+          typescript({ sourceMap: false }),
           generatePackageJson({ outputFolder, baseContents }),
         ],
         external
