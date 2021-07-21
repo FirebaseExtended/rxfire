@@ -11,12 +11,30 @@
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.ems.js",
-    "./auth": "./dist/auth/index.esm.js",
-    "./database": "./dist/database/index.esm.js",
-    "./firestore": "./dist/firestore/index.esm.js",
-    "./functions": "./dist/functions/index.esm.js",
-    "./storage": "./dist/storage/index.esm.js"
+    ".": {
+      "import": "./dist/index.ems.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./auth": {
+      "import": "./dist/auth/index.esm.js",
+      "require": "./dist/auth/index.cjs.js"
+    },
+    "./database": {
+      "import": "./dist/database/index.esm.js",
+      "require": "./dist/database/index.cjs.js"
+    },
+    "./firestore": {
+      "import": "./dist/firestore/index.esm.js",
+      "require": "./dist/firestore/index.cjs.js"
+    },
+    "./functions": {
+      "import": "./dist/functions/index.esm.js",
+      "require": "./dist/functions/index.cjs.js"
+    },
+    "./storage": {
+      "import": "./dist/storage/index.esm.js",
+      "require": "./dist/storage/index.cjs.js"
+    }
   },
   "sideEffects": false,
   "keywords": [
