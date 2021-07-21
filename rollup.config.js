@@ -30,7 +30,8 @@ const packages = packageJsonPaths.reduce((acc, path) => {
   const component = dirname(path);
   if (component === '.') {
     Object.keys(pkg.exports).forEach(exportName => {
-      pkg.exports[exportName] = pkg.exports[exportName].replace(/^\.\/dist\//, './');
+      pkg.exports[exportName] = pkg.exports[exportName].import.replace(/^\.\/dist\//, './');
+      pkg.exports[exportName] = pkg.exports[exportName].require.replace(/^\.\/dist\//, './');
     });
   }
   acc[component] = pkg;
