@@ -12,7 +12,7 @@
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.ems.js",
+      "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs.js"
     },
     "./auth": {
