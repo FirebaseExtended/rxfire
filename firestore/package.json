@@ -3,5 +3,6 @@
   "browser": "../dist/firestore/index.esm.js",
   "main": "../dist/firestore/index.cjs.js",
   "module": "../dist/firestore/index.esm.js",
-  "typings": "../dist/firestore/index.d.ts"
+  "typings": "../dist/firestore/index.d.ts",
+  "sideEffects": false
 }

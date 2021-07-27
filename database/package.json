@@ -3,5 +3,6 @@
   "browser": "../dist/database/index.esm.js",
   "main": "../dist/database/index.cjs.js",
   "module": "../dist/database/index.esm.js",
-  "typings": "../dist/database/index.d.ts"
+  "typings": "../dist/database/index.d.ts",
+  "sideEffects": false
 }
