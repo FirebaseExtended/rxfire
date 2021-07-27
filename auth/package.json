@@ -3,5 +3,6 @@
   "browser": "../dist/auth/index.esm.js",
   "main": "../dist/auth/index.cjs.js",
   "module": "../dist/auth/index.esm.js",
-  "typings": "../dist/auth/index.d.ts"
+  "typings": "../dist/auth/index.d.ts",
+  "sideEffects": false
 }
