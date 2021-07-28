@@ -27,6 +27,10 @@
       "import": "./dist/firestore/index.esm.js",
       "require": "./dist/firestore/index.cjs.js"
     },
+    "./firestore/lite": {
+      "import": "./dist/firestore/lite/index.esm.js",
+      "require": "./dist/firestore/lite/index.cjs.js"
+    },
     "./functions": {
       "import": "./dist/functions/index.esm.js",
       "require": "./dist/functions/index.cjs.js"
