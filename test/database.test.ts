@@ -30,7 +30,7 @@ import {
   Reference,
   ref,
   set,
-  useDatabaseEmulator,
+  connectDatabaseEmulator,
   push,
   remove,
   child,
@@ -97,7 +97,7 @@ describe('RxFire Database', () => {
   beforeEach(() => {
     app = initializeApp(TEST_PROJECT, rando());
     database = getDatabase(app);
-    useDatabaseEmulator(database, "localhost", databaseEmulatorPort);
+    connectDatabaseEmulator(database, "localhost", databaseEmulatorPort);
   });
 
   afterEach(() => {

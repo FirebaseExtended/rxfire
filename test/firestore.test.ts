@@ -33,7 +33,7 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, useFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
+import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -87,7 +87,7 @@ describe('RxFire Firestore', () => {
   beforeEach(() => {
     app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    useFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
+    connectFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
   });
 
   afterEach(() => {

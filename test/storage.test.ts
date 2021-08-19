@@ -17,7 +17,7 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import { UploadTaskSnapshot, StorageService, getStorage, useStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString, UploadResult } from 'firebase/storage';
+import { UploadTaskSnapshot, StorageService, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString, UploadResult } from 'firebase/storage';
 import { FirebaseApp, initializeApp, deleteApp } from 'firebase/app';
 import {
   fromTask,
@@ -80,7 +80,7 @@ describe('RxFire Storage', () => {
   beforeAll(() => {
     app = initializeApp(TEST_PROJECT, rando());
     storage = getStorage(app, 'default-bucket');
-    useStorageEmulator(storage, 'localhost', storageEmulatorPort);
+    connectStorageEmulator(storage, 'localhost', storageEmulatorPort);
   });
 
   afterAll(() => {

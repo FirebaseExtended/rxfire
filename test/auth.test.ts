@@ -17,7 +17,7 @@
  */
 import { default as config, authEmulatorPort } from './config';
 import { initializeApp, FirebaseApp, deleteApp } from 'firebase/app';
-import { getAuth, Auth, useAuthEmulator, signInAnonymously } from 'firebase/auth';
+import { getAuth, Auth, connectAuthEmulator, signInAnonymously } from 'firebase/auth';
 import { authState } from '../dist/auth';
 import { skip, take } from 'rxjs/operators';
 
@@ -28,7 +28,7 @@ describe('RxFire Auth', () => {
   beforeEach(() => {
     app = initializeApp(config);
     auth = getAuth(app);
-    useAuthEmulator(auth, `http://localhost:${authEmulatorPort}`);
+    connectAuthEmulator(auth, `http://localhost:${authEmulatorPort}`);
   });
 
   afterEach(() => {

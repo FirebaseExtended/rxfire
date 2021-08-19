@@ -18,7 +18,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
 import { initializeApp, FirebaseApp, deleteApp } from 'firebase/app';
-import { getFunctions, useFunctionsEmulator, Functions } from 'firebase/functions';
+import { getFunctions, connectFunctionsEmulator, Functions } from 'firebase/functions';
 import { httpsCallable } from '../dist/functions';
 import { default as TEST_PROJECT, functionsEmulatorPort } from './config';
 
@@ -40,7 +40,7 @@ describe('RxFire Functions', () => {
   beforeEach(() => {
     app = initializeApp(TEST_PROJECT, rando());
     functions = getFunctions(app);
-    useFunctionsEmulator(functions, 'localhost', functionsEmulatorPort);
+    connectFunctionsEmulator(functions, 'localhost', functionsEmulatorPort);
   });
 
   afterEach(() => {
