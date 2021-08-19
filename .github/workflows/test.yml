@@ -29,9 +29,9 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-beta-7-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-14-next-7-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-beta-7-node_modules-
+            ${{ runner.os }}-14-next-7-node_modules-
             ${{ runner.os }}-14-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
@@ -62,7 +62,7 @@ jobs:
     strategy:
       matrix:
         node: ["12", "14", "16"]
-        firebase: ["beta"]
+        firebase: ["next"]
         rxjs: ["6", "7"]
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
