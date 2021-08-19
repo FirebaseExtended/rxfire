@@ -12,13 +12,20 @@ Firebase and RxJS for all frameworks.
 
 Status: Beta
 
+
+---
+
+> **WARNING**: This branch is the work in progress for version 6 of RxFire. [You can find version 5 here](https://github.com/FirebaseExtended/rxfire/tree/v5), if you're looking for documentation or to contribute to stable.
+
+---
+
 ## Install
 
 ```bash
 # npm
-npm i rxfire@exp firebase@exp rxjs --save
+npm i rxfire@next firebase@next rxjs --save
 # yarn
-yarn add rxfire@exp firebase@exp rxjs
+yarn add rxfire@next firebase@next rxjs
 ```
 
 Make sure to install Firebase and RxJS individually as they are peer dependencies of RxFire.
