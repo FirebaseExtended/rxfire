@@ -41,7 +41,7 @@ export function snapToData<T=DocumentData>(
     idField?: string,
 ): {} | undefined {
   // match the behavior of the JS SDK when the snapshot doesn't exist
-  if (!snapshot.exists) {
+  if (!snapshot.exists()) {
     return snapshot.data();
   }
   return {
