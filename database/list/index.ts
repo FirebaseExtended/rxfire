@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,53 +15,53 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase';
-import {QueryChange, ListenEvent} from '../interfaces';
-import {Observable, of, merge, from} from 'rxjs';
-import {validateEventsArray} from '../utils';
-import {fromRef} from '../fromRef';
-import {switchMap, scan, distinctUntilChanged, map} from 'rxjs/operators';
-import {changeToData} from '../object';
-
-type Query = firebase.database.Query;
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { Observable, of, merge, from } from 'rxjs';
+import { validateEventsArray } from '../utils';
+import { fromRef } from '../fromRef';
+import { switchMap, scan, distinctUntilChanged, map } from 'rxjs/operators';
+import { changeToData } from '../object';
+import { get as databaseGet } from 'firebase/database';
 
 export function stateChanges(
-    query: Query,
-    events?: ListenEvent[],
+  query: Query,
+  options: {
+    events?: ListenEvent[]
+  } = {}
 ): Observable<QueryChange> {
-  events = validateEventsArray(events);
-  const childEvent$ = events.map((event) => fromRef(query, event));
+  const events = validateEventsArray(options.events);
+  const childEvent$ = events.map(event => fromRef(query, event));
   return merge(...childEvent$);
 }
 
-function fromOnce(query: Query): Observable<QueryChange> {
-  return from(query.once(ListenEvent.value)).pipe(
-      map((snapshot) => {
-        const event = ListenEvent.value;
-        return {snapshot, prevKey: null, event};
-      }),
+function get(query: Query): Observable<QueryChange> {
+  return from(databaseGet(query)).pipe(
+    map(snapshot => {
+      const event = ListenEvent.value;
+      return { snapshot, prevKey: null, event };
+    })
   );
 }
 
 export function list(
-    query: Query,
-    events?: ListenEvent[],
+  query: Query,
+  options: {
+    events?: ListenEvent[]
+  }={}
 ): Observable<QueryChange[]> {
-  const eventsList = validateEventsArray(events);
-  return fromOnce(query).pipe(
-      switchMap((change) => {
-        // in case the list doesn't exist, match the RTDB SDK's default behavior
-        if (!change.snapshot.exists()) {
-          return of(change.snapshot.val());
-        }
-
-        const childEvent$ = [of(change)];
-        for (const event of eventsList) {
-          childEvent$.push(fromRef(query, event));
-        }
-        return merge(...childEvent$).pipe(scan(buildView, []));
-      }),
-      distinctUntilChanged(),
+  const events = validateEventsArray(options.events);
+  return get(query).pipe(
+    switchMap(change => {
+      if (!change.snapshot.exists()) {
+        return of([]);
+      }
+      const childEvent$ = [of(change)];
+      events.forEach(event => {
+        childEvent$.push(fromRef(query, event));
+      });
+      return merge(...childEvent$).pipe(scan(buildView, []));
+    }),
+    distinctUntilChanged()
   );
 }
 
@@ -72,17 +72,14 @@ export function list(
  */
 export function listVal<T>(
     query: Query,
-    keyField?: string,
+    options: {
+      keyField?: string,
+    }={}
 ): Observable<T[] | null> {
   return list(query).pipe(
-      map((arr) => {
-        // result can be null if query returns no data
-        if (arr === null) {
-          return arr;
-        }
-
-        return arr.map((change) => changeToData(change, keyField) as T);
-      }),
+    map(arr => {
+      return arr.map(change => changeToData(change, options) as T);
+    }),
   );
 }
 
@@ -110,19 +107,19 @@ function positionAfter(changes: QueryChange[], prevKey?: string): number {
 }
 
 function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
-  const {snapshot, prevKey, event} = change;
-  const {key} = snapshot;
+  const { snapshot, prevKey, event } = change;
+  const { key } = snapshot;
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey || undefined);
   switch (event) {
     case ListenEvent.value:
       if (change.snapshot && change.snapshot.exists()) {
         let prevKey: string | null = null;
-        change.snapshot.forEach((snapshot) => {
+        change.snapshot.forEach(snapshot => {
           const action: QueryChange = {
             snapshot,
             event: ListenEvent.value,
-            prevKey,
+            prevKey
           };
           prevKey = snapshot.key;
           current = [...current, action];
@@ -135,7 +132,7 @@ function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
         // check that the previouskey is what we expect, else reorder
         const previous = current[currentKeyPosition - 1];
         if (((previous && previous.snapshot.key) || null) !== prevKey) {
-          current = current.filter((x) => x.snapshot.key !== snapshot.key);
+          current = current.filter(x => x.snapshot.key !== snapshot.key);
           current.splice(afterPreviousKeyPosition, 0, change);
         }
       } else if (prevKey == null) {
@@ -146,9 +143,9 @@ function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
       }
       return current;
     case ListenEvent.removed:
-      return current.filter((x) => x.snapshot.key !== snapshot.key);
+      return current.filter(x => x.snapshot.key !== snapshot.key);
     case ListenEvent.changed:
-      return current.map((x) => (x.snapshot.key === key ? change : x));
+      return current.map(x => (x.snapshot.key === key ? change : x));
     case ListenEvent.moved:
       if (currentKeyPosition > -1) {
         const data = current.splice(currentKeyPosition, 1)[0];

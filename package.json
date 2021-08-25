@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "5.0.0",
+  "version": "6.0.0",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -27,9 +27,21 @@
       "import": "./dist/firestore/index.esm.js",
       "require": "./dist/firestore/index.cjs.js"
     },
+    "./firestore/lite": {
+      "import": "./dist/firestore/lite/index.esm.js",
+      "require": "./dist/firestore/lite/index.cjs.js"
+    },
     "./functions": {
       "import": "./dist/functions/index.esm.js",
       "require": "./dist/functions/index.cjs.js"
+    },
+    "./performance": {
+      "import": "./dist/performance/index.esm.js",
+      "require": "./dist/performance/index.cjs.js"
+    },
+    "./remote-config": {
+      "import": "./dist/remote-config/index.esm.js",
+      "require": "./dist/remote-config/index.cjs.js"
     },
     "./storage": {
       "import": "./dist/storage/index.esm.js",
@@ -60,13 +72,15 @@
     "build:rollup": "rollup -c",
     "build:docs": "cp README.md ./dist/ && cp -r ./docs ./dist/",
     "dev": "rollup -c -w",
-    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec --project=rxfire-test-c497c \"jest\""
+    "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
+    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec jest --project=rxfire-test-c497c",
+    "test:debug": "yarn echo:chrome && FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
   },
   "dependencies": {
     "tslib": "^1.9.0 || ~2.1.0"
   },
   "peerDependencies": {
-    "firebase": "^8.0.0",
+    "firebase": "^9.0.0-0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
@@ -83,7 +97,7 @@
     "cross-fetch": "^3.1.4",
     "eslint": "^7.17.0",
     "eslint-config-google": "^0.14.0",
-    "firebase": "^8.6.1",
+    "firebase": "9.0.0-202172505352",
     "firebase-tools": "^9.10.2",
     "glob": "^7.1.6",
     "jest": "^26.6.3",

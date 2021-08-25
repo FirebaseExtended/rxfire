@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,11 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase';
-import {Observable} from 'rxjs';
-import {QueryChange, ListenEvent} from '../interfaces';
-import {fromRef} from '../fromRef';
-import {map, withLatestFrom, scan, skipWhile} from 'rxjs/operators';
-import {stateChanges} from './index';
-
-type Query = firebase.database.Query;
+import { Observable } from 'rxjs';
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { fromRef } from '../fromRef';
+import { map, withLatestFrom, scan, skipWhile } from 'rxjs/operators';
+import { stateChanges } from './index';
 
 interface LoadedMetadata {
   data: QueryChange;
@@ -30,14 +27,16 @@ interface LoadedMetadata {
 }
 
 export function auditTrail(
-    query: Query,
-    events?: ListenEvent[],
+  query: Query,
+  options: {
+    events?: ListenEvent[]
+  }={}
 ): Observable<QueryChange[]> {
-  const auditTrail$ = stateChanges(query, events).pipe(
-      scan<QueryChange, QueryChange[]>(
-          (current, changes) => [...current, changes],
-          [],
-      ),
+  const auditTrail$ = stateChanges(query, options).pipe(
+    scan<QueryChange, QueryChange[]>(
+      (current, changes) => [...current, changes],
+      []
+    )
   );
   return waitForLoaded(query, auditTrail$);
 }
@@ -47,45 +46,45 @@ function loadedData(query: Query): Observable<LoadedMetadata> {
   // known dataset. This will allow us to know what key to
   // emit the "whole" array at when listening for child events.
   return fromRef(query, ListenEvent.value).pipe(
-      map((data) => {
+    map(data => {
       // Store the last key in the data set
-        let lastKeyToLoad;
-        // Loop through loaded dataset to find the last key
-        data.snapshot.forEach((child) => {
-          lastKeyToLoad = child.key;
-          return false;
-        });
-        // return data set and the current last key loaded
-        return {data, lastKeyToLoad};
-      }),
+      let lastKeyToLoad;
+      // Loop through loaded dataset to find the last key
+      data.snapshot.forEach(child => {
+        lastKeyToLoad = child.key;
+        return false;
+      });
+      // return data set and the current last key loaded
+      return { data, lastKeyToLoad };
+    })
   );
 }
 
 function waitForLoaded(
-    query: Query,
-    snap$: Observable<QueryChange[]>,
+  query: Query,
+  snap$: Observable<QueryChange[]>
 ): Observable<QueryChange[]> {
   const loaded$ = loadedData(query);
   return loaded$.pipe(
-      withLatestFrom(snap$),
-      // Get the latest values from the "loaded" and "child" datasets
-      // We can use both datasets to form an array of the latest values.
-      map(([loaded, changes]) => {
+    withLatestFrom(snap$),
+    // Get the latest values from the "loaded" and "child" datasets
+    // We can use both datasets to form an array of the latest values.
+    map(([loaded, changes]) => {
       // Store the last key in the data set
-        const lastKeyToLoad = loaded.lastKeyToLoad;
-        // Store all child keys loaded at this point
-        const loadedKeys = changes.map((change) => change.snapshot.key);
-        return {changes, lastKeyToLoad, loadedKeys};
-      }),
-      // This is the magical part, only emit when the last load key
-      // in the dataset has been loaded by a child event. At this point
-      // we can assume the dataset is "whole".
-      skipWhile(
-          (meta) =>
-            meta.loadedKeys.indexOf(meta.lastKeyToLoad as string | null) === -1,
-      ),
-      // Pluck off the meta data because the user only cares
-      // to iterate through the snapshots
-      map((meta) => meta.changes),
+      const lastKeyToLoad = loaded.lastKeyToLoad;
+      // Store all child keys loaded at this point
+      const loadedKeys = changes.map(change => change.snapshot.key);
+      return { changes, lastKeyToLoad, loadedKeys };
+    }),
+    // This is the magical part, only emit when the last load key
+    // in the dataset has been loaded by a child event. At this point
+    // we can assume the dataset is "whole".
+    skipWhile(
+      meta =>
+        meta.loadedKeys.indexOf(meta.lastKeyToLoad as string | null) === -1
+    ),
+    // Pluck off the meta data because the user only cares
+    // to iterate through the snapshots
+    map(meta => meta.changes)
   );
 }

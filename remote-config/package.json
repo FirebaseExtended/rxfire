@@ -1,0 +1,9 @@
+{
+    "name": "rxfire/remote-config",
+    "browser": "../dist/rxfire-remote-config.js",
+    "main": "../dist/remote-config/index.cjs.js",
+    "module": "../dist/remote-config/index.esm.js",
+    "typings": "../dist/remote-config/index.d.ts",
+    "sideEffects": false
+  }
+  

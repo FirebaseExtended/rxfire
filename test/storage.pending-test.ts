@@ -17,15 +17,15 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import firebase from 'firebase/app';
-import 'firebase/storage';
+import { UploadTaskSnapshot, FirebaseStorage, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString, UploadResult } from 'firebase/storage';
+import { FirebaseApp, initializeApp, deleteApp } from 'firebase/app';
 import {
   fromTask,
   getDownloadURL,
   getMetadata,
   percentage,
-  put,
-  putString,
+  uploadBytesResumable,
+  uploadString,
 } from '../dist/storage';
 import { switchMap, take, tap, reduce, concatMap } from 'rxjs/operators';
 import { default as TEST_PROJECT, storageEmulatorPort } from './config';
@@ -45,16 +45,16 @@ const rando = (): string => [
 class MockTask {
   _resolve: (value: any) => void;
   _reject: (reason?: any) => void;
-  _state_changed_cbs: Array<(snapshot: firebase.storage.UploadTaskSnapshot) => {}> = [];
+  _state_changed_cbs: Array<(snapshot: UploadTaskSnapshot) => {}> = [];
   _state_change = (progress: any) => {
     this.snapshot = progress;
     this._state_changed_cbs.forEach(it => it(progress));
-    if (progress.state === firebase.storage.TaskState.CANCELED) { this._reject() }
-    if (progress.state === firebase.storage.TaskState.ERROR) { this._reject() }
-    if (progress.state === firebase.storage.TaskState.SUCCESS) { this._resolve(progress) }
+    if (progress.state === 'canceled') { this._reject() }
+    if (progress.state === 'error') { this._reject() }
+    if (progress.state === 'success') { this._resolve(progress) }
   };
   _unsubscribe = () => {};
-  on = (event: string, cb: (snapshot: firebase.storage.UploadTaskSnapshot) => {}) => {
+  on = (event: string, cb: (snapshot: UploadTaskSnapshot) => {}) => {
     if (event === 'state_changed') { this._state_changed_cbs.push(cb); }
     return this._unsubscribe;
   };
@@ -71,20 +71,20 @@ class MockTask {
 };
 
 describe('RxFire Storage', () => {
-  let app: firebase.app.App;
-  let storage: firebase.storage.Storage;
+  let app: FirebaseApp;
+  let storage: FirebaseStorage;
 
   // I can't do beforeEach for whatever reason with the Firebase Emulator
   // storage seems to be tearing things down and canceling tasks early...
   // not sure what's up. All using the same app isn't a big deal IMO
   beforeAll(() => {
-    app = firebase.initializeApp(TEST_PROJECT, rando());
-    storage = app.storage('default-bucket');
-    (storage as any).useEmulator('localhost', storageEmulatorPort);
+    app = initializeApp(TEST_PROJECT, rando());
+    storage = getStorage(app, 'default-bucket');
+    connectStorageEmulator(storage, 'localhost', storageEmulatorPort);
   });
 
   afterAll(() => {
-    app.delete().catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   // Mock these tests, so I can control progress
@@ -123,7 +123,7 @@ describe('RxFire Storage', () => {
     it('should emit on progress change and complete when done', (done) => {
       let timesFired = 0;
       const newSnapshot = { _something: rando() };
-      const completedSnapshot = { state: firebase.storage.TaskState.SUCCESS };
+      const completedSnapshot = { state: 'success' };
       fromTask(mockTask as any).subscribe({
         next: it => {
           timesFired++;
@@ -158,7 +158,7 @@ describe('RxFire Storage', () => {
     it('should emit on progress change and error when canceled', (done) => {
       let timesFired = 0;
       const newSnapshot = { _something: rando() };
-      const completedSnapshot = { state: firebase.storage.TaskState.CANCELED };
+      const completedSnapshot = { state: 'canceled' };
       fromTask(mockTask as any).subscribe({
         next: it => {
           timesFired++;
@@ -223,7 +223,7 @@ describe('RxFire Storage', () => {
         }
       };
       const newSnapshot = { _something: rando() };
-      const completedSnapshot = { state: firebase.storage.TaskState.SUCCESS };
+      const completedSnapshot = { state: 'sucess' };
       fromTask(mockTask as any).subscribe({
         next: it => {
           timesFired['a']++;
@@ -291,12 +291,12 @@ describe('RxFire Storage', () => {
 
   describe('fromTask', () => {
 
-    let ref: firebase.storage.Reference;
-    let task: firebase.storage.UploadTask;
+    let ref: StorageReference;
+    let task: UploadTask;
 
     beforeEach(() => {
-      ref = storage.ref(rando());
-      task = ref.putString(rando());
+      ref = _ref(storage, rando());
+      task = _uploadBytesResumable(ref, Buffer.from(rando()));
     });
 
     it('completed upload should fire success and complete', done => {
@@ -305,7 +305,7 @@ describe('RxFire Storage', () => {
         fromTask(task).subscribe({
           next: it => {
             firedNext = true;
-            expect(it.state).toEqual(firebase.storage.TaskState.SUCCESS);
+            expect(it.state).toEqual('success');
           },
           error: it => { throw it },
           complete: () => {
@@ -322,7 +322,7 @@ describe('RxFire Storage', () => {
       fromTask(task).subscribe({
         next: it => {
           firedNext = true;
-          expect(it.state).toEqual(firebase.storage.TaskState.CANCELED);
+          expect(it.state).toEqual('canceled');
         },
         error: () => {
           expect(firedNext).toBeTruthy();
@@ -334,7 +334,7 @@ describe('RxFire Storage', () => {
 
     it('running should fire and complete', done => {
       let emissions = 0;
-      let lastEmission: firebase.storage.UploadTaskSnapshot;
+      let lastEmission: UploadTaskSnapshot;
       fromTask(task).subscribe({
         next: it => {
           emissions++;
@@ -343,7 +343,7 @@ describe('RxFire Storage', () => {
         error: it => { throw it },
         complete: () => {
           expect(emissions).toBeGreaterThan(1);
-          expect(lastEmission.state).toEqual(firebase.storage.TaskState.SUCCESS);
+          expect(lastEmission.state).toEqual('success');
           done();
         }
       });
@@ -354,7 +354,7 @@ describe('RxFire Storage', () => {
       fromTask(task).subscribe({
         next: it => {
           task.cancel();
-          if (it.state === firebase.storage.TaskState.CANCELED) {
+          if (it.state === 'canceled') {
             cancelEmitted = true;
           }
         },
@@ -372,8 +372,8 @@ describe('RxFire Storage', () => {
 
     it('works', done => {
       const body = rando();
-      const ref = storage.ref(rando());
-      ref.putString(body).then(it => {
+      const ref = _ref(storage, rando());
+      _uploadString(ref, body).then(it => {
         getDownloadURL(ref).pipe(
           switchMap(url => fetch(url)),
           switchMap(it => it.text()),
@@ -396,8 +396,8 @@ describe('RxFire Storage', () => {
         a: rando(),
         b: rando(),
       };
-      const ref = storage.ref(rando());
-      ref.putString(base64body, 'base64', { customMetadata }).then(() => {
+      const ref = _ref(storage, rando());
+      _uploadString(ref, base64body, 'base64', { customMetadata }).then(() => {
         getMetadata(ref).subscribe(it => {
           expect(it.md5Hash).toEqual(md5Hash);
           expect(it.customMetadata).toEqual(customMetadata);
@@ -410,12 +410,12 @@ describe('RxFire Storage', () => {
 
   describe('percentage', () => {
     
-    let ref: firebase.storage.Reference;
-    let task: firebase.storage.UploadTask;
+    let ref: StorageReference;
+    let task: UploadTask;
 
     beforeEach(() => {
-      ref = storage.ref(rando());
-      task = ref.putString(rando());
+      ref = _ref(storage, rando());
+      task = _uploadBytesResumable(ref, Buffer.from(rando()));
     });
 
     it('completed upload should fire 100% and complete', done => {
@@ -425,7 +425,7 @@ describe('RxFire Storage', () => {
           next: it => {
             firedNext = true;
             expect(it.progress).toEqual(100);
-            expect(it.snapshot.state).toEqual(firebase.storage.TaskState.SUCCESS);
+            expect(it.snapshot.state).toEqual('success');
           },
           error: it => { throw it },
           complete: () => {
@@ -439,7 +439,7 @@ describe('RxFire Storage', () => {
     it('running should fire and complete', done => {
       let lastEmission: {
         progress: number;
-        snapshot: firebase.storage.UploadTaskSnapshot;
+        snapshot: UploadTaskSnapshot;
       };
       percentage(task).subscribe({
         next: it => {
@@ -450,7 +450,7 @@ describe('RxFire Storage', () => {
         error: it => { throw it },
         complete: () => {
           expect(lastEmission.progress).toEqual(100);
-          expect(lastEmission.snapshot.state).toEqual(firebase.storage.TaskState.SUCCESS);
+          expect(lastEmission.snapshot.state).toEqual('success');
           done();
         }
       });
@@ -463,7 +463,7 @@ describe('RxFire Storage', () => {
         next: it => {
           firedNext = true;
           expect(it.progress).toEqual(0);
-          expect(it.snapshot.state).toEqual(firebase.storage.TaskState.CANCELED);
+          expect(it.snapshot.state).toEqual('canceled');
         },
         error: () => {
           expect(firedNext).toBeTruthy();
@@ -478,7 +478,7 @@ describe('RxFire Storage', () => {
       percentage(task).subscribe({
         next: it => {
           task.cancel();
-          if (it.snapshot.state === firebase.storage.TaskState.CANCELED) {
+          if (it.snapshot.state === 'canceled') {
             cancelEmitted = true;
           }
         },
@@ -495,13 +495,13 @@ describe('RxFire Storage', () => {
   describe('put', () => {
 
     it('should work', done => {
-      const ref = storage.ref(rando());
+      const ref = _ref(storage, rando());
       const body = rando();
       const customMetadata = {
         a: rando(),
         b: rando(),
       };
-      put(ref, Buffer.from(body, 'utf8'), { customMetadata }).pipe(
+      uploadBytesResumable(ref, Buffer.from(body, 'utf8'), { customMetadata }).pipe(
         reduce((_, it) => it),
         concatMap(() => getMetadata(ref)),
       ).subscribe(it => {
@@ -513,8 +513,8 @@ describe('RxFire Storage', () => {
     });
 
     it('should cancel when unsubscribed', done => {
-      const ref = storage.ref(rando());
-      put(ref, Buffer.from(rando(), 'utf8')).pipe(
+      const ref = _ref(storage, rando());
+      uploadBytesResumable(ref, Buffer.from(rando(), 'utf8')).pipe(
         take(1),
         switchMap(() => getDownloadURL(ref))
       ).subscribe({
@@ -532,7 +532,7 @@ describe('RxFire Storage', () => {
   describe('putString', () => {
 
     it('should work', done => {
-      const ref = storage.ref(rando());
+      const ref = _ref(storage, rando());
       const body = rando();
       const base64body = btoa(body);
       const md5Hash = btoa(md5(body, { asString: true }) as string);
@@ -540,7 +540,7 @@ describe('RxFire Storage', () => {
         a: rando(),
         b: rando(),
       };
-      putString(ref, base64body, 'base64', { customMetadata }).pipe(
+      uploadString(ref, base64body, 'base64', { customMetadata }).pipe(
         reduce((_, it) => it),
         concatMap(() => getMetadata(ref))
       ).subscribe(it => {
@@ -551,8 +551,8 @@ describe('RxFire Storage', () => {
     });
 
     it('should cancel when unsubscribed', done => {
-      const ref = storage.ref(rando());
-      putString(ref, rando()).pipe(
+      const ref = _ref(storage, rando());
+      uploadString(ref, rando()).pipe(
         take(1),
         switchMap(() => getDownloadURL(ref))
       ).subscribe({

@@ -1,30 +1,18 @@
-/**
- * @license
- * Copyright 2018 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-import firebase from 'firebase/app';
+import { 
+  getDownloadURL as _getDownloadURL,
+  getMetadata as _getMetadata,
+  uploadBytesResumable as _uploadBytesResumable,
+  uploadString as _uploadString,
+} from 'firebase/storage';
 import { Observable, from } from 'rxjs';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 
-type UploadTaskSnapshot = firebase.storage.UploadTaskSnapshot;
-type Reference = firebase.storage.Reference;
-type UploadMetadata = firebase.storage.UploadMetadata;
-type StringFormat = firebase.storage.StringFormat;
-type UploadTask = firebase.storage.UploadTask;
-type Data = Blob | Uint8Array | ArrayBuffer;
+type UploadTaskSnapshot = import('firebase/storage').UploadTaskSnapshot;
+type StorageReference = import('firebase/storage').StorageReference;
+type UploadMetadata = import('firebase/storage').UploadMetadata;
+type StringFormat = import('firebase/storage').StringFormat;
+type UploadTask = import('firebase/storage').UploadTask;
+type UploadResult = import('firebase/storage').UploadResult;
 
 export function fromTask(
   task: UploadTask
@@ -61,37 +49,40 @@ export function fromTask(
   );
 }
 
-export function getDownloadURL(ref: Reference): Observable<string> {
-  return from(ref.getDownloadURL());
+export function getDownloadURL(ref: StorageReference): Observable<string> {
+  return from(_getDownloadURL(ref));
 }
 
 // TODO: fix storage typing in firebase, then apply the same fix here
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getMetadata(ref: Reference): Observable<any> {
-  return from(ref.getMetadata());
+export function getMetadata(ref: StorageReference): Observable<any> {
+  return from(_getMetadata(ref));
 }
 
-export function put(
-  ref: Reference,
-  data: Data,
-  metadata?: UploadMetadata,
-): Observable<UploadTaskSnapshot> {
-  return new Observable<UploadTaskSnapshot>(subscriber => {
-    const task = ref.put(data, metadata);
-    return fromTask(task).subscribe(subscriber).add(task.cancel);
-  }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
-}
-
-export function putString(
-  ref: Reference,
-  data: string,
-  format?: StringFormat,
+// MARK: Breaking change (renaming put to uploadBytesResumable)
+export function uploadBytesResumable(
+  ref: StorageReference,
+  data: Blob | Uint8Array | ArrayBuffer,
   metadata?: UploadMetadata
 ): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
-    const task = ref.putString(data, format, metadata);
-    return fromTask(task).subscribe(subscriber).add(task.cancel);
+    const task = _uploadBytesResumable(ref, data, metadata);
+    const subscription = fromTask(task).subscribe(subscriber);
+    return function unsubscribe() {
+      subscription.unsubscribe();
+      task.cancel();
+    };
   }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
+}
+
+// MARK: Breaking change (renaming put to uploadString)
+export function uploadString(
+  ref: StorageReference,
+  data: string,
+  format?: StringFormat,
+  metadata?: UploadMetadata
+): Observable<UploadResult> {
+  return from(_uploadString(ref, data, format, metadata));
 }
 
 export function percentage(
@@ -101,9 +92,9 @@ export function percentage(
   snapshot: UploadTaskSnapshot;
 }> {
   return fromTask(task).pipe(
-    map(s => ({
-      progress: (s.bytesTransferred / s.totalBytes) * 100,
-      snapshot: s
+    map(snapshot => ({
+      progress: (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+      snapshot
     }))
   );
 }

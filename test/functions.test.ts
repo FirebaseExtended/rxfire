@@ -17,16 +17,16 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import firebase from 'firebase/app';
-import 'firebase/functions';
+import { initializeApp, FirebaseApp, deleteApp } from 'firebase/app';
+import { getFunctions, connectFunctionsEmulator, Functions } from 'firebase/functions';
 import { httpsCallable } from '../dist/functions';
 import { default as TEST_PROJECT, functionsEmulatorPort } from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
 describe('RxFire Functions', () => {
-  let app: firebase.app.App;
-  let functions: firebase.functions.Functions;
+  let app: FirebaseApp;
+  let functions: Functions;
 
   /**
    * Each test runs inside it's own app instance and the app
@@ -38,13 +38,13 @@ describe('RxFire Functions', () => {
    * against the emulator.
    */
   beforeEach(() => {
-    app = firebase.initializeApp(TEST_PROJECT, rando());
-    functions = app.functions();
-    functions.useEmulator('localhost', functionsEmulatorPort);
+    app = initializeApp(TEST_PROJECT, rando());
+    functions = getFunctions(app);
+    connectFunctionsEmulator(functions, 'localhost', functionsEmulatorPort);
   });
 
   afterEach(() => {
-    app.delete().catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   describe('httpsCallable', () => {

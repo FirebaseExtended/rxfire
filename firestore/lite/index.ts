@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2021 Google LLC
+ * Copyright 2018 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,6 @@
  * limitations under the License.
  */
 
-import { ListenEvent } from './interfaces';
-
-/**
- * Check the length of the provided array. If it is empty return an array
- * that is populated with all the Realtime Database child events.
- * @param events
- */
-export function validateEventsArray(events?: ListenEvent[]): ListenEvent[] {
-  if (events == null || events.length === 0) {
-    events = [
-      ListenEvent.added,
-      ListenEvent.removed,
-      ListenEvent.changed,
-      ListenEvent.moved
-    ];
-  }
-  return events;
-}
+export * from './collection';
+export * from './document';
+export * from './fromRef';

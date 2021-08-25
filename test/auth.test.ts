@@ -1,6 +1,7 @@
+
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,42 +15,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import { default as TEST_PROJECT, authEmulatorPort } from './config';
-
-const rando = (): string => Math.random().toString(36).substring(5);
+import { default as config, authEmulatorPort } from './config';
+import { initializeApp, FirebaseApp, deleteApp } from 'firebase/app';
+import { getAuth, Auth, connectAuthEmulator, signInAnonymously } from 'firebase/auth';
+import { authState } from '../dist/auth';
+import { skip, take } from 'rxjs/operators';
 
 describe('RxFire Auth', () => {
-  let app: firebase.app.App;
-  let auth: firebase.auth.Auth;
+  let app: FirebaseApp;
+  let auth: Auth;
 
-  /**
-   * Each test runs inside it's own app instance and the app
-   * is deleted after the test runs.
-   *
-   * Each test is responsible for seeding and removing data. Helper
-   * functions are useful if the process becomes brittle or tedious.
-   * Note that removing is less necessary since the tests are run
-   * against the emulator.
-   */
   beforeEach(() => {
-    app = firebase.initializeApp(TEST_PROJECT, rando());
-    auth = app.auth();
-    auth.useEmulator(`http://localhost:${authEmulatorPort}`);
+    app = initializeApp(config);
+    auth = getAuth(app);
+    connectAuthEmulator(auth, `http://localhost:${authEmulatorPort}`, { disableWarnings: true });
   });
 
   afterEach(() => {
-    app.delete().catch();
+    deleteApp(app).catch(() => undefined);
   });
 
-  describe('fromTask', () => {
-      it('should work', () => {
-          expect('a').toEqual('a');
-      })
+  describe('Authentication state', () => {
+
+    it('should initially be unauthenticated', done => {
+      authState(auth)
+        .pipe(take(1))
+        .subscribe(state => {
+          expect(state).toBeNull();
+        })
+        .add(done);
+    });
+
+    it('should trigger an authenticated state', done => {
+      authState(auth)
+        .pipe(skip(1), take(1))
+        .subscribe(state => {
+          expect(state).not.toBeNull();
+          expect(state.isAnonymous).toEqual(true);
+        })
+        .add(done);
+
+      signInAnonymously(auth);
+    });
+
   });
 
 });

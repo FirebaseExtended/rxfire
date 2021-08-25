@@ -15,59 +15,27 @@
  * limitations under the License.
  */
 
-import firebase from 'firebase/app';
-import {Observable} from 'rxjs';
-
-type DocumentReference<T=DocumentData> = firebase.firestore.DocumentReference<T>;
-type SnapshotListenOptions = firebase.firestore.SnapshotListenOptions;
-type Query<T=DocumentData> = firebase.firestore.Query<T>;
-type DocumentData = firebase.firestore.DocumentData;
-type DocumentSnapshot<T=DocumentData> = firebase.firestore.DocumentSnapshot<T>;
-type QuerySnapshot<T=DocumentData> = firebase.firestore.QuerySnapshot<T>;
+// TODO figure out what is wrong with the types...
+import { onSnapshot } from 'firebase/firestore';
+import { Observable } from 'rxjs';
+import { DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot } from './interfaces';
 
 const DEFAULT_OPTIONS = { includeMetadataChanges: false };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-function _fromRef(
-    ref: any,
-    options: SnapshotListenOptions=DEFAULT_OPTIONS,
+export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;
+export function fromRef<T=DocumentData>(ref: Query<T>, options?: SnapshotListenOptions): Observable<QuerySnapshot<T>>;
+export function fromRef(
+  ref: any,
+  options: SnapshotListenOptions=DEFAULT_OPTIONS
 ): Observable<any> {
   /* eslint-enable @typescript-eslint/no-explicit-any */
-  return new Observable((subscriber) => {
-    const unsubscribe = ref.onSnapshot(options, {
+  return new Observable(subscriber => {
+    const unsubscribe = onSnapshot(ref, options, {
       next: subscriber.next.bind(subscriber),
       error: subscriber.error.bind(subscriber),
       complete: subscriber.complete.bind(subscriber),
     });
-    return {unsubscribe};
+    return { unsubscribe };
   });
-}
-
-export function fromRef<T=DocumentData>(
-  ref: Query<T>,
-  options?: SnapshotListenOptions
-): Observable<QuerySnapshot<T>>;
-export function fromRef<T=DocumentData>(
-  ref: DocumentReference<T>,
-  options?: SnapshotListenOptions
-): Observable<DocumentSnapshot<T>>;
-export function fromRef<T=DocumentData>(
-  ref: DocumentReference<T> | Query<T>,
-  options?: SnapshotListenOptions,
-) {
-  return _fromRef(ref, options);
-}
-
-export function fromDocRef<T=DocumentData>(
-    ref: DocumentReference<T>,
-    options?: SnapshotListenOptions,
-) {
-  return fromRef(ref, options);
-}
-
-export function fromCollectionRef<T>(
-    ref: Query<T>,
-    options?: SnapshotListenOptions,
-) {
-  return fromRef(ref, options);
 }

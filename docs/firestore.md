@@ -7,23 +7,23 @@ The `doc()` function creates an observable that emits document changes.  Returns
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `doc()`                                  |
-| **params**      | `ref:firestore.DocumentReference`        |
+| **params**      | `ref:import('firebase/firestore').DocumentReference`        |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.DocumentSnapshot>` |
+| **return**      | `Observable<import('firebase/firestore').DocumentSnapshot>` |
 
 #### TypeScript Example
 ```ts
 import { doc } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const davidDocRef = db.doc('users/david');
+const db = getFirestore(app);
+const davidDocRef = doc(db, 'users/david');
 
 // Seed the firestore
-davidDocRef.set({ name: 'David' });
+setDoc(davidDocRef, { name: 'David' });
 
 doc(davidDocRef).subscribe(snapshot => {
   console.log(snapshot.id);
@@ -37,23 +37,23 @@ The `docData()` function creates an observable that returns a stream of a docume
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `docData()`                              |
-| **params**      | ref: `firestore.DocumentReference` <br> idField?: `string` |
+| **params**      | ref: `import('firebase/firestore').DocumentReference` <br> idField?: `string` |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<T>` |
 
 #### TypeScript Example
 ```ts
 import { docData } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const davidDocRef = db.doc('users/david');
+const db = getFirestore(app);
+const davidDocRef = doc(db, 'users/david');
 
 // Seed the firestore
-davidDocRef.set({ name: 'David' });
+setDoc(davidDocRef, { name: 'David' });
 
 docData(davidDocRef,'uid').subscribe(userData => {
   console.log(`${userData.name} has id ${userData.uid}`);
@@ -68,20 +68,20 @@ The `collection()` function creates an observable that emits changes to the spec
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collection()`                           |
-| **params**      | query: `firestore.CollectionReference | firestore.Query` |
+| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.QueryDocumentSnapshot[]>`    |
+| **return**      | `Observable<import('firebase/firestore').QueryDocumentSnapshot[]>`    |
 
 #### TypeScript Example
 ```ts
 import { collection } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
 
 collection(collectionRef)
   .pipe(map(docs => docs.map(d => d.data())))
@@ -94,20 +94,20 @@ The `collectionData()` function creates an observable that emits a stream of doc
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collectionData()`                           |
-| **params**      | query: `firestore.CollectionReference | firestore.Query` <br> idField?: `string`  |
+| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` <br> idField?: `string`  |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<T[]>`    |
 
 #### TypeScript Example
 ```ts
 import { collectionData } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
 
 collectionData(collectionRef, 'uid')
   .subscribe(users => { console.log(users) });
@@ -119,21 +119,21 @@ The `collectionChanges()` function creates an observable that emits the changes 
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collectionChanges()`                           |
-| **params**      | query: `firestore.CollectionReference | firestore.Query` <br> events?: `firestore.DocumentChangeType[]` |
+| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` <br> events?: `import('firebase/firestore').DocumentChangeType[]` |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.DocumentChange[]>`    |
+| **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`    |
 
 #### TypeScript Example
 ```ts
 import { collectionChanges } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
 
 // Listen to all events
 collectionChanges(collectionRef)
@@ -150,21 +150,21 @@ The `sortedChanges()` function creates an observable that emits the reduced stat
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `sortedChanges()`                           |
-| **params**      | query: `firestore.CollectionReference | firestore.Query`<br> events?: `firestore.DocumentChangeType[]` |
+| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query`<br> events?: `import('firebase/firestore').DocumentChangeType[]` |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.DocumentChange[]>`    |
+| **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`    |
 
 #### TypeScript Example
 ```ts
 import { sortedChanges } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
 
 // Listen to all events
 sortedChanges(collectionRef)
@@ -181,22 +181,22 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `auditTrail()`                                       |
-| **params**      | ref: `firestore.Reference | firestore.Query`<br> events?: `firestore.DocumentChangeType[]` |
+| **params**      | ref: `import('firebase/firestore').Reference | import('firebase/firestore').Query`<br> events?: `import('firebase/firestore').DocumentChangeType[]` |
 | **import path** | `rxfire/firestore`                                    |
-| **return**      | `Observable<firestore.DocumentChange[]>`              |
+| **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`              |
 
 #### TypeScript Example
 ```ts
 import { auditTrail } from 'rxfire/firestore';
 import { firestore } from 'firebase';
-import 'firebase/firestore';
+import { getFirestore, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
-const davidDocRef = collectionRef.doc('david');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
+const davidDocRef = doc(collectionRef, 'david');
 
 // Start the audit trail
 auditTrail(collectionRef).pipe(
@@ -212,10 +212,10 @@ auditTrail(collectionRef).pipe(
 });
 
 // Seed Firestore
-davidDocRef.set({ name: 'David' });
+setDoc(davidDocRef, { name: 'David' });
 
 // Remove the document
-davidDocRef.delete();
+deleteDoc(davidDocRef);
 
 /**
   First emission:
@@ -239,24 +239,24 @@ The `fromDocRef()` function creates an observable that emits document changes. T
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `fromDocRef()`                           |
-| **params**      |  ref: `firestore.DocumentReference` <br> options?: `firestore.SnapshotListenOptions`              |
+| **params**      |  ref: `import('firebase/firestore').DocumentReference` <br> options?: `import('firebase/firestore').SnapshotListenOptions`              |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.DocumentSnapshot>` |
+| **return**      | `Observable<import('firebase/firestore').DocumentSnapshot>` |
 
 #### TypeScript Example
 ```ts
 import { fromDocRef } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const davidDocRef = db.doc('users/david');
+const db = getFirestore(app);
+const davidDocRef = doc(db, 'users/david');
 
 // Seed Firestore
-davidDocRef.set({ name: 'David' });
+setDoc(davidDocRef, { name: 'David' });
 
 fromDocRef(davidDocRef).subscribe(snap => { console.log(snap); })
 ```
@@ -267,21 +267,21 @@ The `fromCollectionRef()` function creates an observable that emits changes to t
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `fromCollectionRef()`                    |
-| **params**      | ref: `firestore.Reference | firestore.Query`<br> options?: `firestore.SnapshotListenOptions` |
+| **params**      | ref: `import('firebase/firestore').Reference | import('firebase/firestore').Query`<br> options?: `import('firebase/firestore').SnapshotListenOptions` |
 | **import path** | `rxfire/firestore`                       |
-| **return**      | `Observable<firestore.QuerySnapshot>`    |
+| **return**      | `Observable<import('firebase/firestore').QuerySnapshot>`    |
 
 #### TypeScript Example
 ```ts
 import { fromCollectionRef } from 'rxfire/firestore';
-import { firestore, initializeApp } from 'firebase';
-import 'firebase/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({ /* config */ });
-const db = app.firestore();
-const collectionRef = db.collection('users');
+const db = getFirestore(app);
+const collectionRef = collection(db, 'users');
 
 fromCollectionRef(collectionRef).subscribe(snap => { console.log(snap.docs); })
 ```

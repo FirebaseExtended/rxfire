@@ -17,12 +17,12 @@
 
 // TODO fix the import
 import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
-import { fromRef } from '../fromRef';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
+import { getDoc } from 'firebase/firestore/lite';
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
-  return fromRef(ref, { includeMetadataChanges: true });
+  return from(getDoc<T>(ref));
 }
 
 /**
