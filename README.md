@@ -38,7 +38,7 @@ const citiesRef = query(
     where('state', '==', 'CO')
 );
 
-collectionData(citiesRef, 'id')
+collectionData(citiesRef, { idField: 'id' })
   .pipe(
     tap(cities => console.log('This is just an observable!'))
   )
@@ -68,7 +68,7 @@ const citiesRef = query(
     where('state', '==', 'CO')
 );
 
-collectionData(citiesRef, 'id')
+collectionData(citiesRef, { idField: 'id' })
   .pipe(
     switchMap(cities => {
       return combineLatest(...cities.map(c => {
@@ -107,6 +107,8 @@ import { } from 'rxfire/database';
 import { } from 'rxfire/storage';
 import { } from 'rxfire/auth';
 import { } from 'rxfire/functions';
+import { } from 'rxfire/performance';
+import { } from 'rxfire/remote-config';
 ```
 
 ## Simple functions
