@@ -91,7 +91,7 @@ describe('RxFire Firestore', () => {
   });
 
   afterEach(() => {
-    deleteApp(app).catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   describe('collection', () => {

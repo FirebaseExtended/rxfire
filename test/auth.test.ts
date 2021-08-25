@@ -28,11 +28,11 @@ describe('RxFire Auth', () => {
   beforeEach(() => {
     app = initializeApp(config);
     auth = getAuth(app);
-    connectAuthEmulator(auth, `http://localhost:${authEmulatorPort}`);
+    connectAuthEmulator(auth, `http://localhost:${authEmulatorPort}`, { disableWarnings: true });
   });
 
   afterEach(() => {
-    deleteApp(app).catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   describe('Authentication state', () => {

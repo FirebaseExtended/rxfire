@@ -17,7 +17,7 @@
 
 /* eslint-disable @typescript-eslint/no-floating-promises */
 
-import { UploadTaskSnapshot, StorageService, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString, UploadResult } from 'firebase/storage';
+import { UploadTaskSnapshot, FirebaseStorage, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString, UploadResult } from 'firebase/storage';
 import { FirebaseApp, initializeApp, deleteApp } from 'firebase/app';
 import {
   fromTask,
@@ -72,7 +72,7 @@ class MockTask {
 
 describe('RxFire Storage', () => {
   let app: FirebaseApp;
-  let storage: StorageService;
+  let storage: FirebaseStorage;
 
   // I can't do beforeEach for whatever reason with the Firebase Emulator
   // storage seems to be tearing things down and canceling tasks early...
@@ -84,7 +84,7 @@ describe('RxFire Storage', () => {
   });
 
   afterAll(() => {
-    deleteApp(app).catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   // Mock these tests, so I can control progress

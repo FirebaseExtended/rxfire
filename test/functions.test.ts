@@ -44,7 +44,7 @@ describe('RxFire Functions', () => {
   });
 
   afterEach(() => {
-    deleteApp(app).catch();
+    deleteApp(app).catch(() => undefined);
   });
 
   describe('httpsCallable', () => {
