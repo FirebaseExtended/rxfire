@@ -12,20 +12,13 @@ Firebase and RxJS for all frameworks.
 
 Status: Beta
 
-
----
-
-> **WARNING**: This branch is the work in progress for version 6 of RxFire. [You can find version 5 here](https://github.com/FirebaseExtended/rxfire/tree/v5), if you're looking for documentation or to contribute to stable.
-
----
-
 ## Install
 
 ```bash
 # npm
-npm i rxfire@next firebase@next rxjs --save
+npm i rxfire firebase rxjs --save
 # yarn
-yarn add rxfire@next firebase@next rxjs
+yarn add rxfire firebase rxjs
 ```
 
 Make sure to install Firebase and RxJS individually as they are peer dependencies of RxFire.
@@ -45,7 +38,7 @@ const citiesRef = query(
     where('state', '==', 'CO')
 );
 
-collectionData(citiesRef, 'id')
+collectionData(citiesRef, { idField: 'id' })
   .pipe(
     tap(cities => console.log('This is just an observable!'))
   )
@@ -75,7 +68,7 @@ const citiesRef = query(
     where('state', '==', 'CO')
 );
 
-collectionData(citiesRef, 'id')
+collectionData(citiesRef, { idField: 'id' })
   .pipe(
     switchMap(cities => {
       return combineLatest(...cities.map(c => {
@@ -114,6 +107,8 @@ import { } from 'rxfire/database';
 import { } from 'rxfire/storage';
 import { } from 'rxfire/auth';
 import { } from 'rxfire/functions';
+import { } from 'rxfire/performance';
+import { } from 'rxfire/remote-config';
 ```
 
 ## Simple functions

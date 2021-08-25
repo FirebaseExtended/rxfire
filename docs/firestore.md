@@ -37,7 +37,7 @@ The `docData()` function creates an observable that returns a stream of a docume
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `docData()`                              |
-| **params**      | ref: `import('firebase/firestore').DocumentReference` <br> idField?: `string` |
+| **params**      | ref: `import('firebase/firestore').DocumentReference` <br> options?: { idField?: `string` } |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<T>` |
 
@@ -55,7 +55,7 @@ const davidDocRef = doc(db, 'users/david');
 // Seed the firestore
 setDoc(davidDocRef, { name: 'David' });
 
-docData(davidDocRef,'uid').subscribe(userData => {
+docData(davidDocRef, { idField: 'uid' }).subscribe(userData => {
   console.log(`${userData.name} has id ${userData.uid}`);
 });
 ```
@@ -68,7 +68,7 @@ The `collection()` function creates an observable that emits changes to the spec
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collection()`                           |
-| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` |
+| **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query` |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<import('firebase/firestore').QueryDocumentSnapshot[]>`    |
 
@@ -94,7 +94,7 @@ The `collectionData()` function creates an observable that emits a stream of doc
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collectionData()`                           |
-| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` <br> idField?: `string`  |
+| **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query` <br> options?: { idField?: `string` } |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<T[]>`    |
 
@@ -109,7 +109,7 @@ const app = initializeApp({ /* config */ });
 const db = getFirestore(app);
 const collectionRef = collection(db, 'users');
 
-collectionData(collectionRef, 'uid')
+collectionData(collectionRef, { idField: 'uid' })
   .subscribe(users => { console.log(users) });
 ```
 
@@ -119,7 +119,7 @@ The `collectionChanges()` function creates an observable that emits the changes 
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `collectionChanges()`                           |
-| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query` <br> events?: `import('firebase/firestore').DocumentChangeType[]` |
+| **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query` <br> options?: { events?: `import('firebase/firestore').DocumentChangeType[]` } |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`    |
 
@@ -140,7 +140,7 @@ collectionChanges(collectionRef)
   .subscribe(changes => { console.log(changes) });
 
 // Listen to only 'added' events
-collectionChanges(collectionRef, ['added'])
+collectionChanges(collectionRef, { events: ['added'] })
   .subscribe(addedEvents => { console.log(addedEvents) });
 ```
 
@@ -150,7 +150,7 @@ The `sortedChanges()` function creates an observable that emits the reduced stat
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `sortedChanges()`                           |
-| **params**      | query: `import('firebase/firestore').CollectionReference | import('firebase/firestore').Query`<br> events?: `import('firebase/firestore').DocumentChangeType[]` |
+| **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query` <br> options?: { events?: `import('firebase/firestore').DocumentChangeType[]` } |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`    |
 
@@ -171,7 +171,7 @@ sortedChanges(collectionRef)
   .subscribe(changes => { console.log(changes) });
 
 // Listen to only 'added' events
-docChanges(collectionRef, ['added'])
+docChanges(collectionRef, { events: ['added'] })
   .subscribe(addedEvents => { console.log(addedEvents) });
 ```
 
@@ -181,7 +181,7 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `auditTrail()`                                       |
-| **params**      | ref: `import('firebase/firestore').Reference | import('firebase/firestore').Query`<br> events?: `import('firebase/firestore').DocumentChangeType[]` |
+| **params**      | ref: `import('firebase/firestore').Reference \| import('firebase/firestore').Query` <br> options?: { events?: `import('firebase/firestore').DocumentChangeType[]` } |
 | **import path** | `rxfire/firestore`                                    |
 | **return**      | `Observable<import('firebase/firestore').DocumentChange[]>`              |
 
@@ -267,7 +267,7 @@ The `fromCollectionRef()` function creates an observable that emits changes to t
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `fromCollectionRef()`                    |
-| **params**      | ref: `import('firebase/firestore').Reference | import('firebase/firestore').Query`<br> options?: `import('firebase/firestore').SnapshotListenOptions` |
+| **params**      | ref: `import('firebase/firestore').Reference \| import('firebase/firestore').Query` <br> options?: `import('firebase/firestore').SnapshotListenOptions` |
 | **import path** | `rxfire/firestore`                       |
 | **return**      | `Observable<import('firebase/firestore').QuerySnapshot>`    |
 

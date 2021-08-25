@@ -48,7 +48,7 @@ The `list()` function creates an observable that emits a sorted array for each c
 |                 |                                                       |
 |-----------------|-------------------------------------------------------|
 | **function**    | `list()`                                              |
-| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, options?: { events?: `ListenEvent[]` } |
 | **import path** | `rxfire/database`                                     |
 | **return**      | `Observable<QueryChange[]>`                           |
 
@@ -86,11 +86,11 @@ list(ref)
   .subscribe(users => { console.log(users); })
 
 // Listen only to 'child_added' events
-list(ref, [ListenEvent.added] /* 'child_added' for js */)
+list(ref, { events: [ListenEvent.added] } /* 'child_added' for js */)
   .subscribe(addedChanges => { console.log(addedChanges); });
 
 // Listen only to 'child_added' and 'child_removed' events
-list(ref, [ListenEvent.added, ListenEvent.removed] /* 'child_added', 'child_removed' for js */)
+list(ref, { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */)
   .subscribe(addedChanges => { console.log(addedChanges); });
 ```
 
@@ -100,7 +100,7 @@ The `stateChanges()` function creates an observable that emits each time a chang
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `stateChanges()`                                     |
-| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, options:? { events?: `ListenEvent[]` } |
 | **import path** | `rxfire/database`                                    |
 | **return**      | `Observable<QueryChange>`                          |
 
@@ -137,11 +137,11 @@ stateChanges(ref).pipe(
 ).subscribe(data => { console.log(data); });
 
 // Listen only to 'child_added' events
-stateChanges(ref, [ListenEvent.added] /* 'child_added' for js */)
+stateChanges(ref, { events: [ListenEvent.added] } /* 'child_added' for js */)
   .subscribe(addedChanges => { console.log(addedChanges); });
 
 // Listen only to 'child_added' and 'child_removed' events
-stateChanges(ref, [ListenEvent.added, ListenEvent.removed] /* 'child_added', 'child_removed' for js */)
+stateChanges(ref, { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */)
   .subscribe(addedChanges => { console.log(addedChanges); });
 
 ```
@@ -152,7 +152,7 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 |                 |                                                      |
 |-----------------|------------------------------------------------------|
 | **function**    | `auditTrail()`                                       |
-| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, events?: `ListenEvent[]` |
+| **params**      | ref: `import('firebase/database').Reference` or `import('firebase/database').Query`, options?: { events?: `ListenEvent[]` } |
 | **import path** | `rxfire/database`                                    |
 | **return**      | `Observable<QueryChange[]>`                          |
 
