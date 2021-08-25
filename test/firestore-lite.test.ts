@@ -113,7 +113,7 @@ describe('RxFire firestore/lite', () => {
       const {colRef} = await seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, 'userId');
+      const unwrapped = collectionData(colRef, { idField: 'userId' });
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -130,7 +130,7 @@ describe('RxFire firestore/lite', () => {
       const {davidDoc} = await seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
-      const unwrapped = docData(davidDoc, 'UID');
+      const unwrapped = docData(davidDoc, { idField: 'UID'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {

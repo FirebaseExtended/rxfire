@@ -83,7 +83,7 @@ describe('RxFire Database', () => {
   } {
     const { events, skipnumber } = opts;
     const aref = builtRef(rando());
-    const snapChanges = list(aref, events);
+    const snapChanges = list(aref, { events });
     return {
       snapChanges: snapChanges.pipe(skip(skipnumber)),
       ref: aref
@@ -294,7 +294,7 @@ describe('RxFire Database', () => {
        */
       it('should stream value at first', done => {
         const someRef = builtRef(rando());
-        const obs = list(someRef, [ListenEvent.added]);
+        const obs = list(someRef, { events: [ListenEvent.added] });
         obs
           .pipe(take(1))
           .subscribe(changes => {
@@ -315,7 +315,7 @@ describe('RxFire Database', () => {
        */
       it('should process a new child_added event', done => {
         const aref = builtRef(rando());
-        const obs = list(aref, [ListenEvent.added]);
+        const obs = list(aref, { events: [ListenEvent.added] });
         obs
           .pipe(skip(2), take(1))
           .subscribe(changes => {
@@ -334,7 +334,7 @@ describe('RxFire Database', () => {
        */
       it('should stream in order events', done => {
         const aref = builtRef(rando());
-        const obs = list(query(aref, orderByChild('name')), [ListenEvent.added]);
+        const obs = list(query(aref, orderByChild('name')), { events: [ListenEvent.added] });
         obs
           .pipe(take(1))
           .subscribe(changes => {
@@ -355,7 +355,7 @@ describe('RxFire Database', () => {
        */
       it('should stream in order events w/child_added', done => {
         const aref = builtRef(rando());
-        const obs = list(query(aref, orderByChild('name')), [ListenEvent.added]);
+        const obs = list(query(aref, orderByChild('name')), { events: [ListenEvent.added] });
         obs
           .pipe(skip(1), take(1))
           .subscribe(changes => {
@@ -376,9 +376,9 @@ describe('RxFire Database', () => {
        */
       it('should stream events filtering', done => {
         const aref = builtRef(rando());
-        const obs = list(query(aref, orderByChild('name'), equalTo('zero')), [
+        const obs = list(query(aref, orderByChild('name'), equalTo('zero')), { events: [
           ListenEvent.added
-        ]);
+        ]});
         obs
           .pipe(skip(1), take(1))
           .subscribe(changes => {
@@ -406,7 +406,7 @@ describe('RxFire Database', () => {
         }
 
         function listen() {
-          list(aref, [ListenEvent.removed])
+          list(aref, { events: [ListenEvent.removed] })
           .pipe(take(1))
           .subscribe(changes => {
             const data = changes.map(change => change.snapshot.val());
@@ -447,7 +447,7 @@ describe('RxFire Database', () => {
        */
       it('should process a new child_moved event', done => {
         const aref = builtRef(rando());
-        list(aref, [ListenEvent.added, ListenEvent.moved])
+        list(aref, { events: [ListenEvent.added, ListenEvent.moved] })
           .pipe(skip(2))
           .subscribe(changes => {
             const data = changes.map(change => change.snapshot.val());
@@ -674,7 +674,7 @@ describe('RxFire Database', () => {
       const data = { testKey: { hello: 'world' } };
       set(itemRef, data);
 
-      const obs = listVal<any>(itemRef, 'KEY').pipe(take(1));
+      const obs = listVal<any>(itemRef, { keyField: 'KEY' }).pipe(take(1));
 
       obs.subscribe(val => {
         expect(Array.isArray(val)).toEqual(true);

@@ -185,7 +185,9 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
  */
 export function collectionChanges<T=DocumentData>(
   query: Query<T>,
-  events: DocumentChangeType[] = ALL_EVENTS
+  options: {
+    events?: DocumentChangeType[]
+  }={}
 ): Observable<DocumentChange<T>[]> {
   return fromRef(query, { includeMetadataChanges: true }).pipe(
     windowwise(),
@@ -226,7 +228,7 @@ export function collectionChanges<T=DocumentData>(
       }
       return docChanges;
     }),
-    filterEvents(events),
+    filterEvents(options.events || ALL_EVENTS),
     filterEmptyUnlessFirst()
   );
 }
@@ -247,12 +249,14 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  */
 export function sortedChanges<T=DocumentData>(
   query: Query<T>,
-  events?: DocumentChangeType[]
+  options: {
+    events?: DocumentChangeType[]
+  }={}
 ): Observable<DocumentChange<T>[]> {
-  return collectionChanges(query, events).pipe(
+  return collectionChanges(query, options).pipe(
     scan(
       (current: DocumentChange<T>[], changes: DocumentChange<T>[]) =>
-        processDocumentChanges(current, changes, events),
+        processDocumentChanges(current, changes, options.events),
       []
     ),
     distinctUntilChanged()
@@ -265,9 +269,11 @@ export function sortedChanges<T=DocumentData>(
  */
 export function auditTrail<T=DocumentData>(
   query: Query<T>,
-  events?: DocumentChangeType[]
+  options: {
+    events?: DocumentChangeType[]
+  }={}
 ): Observable<DocumentChange<T>[]> {
-  return collectionChanges(query, events).pipe(
+  return collectionChanges(query, options).pipe(
     scan((current, action) => [...current, ...action], [] as DocumentChange<T>[])
   );
 }
@@ -278,11 +284,13 @@ export function auditTrail<T=DocumentData>(
  */
 export function collectionData<T=DocumentData>(
   query: Query<T>,
-  idField?: string
+  options: {
+    idField?: string
+  }={}
 ): Observable<T[]> {
   return collection(query).pipe(
     map(arr => {
-      return arr.map(snap => snapToData(snap, idField) as T);
+      return arr.map(snap => snapToData(snap, options) as T);
     })
   );
 }

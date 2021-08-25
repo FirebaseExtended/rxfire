@@ -28,9 +28,11 @@ interface LoadedMetadata {
 
 export function auditTrail(
   query: Query,
-  events?: ListenEvent[]
+  options: {
+    events?: ListenEvent[]
+  }={}
 ): Observable<QueryChange[]> {
-  const auditTrail$ = stateChanges(query, events).pipe(
+  const auditTrail$ = stateChanges(query, options).pipe(
     scan<QueryChange, QueryChange[]>(
       (current, changes) => [...current, changes],
       []

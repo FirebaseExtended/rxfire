@@ -25,9 +25,11 @@ import { get as databaseGet } from 'firebase/database';
 
 export function stateChanges(
   query: Query,
-  events?: ListenEvent[]
+  options: {
+    events?: ListenEvent[]
+  } = {}
 ): Observable<QueryChange> {
-  events = validateEventsArray(events);
+  const events = validateEventsArray(options.events);
   const childEvent$ = events.map(event => fromRef(query, event));
   return merge(...childEvent$);
 }
@@ -43,18 +45,20 @@ function get(query: Query): Observable<QueryChange> {
 
 export function list(
   query: Query,
-  events?: ListenEvent[]
+  options: {
+    events?: ListenEvent[]
+  }={}
 ): Observable<QueryChange[]> {
-  const eventsList = validateEventsArray(events);
+  const events = validateEventsArray(options.events);
   return get(query).pipe(
     switchMap(change => {
       if (!change.snapshot.exists()) {
         return of([]);
       }
       const childEvent$ = [of(change)];
-      for (const event of eventsList) {
+      events.forEach(event => {
         childEvent$.push(fromRef(query, event));
-      }
+      });
       return merge(...childEvent$).pipe(scan(buildView, []));
     }),
     distinctUntilChanged()
@@ -68,11 +72,13 @@ export function list(
  */
 export function listVal<T>(
     query: Query,
-    keyField?: string,
+    options: {
+      keyField?: string,
+    }={}
 ): Observable<T[] | null> {
   return list(query).pipe(
     map(arr => {
-      return arr.map(change => changeToData(change, keyField) as T);
+      return arr.map(change => changeToData(change, options) as T);
     }),
   );
 }

@@ -33,7 +33,7 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
+import { getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -153,7 +153,7 @@ describe('RxFire Firestore', () => {
     it('should emit an array of sorted snapshots', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const addedChanges = sortedChanges(colRef, ['added']).pipe(unwrapChange);
+      const addedChanges = sortedChanges(colRef, { events: ['added']}).pipe(unwrapChange);
 
       const modifiedChanges = sortedChanges(colRef).pipe(
           unwrapChange,
@@ -193,8 +193,8 @@ describe('RxFire Firestore', () => {
     it('should filter by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc, expectedEvents} = seedTest(firestore);
 
-      const addedChanges = sortedChanges(colRef, ['added']).pipe(unwrapChange);
-      const modifiedChanges = sortedChanges(colRef, ['modified']).pipe(
+      const addedChanges = sortedChanges(colRef, { events: ['added']}).pipe(unwrapChange);
+      const modifiedChanges = sortedChanges(colRef, { events: ['modified']}).pipe(
           unwrapChange,
       );
 
@@ -249,7 +249,7 @@ describe('RxFire Firestore', () => {
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const modifiedAudit = auditTrail(colRef, ['modified']).pipe(unwrapChange);
+      const modifiedAudit = auditTrail(colRef, { events: ['modified']}).pipe(unwrapChange);
 
       modifiedAudit.subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
@@ -295,7 +295,7 @@ describe('RxFire Firestore', () => {
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const modifiedAudit = auditTrail(colRef, ['modified']).pipe(unwrapChange);
+      const modifiedAudit = auditTrail(colRef, { events: ['modified']}).pipe(unwrapChange);
 
       modifiedAudit.subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
@@ -315,7 +315,7 @@ describe('RxFire Firestore', () => {
       const {colRef} = seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, 'userId');
+      const unwrapped = collectionData(colRef, { idField: 'userId' });
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -332,7 +332,7 @@ describe('RxFire Firestore', () => {
       const {davidDoc} = seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
-      const unwrapped = docData(davidDoc, 'UID');
+      const unwrapped = docData(davidDoc, { idField: 'UID' });
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -356,13 +356,13 @@ describe('RxFire Firestore', () => {
       
       const {colRef} = seedTest(firestore);
 
-      const nonExistentDoc: firebase.firestore.DocumentReference = colRef.doc(
+      const nonExistentDoc: DocumentReference = firestoreDoc(colRef,
           createId(),
       );
 
       const unwrapped = docData(nonExistentDoc);
 
-      nonExistentDoc.onSnapshot((snap) => {
+      getDoc(nonExistentDoc).then((snap) => {
         unwrapped.subscribe((val) => {
           expect(val).toEqual(snap.data());
           done();
@@ -374,11 +374,11 @@ describe('RxFire Firestore', () => {
       
       pending('Not working against the emulator');
       
-      const nonExistentCollection = firestore.collection(createId());
+      const nonExistentCollection = firestoreCollection(firestore, createId());
 
       const unwrapped = collectionData(nonExistentCollection);
 
-      nonExistentCollection.onSnapshot((snap) => {
+      getDocs(nonExistentCollection).then((snap) => {
         unwrapped.subscribe((val) => {
           expect(val).toEqual(snap.docs);
           done();

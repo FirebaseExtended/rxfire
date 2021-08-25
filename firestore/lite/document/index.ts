@@ -31,14 +31,18 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  */
 export function docData<T=DocumentData>(
   ref: DocumentReference<T>,
-  idField?: string
+  options: {
+    idField?: string
+  }={}
 ): Observable<T> {
-  return doc(ref).pipe(map(snap => snapToData(snap, idField) as T));
+  return doc(ref).pipe(map(snap => snapToData(snap, options) as T));
 }
 
 export function snapToData<T=DocumentData>(
     snapshot: DocumentSnapshot<T>,
-    idField?: string,
+    options: {
+      idField?: string,
+    }={}
 ): {} | undefined {
   // match the behavior of the JS SDK when the snapshot doesn't exist
   if (!snapshot.exists()) {
@@ -46,6 +50,6 @@ export function snapToData<T=DocumentData>(
   }
   return {
     ...snapshot.data(),
-    ...(idField ? { [idField]: snapshot.id } : null)
+    ...(options.idField ? { [options.idField]: snapshot.id } : null)
   };
 }

@@ -37,11 +37,13 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  */
 export function collectionData<T=DocumentData>(
   query: Query<T>,
-  idField?: string
+  options: {
+    idField?: string
+  }={}
 ): Observable<T[]> {
   return collection(query).pipe(
     map(arr => {
-      return arr.map(snap => snapToData(snap, idField) as T);
+      return arr.map(snap => snapToData(snap, options) as T);
     })
   );
 }

@@ -33,13 +33,13 @@ export function object(query: Query): Observable<QueryChange> {
  * @param query object ref or query
  * @param keyField map the object key to a specific field
  */
-export function objectVal<T>(query: Query, keyField?: string): Observable<T> {
+export function objectVal<T>(query: Query, options: { keyField?: string }={}): Observable<T> {
   return fromRef(query, ListenEvent.value).pipe(
-    map(change => changeToData(change, keyField) as T)
+    map(change => changeToData(change, options) as T)
   );
 }
 
-export function changeToData(change: QueryChange, keyField?: string): {} {
+export function changeToData(change: QueryChange, options: { keyField?: string}={}): {} {
   const val = change.snapshot.val();
 
   // match the behavior of the JS SDK when the snapshot doesn't exist
@@ -54,6 +54,6 @@ export function changeToData(change: QueryChange, keyField?: string): {} {
 
   return {
     ...val,
-    ...(keyField ? { [keyField]: change.snapshot.key } : null)
+    ...(options.keyField ? { [options.keyField]: change.snapshot.key } : null)
   };
 }
