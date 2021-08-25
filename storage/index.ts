@@ -67,7 +67,11 @@ export function uploadBytesResumable(
 ): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>(subscriber => {
     const task = _uploadBytesResumable(ref, data, metadata);
-    return fromTask(task).subscribe(subscriber).add(task.cancel);
+    const subscription = fromTask(task).subscribe(subscriber);
+    return function unsubscribe() {
+      subscription.unsubscribe();
+      task.cancel();
+    };
   }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 }
 
