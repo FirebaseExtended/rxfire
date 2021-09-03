@@ -1,0 +1,34 @@
+# RxFire Auth
+
+## Callable Functions Observables
+
+### `httpsCallable()`
+
+The `httpsCallable()` function creates an observable that calls a [callable function](https://firebase.google.com/docs/functions/callable), then emits the data returned from that function.
+
+|                 |                                                                          |
+| --------------- | ------------------------------------------------------------------------ |
+| **function**    | `httpsCallable()`                                                        |
+| **params**      | `functions: Functions`, `name: string`, `options?: HttpsCallableOptions` |
+| **import path** | `rxfire/functions`                                                       |
+| **return**      | `Observable<R>`                                                          |
+
+#### TypeScript Example
+
+```ts
+import { httpsCallable } from "rxfire/functions";
+import { initializeApp } from "firebase/app";
+import { getFunctions } from "firebase/functions";
+
+// Set up Firebase
+const app = initializeApp({
+  /* config */
+});
+const functions = getFunctions();
+
+// Listen only for logged in state
+const capitalizedText$ = httpsCallable(functions, "uppercaser")("hello world");
+capitalizedText$.subscribe((text) => {
+  console.log(text);
+}); // logs "HELLO WORLD"
+```
