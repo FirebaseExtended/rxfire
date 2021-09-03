@@ -24,7 +24,7 @@ import { getFunctions } from "firebase/functions";
 const app = initializeApp({
   /* config */
 });
-const functions = getFunctions();
+const functions = getFunctions(app);
 
 // Assume an `uppercaser` function is deployed
 const capitalizedText$ = httpsCallable<string, string>(functions, "uppercaser")("hello world");
