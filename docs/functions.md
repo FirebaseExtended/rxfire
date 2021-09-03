@@ -1,4 +1,4 @@
-# RxFire Auth
+# RxFire Cloud Functions
 
 ## Callable Functions Observables
 
