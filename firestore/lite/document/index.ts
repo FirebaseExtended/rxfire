@@ -44,20 +44,13 @@ export function snapToData<T=DocumentData>(
       idField?: string,
     }={}
 ): {} | undefined {
+  // TODO clean up the typings
   const data = snapshot.data() as any;
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists()) {
+  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
     return data;
   }
-  // If they used a data converter return it, throw if they used any of the option fields
-  if (data?.constructor?.name !== 'Object') {
-    if (options.idField) { throw `Set ${options.idField} in \`fromFirestore\`.`; }
-    return data;
-  } else {
-    return {
-      ...data,
-      ...(options.idField ? { [options.idField]: snapshot.id } : null)
-    };
-  }
+  if (options.idField) { data[options.idField] = snapshot.id; }
+  return data;
 }

@@ -131,9 +131,10 @@ describe('RxFire firestore/lite', () => {
         static toFirestore() {
           return {};
         }
+        static collection = colRef.withConverter(Folk);
       }
 
-      collection(colRef.withConverter(Folk))
+      collection(Folk.collection)
           .subscribe(docs => {
             const names = docs.map(doc => doc.data()?.name);
             const classes = docs.map(doc => doc.data()?.constructor?.name);
