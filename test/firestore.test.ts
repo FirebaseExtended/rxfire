@@ -33,7 +33,7 @@ import {
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
 import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection } from 'firebase/firestore';
+import { getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection, QueryDocumentSnapshot } from 'firebase/firestore';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -110,6 +110,44 @@ describe('RxFire Firestore', () => {
           .pipe(map((docs) => docs.map((doc) => doc.data().name)))
           .subscribe((names) => {
             expect(names).toEqual(expectedNames);
+            done();
+          });
+    });
+  });
+
+  describe('collection w/converter', () => {
+    /**
+     * This is a simple test to see if the collection() method
+     * correctly emits snapshots.
+     *
+     * The test seeds two "people" into the collection. RxFire
+     * creats an observable with the `collection()` method and
+     * asserts that the two "people" are in the array.
+     */
+    it('should emit snapshots', (done: jest.DoneCallback) => {
+      const {colRef, expectedNames} = seedTest(firestore);
+
+      class Folk {
+        constructor(public name: string) { }
+        static fromFirestore(snap: QueryDocumentSnapshot) {
+          const name = snap.data().name;
+          if (name !== 'Shannon') {
+            return new Folk(`${snap.data().name}!`);
+          } else {
+            return undefined;
+          }
+        }
+        static toFirestore() {
+          return {};
+        }
+      }
+
+      collection(colRef.withConverter(Folk))
+          .subscribe(docs => {
+            const names = docs.map(doc => doc.data()?.name);
+            const classes = docs.map(doc => doc.data()?.constructor?.name);
+            expect(names).toEqual(['David!', undefined]);
+            expect(classes).toEqual(['Folk', undefined]);
             done();
           });
     });

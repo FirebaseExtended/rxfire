@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -73,7 +73,7 @@
     "build:docs": "cp README.md ./dist/ && cp -r ./docs ./dist/",
     "dev": "rollup -c -w",
     "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
-    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec jest --project=rxfire-test-c497c",
+    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec \"jest --detectOpenHandles\" --project=rxfire-test-c497c ",
     "test:debug": "yarn echo:chrome && FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
   },
   "dependencies": {

@@ -28,9 +28,9 @@ import {
   docData,
   collectionData,
 } from '../dist/firestore/lite';
-import {map, take, skip} from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection } from 'firebase/firestore/lite';
+import { doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot } from 'firebase/firestore/lite';
 import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -100,6 +100,46 @@ describe('RxFire firestore/lite', () => {
           .pipe(map((docs) => docs.map((doc) => doc.data().name)))
           .subscribe((names) => {
             expect(names).toEqual(expectedNames);
+            done();
+          });
+    });
+  });
+
+
+  describe('collection w/converter', () => {
+    /**
+     * This is a simple test to see if the collection() method
+     * correctly emits snapshots.
+     *
+     * The test seeds two "people" into the collection. RxFire
+     * creats an observable with the `collection()` method and
+     * asserts that the two "people" are in the array.
+     */
+    it('should emit snapshots', async (done: jest.DoneCallback) => {
+      const {colRef, expectedNames} = await seedTest(firestore);
+
+      class Folk {
+        constructor(public name: string) { }
+        static fromFirestore(snap: QueryDocumentSnapshot) {
+          const name = snap.data().name;
+          if (name !== 'Shannon') {
+            return new Folk(`${snap.data().name}!`);
+          } else {
+            return undefined;
+          }
+        }
+        static toFirestore() {
+          return {};
+        }
+        static collection = colRef.withConverter(Folk);
+      }
+
+      collection(Folk.collection)
+          .subscribe(docs => {
+            const names = docs.map(doc => doc.data()?.name);
+            const classes = docs.map(doc => doc.data()?.constructor?.name);
+            expect(names).toEqual(['David!', undefined]);
+            expect(classes).toEqual(['Folk', undefined]);
             done();
           });
     });

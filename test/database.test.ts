@@ -316,15 +316,19 @@ describe('RxFire Database', () => {
       it('should process a new child_added event', done => {
         const aref = builtRef(rando());
         const obs = list(aref, { events: [ListenEvent.added] });
-        obs
-          .pipe(skip(2), take(1))
-          .subscribe(changes => {
-            const data = changes.map(change => change.snapshot.val());
-            expect(data).toContainEqual({ name: 'anotha one' });
-          })
-          .add(done);
         set(aref, itemsObj).then(() => {
-          push(aref, { name: 'anotha one' });
+          let count = 0;
+          obs
+          .pipe(take(2))
+          .subscribe(changes => {
+            if (count++ === 0) {
+              push(aref, { name: 'anotha one' });
+            } else {
+              const data = changes.map(change => change.snapshot.val());
+              expect(data).toContainEqual({ name: 'anotha one' });
+              done();
+            }
+          });
         });
       });
 
