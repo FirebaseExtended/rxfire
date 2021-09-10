@@ -24,13 +24,13 @@ import { map } from 'rxjs/operators';
 type Functions = import('firebase/functions').Functions;
 type HttpsCallableOptions = import('firebase/functions').HttpsCallableOptions;
 
-export function httpsCallable<T, R>(
+export function httpsCallable<RequestData = unknown, ResponseData = unknown>(
   functions: Functions,
   name: string,
   options?: HttpsCallableOptions,
-): (data: T) => Observable<R> {
-  const callable = vanillaHttpsCallable(functions, name, options);
-  return (data: T) => {
-    return from(callable(data)).pipe(map(r => r.data as R));
+): (data?: RequestData | null) => Observable<ResponseData> {
+  const callable = vanillaHttpsCallable<RequestData, ResponseData>(functions, name, options);
+  return (data) => {
+    return from(callable(data)).pipe(map(r => r.data));
   };
 }
