@@ -161,7 +161,7 @@ jobs:
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
           yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
-      - name: Run tests
+      - name: Run lint
         run: |
           yarn lint
 
