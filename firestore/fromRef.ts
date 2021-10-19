@@ -16,26 +16,26 @@
  */
 
 // TODO figure out what is wrong with the types...
-import { onSnapshot } from 'firebase/firestore';
-import { Observable } from 'rxjs';
-import { DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot } from './interfaces';
+import {onSnapshot} from 'firebase/firestore';
+import {Observable} from 'rxjs';
+import {DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot} from './interfaces';
 
-const DEFAULT_OPTIONS = { includeMetadataChanges: false };
+const DEFAULT_OPTIONS = {includeMetadataChanges: false};
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;
 export function fromRef<T=DocumentData>(ref: Query<T>, options?: SnapshotListenOptions): Observable<QuerySnapshot<T>>;
 export function fromRef(
-  ref: any,
-  options: SnapshotListenOptions=DEFAULT_OPTIONS
+    ref: any,
+    options: SnapshotListenOptions=DEFAULT_OPTIONS,
 ): Observable<any> {
   /* eslint-enable @typescript-eslint/no-explicit-any */
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     const unsubscribe = onSnapshot(ref, options, {
       next: subscriber.next.bind(subscriber),
       error: subscriber.error.bind(subscriber),
       complete: subscriber.complete.bind(subscriber),
     });
-    return { unsubscribe };
+    return {unsubscribe};
   });
 }

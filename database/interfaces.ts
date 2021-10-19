@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { onChildAdded, onChildChanged, onChildMoved, onChildRemoved, onValue } from 'firebase/database';
+import {onChildAdded, onChildChanged, onChildMoved, onChildRemoved, onValue} from 'firebase/database';
 
 export type Query = import('firebase/database').Query;
 

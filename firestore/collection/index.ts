@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-import { fromRef } from '../fromRef';
+import {fromRef} from '../fromRef';
 import {
   Observable,
   MonoTypeOperatorFunction,
   OperatorFunction,
   pipe,
-  UnaryFunction
+  UnaryFunction,
 } from 'rxjs';
 import {
   map,
@@ -29,11 +29,11 @@ import {
   scan,
   distinctUntilChanged,
   startWith,
-  pairwise
+  pairwise,
 } from 'rxjs/operators';
-import { snapToData } from '../document';
-import { DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData } from '../interfaces';
-import { refEqual } from 'firebase/firestore';
+import {snapToData} from '../document';
+import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
+import {refEqual} from 'firebase/firestore';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
@@ -42,29 +42,29 @@ const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
  * in specified events array, it will not be emitted.
  */
 const filterEvents = <T>(
-  events?: DocumentChangeType[]
+  events?: DocumentChangeType[],
 ): MonoTypeOperatorFunction<DocumentChange<T>[]> =>
-  filter((changes: DocumentChange<T>[]) => {
-    let hasChange = false;
-    for (let i = 0; i < changes.length; i++) {
-      const change = changes[i];
-      if (events && events.indexOf(change.type) >= 0) {
-        hasChange = true;
-        break;
+    filter((changes: DocumentChange<T>[]) => {
+      let hasChange = false;
+      for (let i = 0; i < changes.length; i++) {
+        const change = changes[i];
+        if (events && events.indexOf(change.type) >= 0) {
+          hasChange = true;
+          break;
+        }
       }
-    }
-    return hasChange;
-  });
+      return hasChange;
+    });
 
 /**
  * Splice arguments on top of a sliced array, to break top-level ===
  * this is useful for change-detection
  */
 function sliceAndSplice<T>(
-  original: T[],
-  start: number,
-  deleteCount: number,
-  ...args: T[]
+    original: T[],
+    start: number,
+    deleteCount: number,
+    ...args: T[]
 ): T[] {
   const returnArray = original.slice();
   returnArray.splice(start, deleteCount, ...args);
@@ -77,8 +77,8 @@ function sliceAndSplice<T>(
  * @param change
  */
 function processIndividualChange<T>(
-  combined: DocumentChange<T>[],
-  change: DocumentChange<T>
+    combined: DocumentChange<T>[],
+    change: DocumentChange<T>,
 ): DocumentChange<T>[] {
   switch (change.type) {
     case 'added':
@@ -130,11 +130,11 @@ function processIndividualChange<T>(
  * @param events
  */
 function processDocumentChanges<T>(
-  current: DocumentChange<T>[],
-  changes: DocumentChange<T>[],
-  events: DocumentChangeType[] = ALL_EVENTS
+    current: DocumentChange<T>[],
+    changes: DocumentChange<T>[],
+    events: DocumentChangeType[] = ALL_EVENTS,
 ): DocumentChange<T>[] {
-  changes.forEach(change => {
+  changes.forEach((change) => {
     // skip unwanted change types
     if (events.indexOf(change.type) > -1) {
       current = processIndividualChange(current, change);
@@ -149,8 +149,8 @@ function processDocumentChanges<T>(
  */
 const windowwise = <T = unknown>() =>
   pipe(
-    startWith(undefined),
-    pairwise() as OperatorFunction<T | undefined, [T | undefined, T]>
+      startWith(undefined),
+    pairwise() as OperatorFunction<T | undefined, [T | undefined, T]>,
   );
 
 /**
@@ -158,9 +158,9 @@ const windowwise = <T = unknown>() =>
  * @param a
  * @param b
  */
-const metaDataEquals = <T,R extends QuerySnapshot<T> | QueryDocumentSnapshot<T>>(
+const metaDataEquals = <T, R extends QuerySnapshot<T> | QueryDocumentSnapshot<T>>(
   a: R,
-  b: R
+  b: R,
 ) => JSON.stringify(a.metadata) === JSON.stringify(b.metadata);
 
 /**
@@ -172,11 +172,11 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
   Observable<T[]>,
   Observable<T[]>
 > =>
-  pipe(
-    windowwise(),
-    filter(([prior, current]) => current.length > 0 || prior === undefined),
-    map(([_, current]) => current)
-  );
+    pipe(
+        windowwise(),
+        filter(([prior, current]) => current.length > 0 || prior === undefined),
+        map(([, current]) => current),
+    );
 
 /**
  * Return a stream of document changes on a query. These results are not in sort order but in
@@ -184,52 +184,52 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
  * @param query
  */
 export function collectionChanges<T=DocumentData>(
-  query: Query<T>,
-  options: {
+    query: Query<T>,
+    options: {
     events?: DocumentChangeType[]
-  }={}
+  }={},
 ): Observable<DocumentChange<T>[]> {
-  return fromRef(query, { includeMetadataChanges: true }).pipe(
-    windowwise(),
-    map(([priorSnapshot, currentSnapshot]) => {
-      const docChanges = currentSnapshot.docChanges();
-      if (priorSnapshot && !metaDataEquals(priorSnapshot, currentSnapshot)) {
+  return fromRef(query, {includeMetadataChanges: true}).pipe(
+      windowwise(),
+      map(([priorSnapshot, currentSnapshot]) => {
+        const docChanges = currentSnapshot.docChanges();
+        if (priorSnapshot && !metaDataEquals(priorSnapshot, currentSnapshot)) {
         // the metadata has changed, docChanges() doesn't return metadata events, so let's
         // do it ourselves by scanning over all the docs and seeing if the metadata has changed
         // since either this docChanges() emission or the prior snapshot
-        currentSnapshot.docs.forEach((currentDocSnapshot, currentIndex) => {
-          const currentDocChange = docChanges.find(c =>
-            refEqual(c.doc.ref, currentDocSnapshot.ref)
-          );
-          if (currentDocChange) {
-            // if the doc is in the current changes and the metadata hasn't changed this doc
-            if (metaDataEquals(currentDocChange.doc, currentDocSnapshot)) {
-              return;
-            }
-          } else {
-            // if there is a prior doc and the metadata hasn't changed skip this doc
-            const priorDocSnapshot = priorSnapshot?.docs.find(d =>
-              refEqual(d.ref, currentDocSnapshot.ref)
+          currentSnapshot.docs.forEach((currentDocSnapshot, currentIndex) => {
+            const currentDocChange = docChanges.find((c) =>
+              refEqual(c.doc.ref, currentDocSnapshot.ref),
             );
-            if (
-              priorDocSnapshot &&
+            if (currentDocChange) {
+            // if the doc is in the current changes and the metadata hasn't changed this doc
+              if (metaDataEquals(currentDocChange.doc, currentDocSnapshot)) {
+                return;
+              }
+            } else {
+            // if there is a prior doc and the metadata hasn't changed skip this doc
+              const priorDocSnapshot = priorSnapshot?.docs.find((d) =>
+                refEqual(d.ref, currentDocSnapshot.ref),
+              );
+              if (
+                priorDocSnapshot &&
               metaDataEquals(priorDocSnapshot, currentDocSnapshot)
-            ) {
-              return;
+              ) {
+                return;
+              }
             }
-          }
-          docChanges.push({
-            oldIndex: currentIndex,
-            newIndex: currentIndex,
-            type: 'modified',
-            doc: currentDocSnapshot
+            docChanges.push({
+              oldIndex: currentIndex,
+              newIndex: currentIndex,
+              type: 'modified',
+              doc: currentDocSnapshot,
+            });
           });
-        });
-      }
-      return docChanges;
-    }),
-    filterEvents(options.events || ALL_EVENTS),
-    filterEmptyUnlessFirst()
+        }
+        return docChanges;
+      }),
+      filterEvents(options.events || ALL_EVENTS),
+      filterEmptyUnlessFirst(),
   );
 }
 
@@ -238,8 +238,8 @@ export function collectionChanges<T=DocumentData>(
  * @param query
  */
 export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
-  return fromRef(query, { includeMetadataChanges: true }).pipe(
-    map(changes => changes.docs)
+  return fromRef(query, {includeMetadataChanges: true}).pipe(
+      map((changes) => changes.docs),
   );
 }
 
@@ -248,18 +248,18 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  * @param query
  */
 export function sortedChanges<T=DocumentData>(
-  query: Query<T>,
-  options: {
+    query: Query<T>,
+    options: {
     events?: DocumentChangeType[]
-  }={}
+  }={},
 ): Observable<DocumentChange<T>[]> {
   return collectionChanges(query, options).pipe(
-    scan(
-      (current: DocumentChange<T>[], changes: DocumentChange<T>[]) =>
-        processDocumentChanges(current, changes, options.events),
-      []
-    ),
-    distinctUntilChanged()
+      scan(
+          (current: DocumentChange<T>[], changes: DocumentChange<T>[]) =>
+            processDocumentChanges(current, changes, options.events),
+          [],
+      ),
+      distinctUntilChanged(),
   );
 }
 
@@ -268,13 +268,13 @@ export function sortedChanges<T=DocumentData>(
  * to docChanges() but it collects each event in an array over time.
  */
 export function auditTrail<T=DocumentData>(
-  query: Query<T>,
-  options: {
+    query: Query<T>,
+    options: {
     events?: DocumentChangeType[]
-  }={}
+  }={},
 ): Observable<DocumentChange<T>[]> {
   return collectionChanges(query, options).pipe(
-    scan((current, action) => [...current, ...action], [] as DocumentChange<T>[])
+      scan((current, action) => [...current, ...action], [] as DocumentChange<T>[]),
   );
 }
 
@@ -283,14 +283,14 @@ export function auditTrail<T=DocumentData>(
  * @param query
  */
 export function collectionData<T=DocumentData>(
-  query: Query<T>,
-  options: {
+    query: Query<T>,
+    options: {
     idField?: string
-  }={}
+  }={},
 ): Observable<T[]> {
   return collection(query).pipe(
-    map(arr => {
-      return arr.map(snap => snapToData(snap, options) as T);
-    })
+      map((arr) => {
+        return arr.map((snap) => snapToData(snap, options) as T);
+      }),
   );
 }
