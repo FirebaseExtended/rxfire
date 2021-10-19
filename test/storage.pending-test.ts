@@ -15,7 +15,8 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
+// TODO: re-enable eslint after updating to emulator tests
+/* eslint-disable */
 
 import {UploadTaskSnapshot, FirebaseStorage, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString} from 'firebase/storage';
 import {FirebaseApp, initializeApp, deleteApp} from 'firebase/app';
