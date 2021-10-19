@@ -121,6 +121,49 @@ jobs:
         run: |
           mv rxfire-${{ github.run_id }} dist
           yarn test
+  
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ["16"]
+        firebase: ["9"]
+        rxjs: ["7"]
+      fail-fast: false
+    name: Lint
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+          check-latest: true
+      - name: node_modules cache
+        id: node_modules_cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn install --frozen-lockfile --prefer-offline
+          yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
+      - name: Run tests
+        run: |
+          yarn lint
 
   publish:
     runs-on: ubuntu-latest
