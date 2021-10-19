@@ -44,12 +44,13 @@ export function snapToData<T=DocumentData>(
       idField?: string,
     }={}
 ): {} | undefined {
+  // TODO clean up the typings
+  const data = snapshot.data() as any;
   // match the behavior of the JS SDK when the snapshot doesn't exist
-  if (!snapshot.exists()) {
-    return snapshot.data();
+  // it's possible with data converters too that the user didn't return an object
+  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
+    return data;
   }
-  return {
-    ...snapshot.data(),
-    ...(options.idField ? { [options.idField]: snapshot.id } : null)
-  };
+  if (options.idField) { data[options.idField] = snapshot.id; }
+  return data;
 }
