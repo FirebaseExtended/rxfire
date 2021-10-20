@@ -17,10 +17,10 @@
 
 // auth is used as a namespace to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Auth } from 'firebase/auth';
-import { onAuthStateChanged, onIdTokenChanged, getIdToken } from 'firebase/auth';
-import { Observable, from, of } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import {Auth} from 'firebase/auth';
+import {onAuthStateChanged, onIdTokenChanged, getIdToken} from 'firebase/auth';
+import {Observable, from, of} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 type User = import('firebase/auth').User;
 
@@ -30,14 +30,14 @@ type User = import('firebase/auth').User;
  * @param auth firebase.auth.Auth
  */
 export function authState(auth: Auth): Observable<User|null> {
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     const unsubscribe = onAuthStateChanged(
-      auth, 
-      subscriber.next.bind(subscriber), 
-      subscriber.error.bind(subscriber), 
-      subscriber.complete.bind(subscriber),
+        auth,
+        subscriber.next.bind(subscriber),
+        subscriber.error.bind(subscriber),
+        subscriber.complete.bind(subscriber),
     );
-    return { unsubscribe };
+    return {unsubscribe};
   });
 }
 
@@ -47,13 +47,13 @@ export function authState(auth: Auth): Observable<User|null> {
  * @param auth firebase.auth.Auth
  */
 export function user(auth: Auth): Observable<User|null> {
-  return new Observable(subscriber => {
-    const unsubscribe = onIdTokenChanged(auth, 
-      subscriber.next.bind(subscriber), 
-      subscriber.error.bind(subscriber), 
-      subscriber.complete.bind(subscriber),
+  return new Observable((subscriber) => {
+    const unsubscribe = onIdTokenChanged(auth,
+        subscriber.next.bind(subscriber),
+        subscriber.error.bind(subscriber),
+        subscriber.complete.bind(subscriber),
     );
-    return { unsubscribe };
+    return {unsubscribe};
   });
 }
 
@@ -64,6 +64,6 @@ export function user(auth: Auth): Observable<User|null> {
  */
 export function idToken(auth: Auth): Observable<string | null> {
   return user(auth).pipe(
-    switchMap(user => (user ? from(getIdToken(user)) : of(null)))
+      switchMap((user) => (user ? from(getIdToken(user)) : of(null))),
   );
 }

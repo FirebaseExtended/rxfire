@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { Observable, from } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { snapToData } from '../document';
-import { Query, QueryDocumentSnapshot, DocumentData } from '../interfaces';
-import { getDocs } from 'firebase/firestore/lite';
+import {Observable, from} from 'rxjs';
+import {map} from 'rxjs/operators';
+import {snapToData} from '../document';
+import {Query, QueryDocumentSnapshot, DocumentData} from '../interfaces';
+import {getDocs} from 'firebase/firestore/lite';
 
 /**
  * Return a stream of document snapshots on a query. These results are in sort order.
@@ -27,7 +27,7 @@ import { getDocs } from 'firebase/firestore/lite';
  */
 export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
   return from(getDocs<T>(query)).pipe(
-    map(changes => changes.docs)
+      map((changes) => changes.docs),
   );
 }
 
@@ -36,14 +36,14 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  * @param query
  */
 export function collectionData<T=DocumentData>(
-  query: Query<T>,
-  options: {
+    query: Query<T>,
+    options: {
     idField?: string
-  }={}
+  }={},
 ): Observable<T[]> {
   return collection(query).pipe(
-    map(arr => {
-      return arr.map(snap => snapToData(snap, options) as T);
-    })
+      map((arr) => {
+        return arr.map((snap) => snapToData(snap, options) as T);
+      }),
   );
 }

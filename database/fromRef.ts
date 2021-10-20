@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import { Observable } from 'rxjs';
-import { delay } from 'rxjs/operators';
-import { ListenEvent, QueryChange, ListenerMethods } from './interfaces';
-import { off } from 'firebase/database';
+import {Observable} from 'rxjs';
+import {delay} from 'rxjs/operators';
+import {ListenEvent, QueryChange, ListenerMethods} from './interfaces';
+import {off} from 'firebase/database';
 
 /**
  * Create an observable from a Database Reference or Database Query.
@@ -26,26 +26,26 @@ import { off } from 'firebase/database';
  * @param event Listen event type ('value', 'added', 'changed', 'removed', 'moved')
  */
 export function fromRef(
-  ref: import('firebase/database').Query,
-  event: ListenEvent
+    ref: import('firebase/database').Query,
+    event: ListenEvent,
 ): Observable<QueryChange> {
-  return new Observable<QueryChange>(subscriber => {
+  return new Observable<QueryChange>((subscriber) => {
     const fn = ListenerMethods[event](
-      ref,
-      (snapshot, prevKey) => {
-        subscriber.next({ snapshot, prevKey, event });
-      },
-      subscriber.error.bind(subscriber)
+        ref,
+        (snapshot, prevKey) => {
+          subscriber.next({snapshot, prevKey, event});
+        },
+        subscriber.error.bind(subscriber),
     );
     return {
       unsubscribe() {
         off(ref, event, fn);
-      }
+      },
     };
   }).pipe(
-    // Ensures subscribe on observable is async. This handles
-    // a quirk in the SDK where on/once callbacks can happen
-    // synchronously.
-    delay(0)
+      // Ensures subscribe on observable is async. This handles
+      // a quirk in the SDK where on/once callbacks can happen
+      // synchronously.
+      delay(0),
   );
 }
