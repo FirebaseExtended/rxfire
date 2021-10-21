@@ -135,7 +135,7 @@ import { getStorage, ref } from 'firebase/storage';
 // Set up Firebase
 const app = initializeApp({ /* config */ });
 const storage = getStorage(app);
-const dataRef = ref(storage, 'users/david.json');
+const davidRef = ref(storage, 'users/david.json');
 
 const blob = new Blob(
   [JSON.stringify({ name: 'david'}, null, 2)], 
