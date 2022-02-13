@@ -29,30 +29,31 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T=DocumentData>(
+export function docData<T=DocumentData, R extends T=T>(
     ref: DocumentReference<T>,
     options: {
-    idField?: string
-  }={},
-): Observable<T> {
-  return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
+      idField?: keyof R
+    }={},
+): Observable<T | R> {
+  return doc(ref).pipe(map((snap) => snapToData(snap, options)!));
 }
 
-export function snapToData<T=DocumentData>(
+export function snapToData<T=DocumentData, R extends T=T>(
     snapshot: DocumentSnapshot<T>,
     options: {
-      idField?: string,
+      idField?: keyof R,
     }={},
-): {} | undefined {
-  // TODO clean up the typings
-  const data = snapshot.data() as any;
+): T | R | undefined {
+  const data = snapshot.data();
+
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
+  if (!snapshot.exists() || typeof data !== 'object' || data === null || !options.idField) {
     return data;
   }
-  if (options.idField) {
-    data[options.idField] = snapshot.id;
-  }
-  return data;
+
+  return {
+    ...data,
+    [options.idField]: snapshot.id,
+  };
 }
