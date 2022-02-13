@@ -34,8 +34,8 @@ export function docData<T=DocumentData, R extends T=T>(
     options: {
       idField?: keyof R
     }={},
-): Observable<T | R> {
-  return doc(ref).pipe(map((snap) => snapToData(snap, options)!));
+): Observable<T | R | undefined> {
+  return doc(ref).pipe(map((snap) => snapToData(snap, options)));
 }
 
 export function snapToData<T=DocumentData, R extends T=T>(
