@@ -59,7 +59,7 @@ export function fromTask(
 
     // task is a promise, so we can convert that to an observable,
     // this is done for the ergonomics around making sure we don't
-    // try to push errors or completions through closed subscribers.
+    // try to push errors or completions through closed subscribers
     subscriber.add(from(task).subscribe({
       next: emit,
       error: err => {
