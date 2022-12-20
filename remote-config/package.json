@@ -4,6 +4,11 @@
     "main": "../dist/remote-config/index.cjs.js",
     "module": "../dist/remote-config/index.esm.js",
     "typings": "../dist/remote-config/index.d.ts",
-    "sideEffects": false
-  }
+    "sideEffects": false,
+    "type": "module",
+    "exports": {
+        "import": "./index.esm.js",
+        "require": "./index.cjs.js"
+    }
+}
   

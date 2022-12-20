@@ -4,5 +4,10 @@
   "main": "../dist/storage/index.cjs.js",
   "module": "../dist/storage/index.esm.js",
   "typings": "../dist/storage/index.d.ts",
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    "import": "./index.esm.js",
+    "require": "./index.cjs.js"
+  }
 }
