@@ -4,5 +4,10 @@
   "main": "../dist/auth/index.cjs.js",
   "module": "../dist/auth/index.esm.js",
   "typings": "../dist/auth/index.d.ts",
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    "import": "./index.esm.js",
+    "require": "./index.cjs.js"
+  }
 }

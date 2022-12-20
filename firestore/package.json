@@ -4,5 +4,10 @@
   "main": "../dist/firestore/index.cjs.js",
   "module": "../dist/firestore/index.esm.js",
   "typings": "../dist/firestore/index.d.ts",
-  "sideEffects": false
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    "import": "./index.esm.js",
+    "require": "./index.cjs.js"
+  }
 }
