@@ -4,7 +4,7 @@ import {
   uploadBytesResumable as _uploadBytesResumable,
   uploadString as _uploadString,
 } from 'firebase/storage';
-import {Observable, from, timeoutProvider} from 'rxjs';
+import {Observable, from} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
 type UploadTaskSnapshot = import('firebase/storage').UploadTaskSnapshot;
@@ -14,10 +14,8 @@ type StringFormat = import('firebase/storage').StringFormat;
 type UploadTask = import('firebase/storage').UploadTask;
 type UploadResult = import('firebase/storage').UploadResult;
 
-export function fromTask(
-    task: UploadTask,
-): Observable<UploadTaskSnapshot> {
-  return new Observable<UploadTaskSnapshot>(subscriber => {
+export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
+  return new Observable<UploadTaskSnapshot>((subscriber) => {
     let lastSnapshot: UploadTaskSnapshot | null = null;
     let complete = false;
     let hasError = false;
@@ -32,7 +30,7 @@ export function fromTask(
 
     /**
      * Schedules an async event to check and emit
-     * the most recent snapshot, and complete or error 
+     * the most recent snapshot, and complete or error
      * if necessary.
      */
     const schedule = () => {
@@ -60,18 +58,20 @@ export function fromTask(
     // task is a promise, so we can convert that to an observable,
     // this is done for the ergonomics around making sure we don't
     // try to push errors or completions through closed subscribers
-    subscriber.add(from(task).subscribe({
-      next: emit,
-      error: err => {
-        hasError = true;
-        error = err;
-        schedule();
-      },
-      complete: () => {
-        complete = true;
-        schedule();
-      }
-    }));
+    subscriber.add(
+        from(task).subscribe({
+          next: emit,
+          error: (err) => {
+            hasError = true;
+            error = err;
+            schedule();
+          },
+          complete: () => {
+            complete = true;
+            schedule();
+          },
+        }),
+    );
   });
 }
 
@@ -111,9 +111,7 @@ export function uploadString(
   return from(_uploadString(ref, data, format, metadata));
 }
 
-export function percentage(
-    task: UploadTask,
-): Observable<{
+export function percentage(task: UploadTask): Observable<{
   progress: number;
   snapshot: UploadTaskSnapshot;
 }> {
