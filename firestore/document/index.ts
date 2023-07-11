@@ -30,30 +30,31 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * @param query
  * @param options
  */
-export function docData<T=DocumentData>(
+export function docData<T=DocumentData, R extends T=T>(
     ref: DocumentReference<T>,
     options: {
-    idField?: string
-  }={},
-): Observable<T | undefined> {
-  return doc(ref).pipe(map((snap) => snapToData(snap, options) as T | undefined));
+      idField?: keyof R
+    }={},
+): Observable<T | R | undefined> {
+  return doc(ref).pipe(map((snap) => snapToData(snap, options)));
 }
 
-export function snapToData<T=DocumentData, U extends string=never>(
+export function snapToData<T=DocumentData, R extends T=T>(
     snapshot: DocumentSnapshot<T>,
     options: {
-      idField?: U,
+      idField?: keyof R,
     }={},
-): T & { [K in U]: string } | undefined {
-  // TODO clean up the typings
-  const data = snapshot.data() as any;
+): T | R | undefined {
+  const data = snapshot.data();
+
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
+  if (!snapshot.exists() || typeof data !== 'object' || data === null || !options.idField) {
     return data;
   }
-  if (options.idField) {
-    data[options.idField] = snapshot.id;
-  }
-  return data;
+
+  return {
+    ...data,
+    [options.idField]: snapshot.id,
+  };
 }
