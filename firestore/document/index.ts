@@ -33,9 +33,9 @@ export function docData<T=DocumentData>(
     ref: DocumentReference<T>,
     options: {
     idField?: string
-  }={}
+  }={},
 ): Observable<T | undefined> {
-  return doc(ref).pipe(map(snap => snapToData(snap, options) as T | undefined));
+  return doc(ref).pipe(map((snap) => snapToData(snap, options) as T | undefined));
 }
 
 export function snapToData<T=DocumentData>(
