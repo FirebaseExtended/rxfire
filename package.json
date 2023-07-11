@@ -76,9 +76,7 @@
     "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec \"jest --detectOpenHandles\" --project=rxfire-test-c497c ",
     "test:debug": "yarn echo:chrome && FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
   },
-  "dependencies": {
-    "tslib": "^2.5.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "firebase": "^9.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
@@ -106,7 +104,7 @@
     "rollup": "^2.33.2",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rxjs": "^7.0.0",
-    "tslib": "^2.5.0",
+    "tslib": "^2.6.0",
     "typescript": "^4.2.4",
     "xhr2": "^0.2.1"
   },
