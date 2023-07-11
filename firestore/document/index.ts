@@ -28,6 +28,7 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
 /**
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
+ * @param options
  */
 export function docData<T=DocumentData>(
     ref: DocumentReference<T>,
@@ -38,12 +39,12 @@ export function docData<T=DocumentData>(
   return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
 }
 
-export function snapToData<T=DocumentData>(
+export function snapToData<T=DocumentData, U extends string=never>(
     snapshot: DocumentSnapshot<T>,
     options: {
-      idField?: string,
+      idField?: U,
     }={},
-): {} | undefined {
+): T & { [K in U]: string } | undefined {
   // TODO clean up the typings
   const data = snapshot.data() as any;
   // match the behavior of the JS SDK when the snapshot doesn't exist

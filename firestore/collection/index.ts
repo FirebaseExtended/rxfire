@@ -281,16 +281,17 @@ export function auditTrail<T=DocumentData>(
 /**
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
  * @param query
+ * @param options
  */
-export function collectionData<T=DocumentData>(
+export function collectionData<T=DocumentData, U extends string=never>(
     query: Query<T>,
     options: {
-    idField?: string
+    idField?: U
   }={},
-): Observable<T[]> {
+): Observable<(T & { [T in U]: string; })[]> {
   return collection(query).pipe(
       map((arr) => {
-        return arr.map((snap) => snapToData(snap, options) as T);
+        return arr.map((snap) => snapToData(snap, options)!);
       }),
   );
 }
