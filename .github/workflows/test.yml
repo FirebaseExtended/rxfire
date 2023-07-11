@@ -23,16 +23,15 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: '20'
       - name: node_modules cache
         uses: actions/cache@v2
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-14-9-7-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-20-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-14-9-7-node_modules-
-            ${{ runner.os }}-14-node_modules-
+            ${{ runner.os }}-20-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v2
@@ -61,7 +60,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        node: ["12", "14", "16"]
+        node: ["20"]
         firebase: ["9"]
         rxjs: ["6", "7"]
       fail-fast: false
@@ -126,7 +125,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ["16"]
+        node: ["20"]
         firebase: ["9"]
         rxjs: ["7"]
       fail-fast: false
@@ -174,7 +173,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2-beta
         with:
-          node-version: '14'
+          node-version: '20'
           registry-url: 'https://wombat-dressing-room.appspot.com'
       - name: 'Download Artifacts'
         uses: actions/download-artifact@v2
