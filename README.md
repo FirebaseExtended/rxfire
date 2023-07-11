@@ -132,6 +132,7 @@ const url$ = getDownloadURL(ref);
 - [Authentication](docs/auth.md)
 - [Storage](docs/storage.md)
 - [Realtime Database](docs/database.md)
+- [Cloud Functions](docs/functions.md)
 
 ## Examples
 

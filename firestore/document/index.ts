@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
  */
 
 // TODO fix the import
-import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
-import { fromRef } from '../fromRef';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
+import {fromRef} from '../fromRef';
+import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
-  return fromRef(ref, { includeMetadataChanges: true });
+  return fromRef(ref, {includeMetadataChanges: true});
 }
 
 /**
@@ -30,8 +30,8 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * @param query
  */
 export function docData<T=DocumentData>(
-  ref: DocumentReference<T>,
-  options: {
+    ref: DocumentReference<T>,
+    options: {
     idField?: string
   }={}
 ): Observable<T | undefined> {
@@ -42,7 +42,7 @@ export function snapToData<T=DocumentData>(
     snapshot: DocumentSnapshot<T>,
     options: {
       idField?: string,
-    }={}
+    }={},
 ): {} | undefined {
   // TODO clean up the typings
   const data = snapshot.data() as any;
@@ -51,6 +51,8 @@ export function snapToData<T=DocumentData>(
   if (!snapshot.exists() || typeof data !== 'object' || data === null) {
     return data;
   }
-  if (options.idField) { data[options.idField] = snapshot.id; }
+  if (options.idField) {
+    data[options.idField] = snapshot.id;
+  }
   return data;
 }

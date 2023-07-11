@@ -19,7 +19,7 @@ module.exports = {
     'max-len': 0,
     'require-jsdoc': 0,
     'valid-jsdoc': 0,
-    // TODO figure out why argsIngnorePattern isn't working and set back to error
-    'no-unused-vars': ['warn', { 'argsIgnorePattern': '^_' }],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'error',
   },
 };

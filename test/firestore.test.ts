@@ -32,9 +32,9 @@ import {
   collectionData,
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
-import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection, QueryDocumentSnapshot } from 'firebase/firestore';
-import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
+import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
+import {getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection, QueryDocumentSnapshot} from 'firebase/firestore';
+import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
 
@@ -125,7 +125,7 @@ describe('RxFire Firestore', () => {
      * asserts that the two "people" are in the array.
      */
     it('should emit snapshots', (done: jest.DoneCallback) => {
-      const {colRef, expectedNames} = seedTest(firestore);
+      const {colRef} = seedTest(firestore);
 
       class Folk {
         constructor(public name: string) { }
@@ -143,9 +143,9 @@ describe('RxFire Firestore', () => {
       }
 
       collection(colRef.withConverter(Folk))
-          .subscribe(docs => {
-            const names = docs.map(doc => doc.data()?.name);
-            const classes = docs.map(doc => doc.data()?.constructor?.name);
+          .subscribe((docs) => {
+            const names = docs.map((doc) => doc.data()?.name);
+            const classes = docs.map((doc) => doc.data()?.constructor?.name);
             expect(names).toEqual(['David!', undefined]);
             expect(classes).toEqual(['Folk', undefined]);
             done();
@@ -191,7 +191,7 @@ describe('RxFire Firestore', () => {
     it('should emit an array of sorted snapshots', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const addedChanges = sortedChanges(colRef, { events: ['added']}).pipe(unwrapChange);
+      const addedChanges = sortedChanges(colRef, {events: ['added']}).pipe(unwrapChange);
 
       const modifiedChanges = sortedChanges(colRef).pipe(
           unwrapChange,
@@ -231,8 +231,8 @@ describe('RxFire Firestore', () => {
     it('should filter by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc, expectedEvents} = seedTest(firestore);
 
-      const addedChanges = sortedChanges(colRef, { events: ['added']}).pipe(unwrapChange);
-      const modifiedChanges = sortedChanges(colRef, { events: ['modified']}).pipe(
+      const addedChanges = sortedChanges(colRef, {events: ['added']}).pipe(unwrapChange);
+      const modifiedChanges = sortedChanges(colRef, {events: ['modified']}).pipe(
           unwrapChange,
       );
 
@@ -287,7 +287,7 @@ describe('RxFire Firestore', () => {
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const modifiedAudit = auditTrail(colRef, { events: ['modified']}).pipe(unwrapChange);
+      const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
 
       modifiedAudit.subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
@@ -333,7 +333,7 @@ describe('RxFire Firestore', () => {
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       const {colRef, davidDoc} = seedTest(firestore);
 
-      const modifiedAudit = auditTrail(colRef, { events: ['modified']}).pipe(unwrapChange);
+      const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
 
       modifiedAudit.subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
@@ -353,7 +353,7 @@ describe('RxFire Firestore', () => {
       const {colRef} = seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, { idField: 'userId' });
+      const unwrapped = collectionData(colRef, {idField: 'userId'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -370,7 +370,7 @@ describe('RxFire Firestore', () => {
       const {davidDoc} = seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
-      const unwrapped = docData(davidDoc, { idField: 'UID' });
+      const unwrapped = docData(davidDoc, {idField: 'UID'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -389,9 +389,8 @@ describe('RxFire Firestore', () => {
      */
 
     it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
-      
       pending('Not working against the emulator');
-      
+
       const {colRef} = seedTest(firestore);
 
       const nonExistentDoc: DocumentReference = firestoreDoc(colRef,
@@ -409,9 +408,8 @@ describe('RxFire Firestore', () => {
     });
 
     it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
-      
       pending('Not working against the emulator');
-      
+
       const nonExistentCollection = firestoreCollection(firestore, createId());
 
       const unwrapped = collectionData(nonExistentCollection);
@@ -423,6 +421,5 @@ describe('RxFire Firestore', () => {
         });
       });
     });
-
   });
 });

@@ -28,10 +28,10 @@ import {
   docData,
   collectionData,
 } from '../dist/firestore/lite';
-import { map } from 'rxjs/operators';
-import { default as TEST_PROJECT, firestoreEmulatorPort } from './config';
-import { doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot } from 'firebase/firestore/lite';
-import { initializeApp, deleteApp, FirebaseApp } from 'firebase/app';
+import {map} from 'rxjs/operators';
+import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
+import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot} from 'firebase/firestore/lite';
+import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
 
@@ -116,7 +116,7 @@ describe('RxFire firestore/lite', () => {
      * asserts that the two "people" are in the array.
      */
     it('should emit snapshots', async (done: jest.DoneCallback) => {
-      const {colRef, expectedNames} = await seedTest(firestore);
+      const {colRef} = await seedTest(firestore);
 
       class Folk {
         constructor(public name: string) { }
@@ -135,9 +135,9 @@ describe('RxFire firestore/lite', () => {
       }
 
       collection(Folk.collection)
-          .subscribe(docs => {
-            const names = docs.map(doc => doc.data()?.name);
-            const classes = docs.map(doc => doc.data()?.constructor?.name);
+          .subscribe((docs) => {
+            const names = docs.map((doc) => doc.data()?.name);
+            const classes = docs.map((doc) => doc.data()?.constructor?.name);
             expect(names).toEqual(['David!', undefined]);
             expect(classes).toEqual(['Folk', undefined]);
             done();
@@ -153,7 +153,7 @@ describe('RxFire firestore/lite', () => {
       const {colRef} = await seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, { idField: 'userId' });
+      const unwrapped = collectionData(colRef, {idField: 'userId'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -170,7 +170,7 @@ describe('RxFire firestore/lite', () => {
       const {davidDoc} = await seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
-      const unwrapped = docData(davidDoc, { idField: 'UID'});
+      const unwrapped = docData(davidDoc, {idField: 'UID'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -189,9 +189,8 @@ describe('RxFire firestore/lite', () => {
      */
 
     it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', async (done) => {
-      
       pending('Not working against the emulator');
-      
+
       const {colRef} = await seedTest(firestore);
 
       const nonExistentDoc: DocumentReference = firestoreDoc(colRef,
@@ -209,9 +208,8 @@ describe('RxFire firestore/lite', () => {
     });
 
     it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
-      
       pending('Not working against the emulator');
-      
+
       const nonExistentCollection = firestoreCollection(firestore, createId());
 
       const unwrapped = collectionData(nonExistentCollection);
@@ -223,6 +221,5 @@ describe('RxFire firestore/lite', () => {
         });
       });
     });
-
   });
 });
