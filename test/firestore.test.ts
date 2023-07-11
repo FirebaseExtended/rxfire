@@ -426,39 +426,35 @@ describe('RxFire Firestore', () => {
   });
 
   describe('Aggregations', () => {
-
     it('should provide an observable with a count aggregate snapshot', async (done) => {
       const colRef = createRandomCol(firestore);
       const entries = [
-        addDoc(colRef, { id: createId() }),
-        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, {id: createId()}),
       ];
-      await Promise.all(entries)
-      
-      collectionCountSnap$(colRef).subscribe(snap => {
+      await Promise.all(entries);
+
+      collectionCountSnap$(colRef).subscribe((snap) => {
         expect(snap.data().count).toEqual(entries.length);
         done();
       });
-
     });
 
     it('should provide an observable with a count aggregate number', async (done) => {
       const colRef = createRandomCol(firestore);
       const entries = [
-        addDoc(colRef, { id: createId() }),
-        addDoc(colRef, { id: createId() }),
-        addDoc(colRef, { id: createId() }),
-        addDoc(colRef, { id: createId() }),
-        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, {id: createId()}),
       ];
-      await Promise.all(entries)
-      
-      collectionCount$(colRef).subscribe(count => {
+      await Promise.all(entries);
+
+      collectionCount$(colRef).subscribe((count) => {
         expect(count).toEqual(entries.length);
         done();
       });
-
     });
-
-  })
+  });
 });

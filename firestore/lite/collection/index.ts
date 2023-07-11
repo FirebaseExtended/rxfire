@@ -53,5 +53,5 @@ export function collectionCountSnap$(query: Query<unknown>): Observable<CountSna
 }
 
 export function collectionCount$(query: Query<unknown>): Observable<number> {
-  return collectionCountSnap$(query).pipe(map(snap => snap.data().count));
+  return collectionCountSnap$(query).pipe(map((snap) => snap.data().count));
 }

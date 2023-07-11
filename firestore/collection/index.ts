@@ -35,7 +35,7 @@ import {
 import {snapToData} from '../document';
 import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
 import {getCountFromServer, refEqual} from 'firebase/firestore';
-import { CountSnapshot } from '../lite/interfaces';
+import {CountSnapshot} from '../lite/interfaces';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
@@ -303,5 +303,5 @@ export function collectionCountSnap$(query: Query<unknown>): Observable<CountSna
 }
 
 export function collectionCount$(query: Query<unknown>): Observable<number> {
-  return collectionCountSnap$(query).pipe(map(snap => snap.data().count));
+  return collectionCountSnap$(query).pipe(map((snap) => snap.data().count));
 }
