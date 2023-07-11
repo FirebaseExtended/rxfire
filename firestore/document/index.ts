@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,8 @@ export function docData<T=DocumentData>(
     options: {
     idField?: string
   }={},
-): Observable<T> {
-  return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
+): Observable<T | undefined> {
+  return doc(ref).pipe(map((snap) => snapToData(snap, options) as T | undefined));
 }
 
 export function snapToData<T=DocumentData, U extends string=never>(
