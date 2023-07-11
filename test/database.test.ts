@@ -685,8 +685,8 @@ describe('RxFire Database', () => {
 
       obs.subscribe((val) => {
         expect(Array.isArray(val)).toEqual(true);
-        expect(val[0].KEY).toEqual('testKey');
-        expect(val[0].hello).toEqual('world');
+        expect(val![0].KEY).toEqual('testKey');
+        expect(val![0].hello).toEqual('world');
         done();
       });
     });
