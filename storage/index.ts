@@ -7,12 +7,7 @@ import {
 import {Observable, from} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
-type UploadTaskSnapshot = import('firebase/storage').UploadTaskSnapshot;
-type StorageReference = import('firebase/storage').StorageReference;
-type UploadMetadata = import('firebase/storage').UploadMetadata;
-type StringFormat = import('firebase/storage').StringFormat;
-type UploadTask = import('firebase/storage').UploadTask;
-type UploadResult = import('firebase/storage').UploadResult;
+import type { UploadTaskSnapshot, StorageReference, UploadMetadata, StringFormat, UploadTask, UploadResult } from 'firebase/storage';
 
 export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>((subscriber) => {
@@ -59,7 +54,7 @@ export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
     // this is done for the ergonomics around making sure we don't
     // try to push errors or completions through closed subscribers
     subscriber.add(
-        from(task).subscribe({
+        from(task as unknown as Promise<UploadTaskSnapshot>).subscribe({
           next: emit,
           error: (err) => {
             hasError = true;
