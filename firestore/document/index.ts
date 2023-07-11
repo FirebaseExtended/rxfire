@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
 /**
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
+ * @param options
  */
 export function docData<T=DocumentData, R extends T=T>(
     ref: DocumentReference<T>,
