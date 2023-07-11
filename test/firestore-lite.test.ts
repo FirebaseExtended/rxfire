@@ -4,7 +4,7 @@
 
 /**
  * @license
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,12 @@ import {
   collection,
   docData,
   collectionData,
+  collectionCountSnap$,
+  collectionCount$,
 } from '../dist/firestore/lite';
 import {map} from 'rxjs/operators';
 import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
-import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot} from 'firebase/firestore/lite';
+import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot, addDoc} from 'firebase/firestore/lite';
 import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
@@ -80,8 +82,10 @@ describe('RxFire firestore/lite', () => {
     connectFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
   });
 
-  afterEach(() => {
-    deleteApp(app).catch(() => undefined);
+  afterEach((done) => {
+    deleteApp(app)
+      .then(() => done())
+      .catch(() => undefined);
   });
 
   describe('collection', () => {
@@ -104,7 +108,6 @@ describe('RxFire firestore/lite', () => {
           });
     });
   });
-
 
   describe('collection w/converter', () => {
     /**
@@ -222,4 +225,42 @@ describe('RxFire firestore/lite', () => {
       });
     });
   });
+
+  describe('Aggregations', () => {
+
+    it('should provide an observable with a count aggregate', async (done) => {
+      const colRef = createRandomCol(firestore);
+      const entries = [
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+      ];
+      await Promise.all(entries)
+      
+      collectionCountSnap$(colRef).subscribe(snap => {
+        expect(snap.data().count).toEqual(entries.length);
+        done();
+      });
+
+    });
+
+    it('should provide an observable with a count aggregate number', async (done) => {
+      const colRef = createRandomCol(firestore);
+      const entries = [
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+      ];
+      await Promise.all(entries)
+      
+      collectionCount$(colRef).subscribe(count => {
+        expect(count).toEqual(entries.length);
+        done();
+      });
+
+    });
+
+  })
+
 });

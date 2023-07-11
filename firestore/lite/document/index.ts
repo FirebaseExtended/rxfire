@@ -22,7 +22,7 @@ import {from, Observable} from 'rxjs';
 import {getDoc} from 'firebase/firestore/lite';
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
-  return from(getDoc<T>(ref));
+  return from(getDoc<T, DocumentData>(ref));
 }
 
 /**

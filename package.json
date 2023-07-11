@@ -73,8 +73,8 @@
     "build:docs": "cp README.md ./dist/ && cp -r ./docs ./dist/",
     "dev": "rollup -c -w",
     "echo:chrome": "echo 'Open Chrome DevTools: \nchrome://inspect/#devices'",
-    "test": "FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec \"jest --detectOpenHandles\" --project=rxfire-test-c497c ",
-    "test:debug": "yarn echo:chrome && FIREBASE_CLI_PREVIEWS=storageemulator firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
+    "test": "firebase emulators:exec \"jest --detectOpenHandles\" --project=rxfire-test-c497c ",
+    "test:debug": "yarn echo:chrome && firebase emulators:exec ./test-debug.sh --project=rxfire-test-c497c"
   },
   "dependencies": {
     "tslib": "^2.5.0"
@@ -97,8 +97,8 @@
     "cross-fetch": "^3.1.4",
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
-    "firebase": "^9.0.0",
-    "firebase-tools": "^9.10.2",
+    "firebase": "^10.0.0",
+    "firebase-tools": "^12.4.3",
     "glob": "^7.1.6",
     "jest": "^26.6.3",
     "md5": "^2.3.0",
