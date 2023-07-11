@@ -7,7 +7,7 @@ import {
 import {Observable, from} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
-import type { UploadTaskSnapshot, StorageReference, UploadMetadata, StringFormat, UploadTask, UploadResult } from 'firebase/storage';
+import type {UploadTaskSnapshot, StorageReference, UploadMetadata, StringFormat, UploadTask, UploadResult} from 'firebase/storage';
 
 export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>((subscriber) => {
