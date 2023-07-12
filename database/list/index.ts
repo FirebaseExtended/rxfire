@@ -52,10 +52,11 @@ export function list(
   const events = validateEventsArray(options.events);
   return get(query).pipe(
       switchMap((change) => {
+        let childEvent$: Observable<QueryChange | null>[];
         if (!change.snapshot.exists()) {
-          return of([]);
+          childEvent$ = [of()];
         }
-        const childEvent$ = [of(change)];
+        childEvent$ = [of(change)];
         events.forEach((event) => {
           childEvent$.push(fromRef(query, event));
         });
@@ -106,7 +107,7 @@ function positionAfter(changes: QueryChange[], prevKey?: string): number {
   }
 }
 
-function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
+function buildView(current: QueryChange[] | null, change: QueryChange): QueryChange[] {
   const {snapshot, prevKey, event} = change;
   const {key} = snapshot;
   const currentKeyPosition = positionFor(current, key);
