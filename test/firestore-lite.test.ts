@@ -27,8 +27,8 @@ import {
   collection,
   docData,
   collectionData,
-  collectionCountSnap$,
-  collectionCount$,
+  collectionCountSnap,
+  collectionCount,
 } from '../dist/firestore/lite';
 import {map} from 'rxjs/operators';
 import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
@@ -235,7 +235,7 @@ describe('RxFire firestore/lite', () => {
       ];
       await Promise.all(entries);
 
-      collectionCountSnap$(colRef).subscribe((snap) => {
+      collectionCountSnap(colRef).subscribe((snap) => {
         expect(snap.data().count).toEqual(entries.length);
         done();
       });
@@ -252,7 +252,7 @@ describe('RxFire firestore/lite', () => {
       ];
       await Promise.all(entries);
 
-      collectionCount$(colRef).subscribe((count) => {
+      collectionCount(colRef).subscribe((count) => {
         expect(count).toEqual(entries.length);
         done();
       });

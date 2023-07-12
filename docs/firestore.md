@@ -231,29 +231,29 @@ deleteDoc(davidDocRef);
   */
 ```
 
-### `collectionCount$()`
+### `collectionCount()`
 
 Create an observable that emits the server-calculated number of documents in a collection or query. [Learn more about count queries in the Firebase docs](https://firebase.google.com/docs/firestore/query-data/aggregation-queries).
 
 |                 |                                          |
 |-----------------|------------------------------------------|
-| **function**    | `collectionCount$()`                           |
+| **function**    | `collectionCount()`                           |
 | **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query`|
 | **import path** | `rxfire/firestore` or `rxfire/firestore/lite`                       |
 | **return**      | `Observable<number>`    |
 
 #### TypeScript Example
 ```ts
-import { collectionCount$ } from 'rxfire/firestore';
+import { collectionCount } from 'rxfire/firestore';
 // Also available in firestore/lite
-import { collectionCount$ } from 'rxfire/firestore/lite';
+import { collectionCount } from 'rxfire/firestore/lite';
 
 import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
 const likesCol = collection(db, 'posts/post_id_123/likes');
 
-collectionCount$(likesCol).subscribe(count => {
+collectionCount(likesCol).subscribe(count => {
    console.log(count);
 });
 ```
@@ -263,13 +263,13 @@ Note that the observable will complete after the first fetch. This is not a long
 ```ts
 import { repeat } from 'rxjs';
 
-import { collectionCount$} from 'rxfire/firestore';
+import { collectionCount} from 'rxfire/firestore';
 import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
 const likesCol = collection(db, 'posts/post_id_123/likes');
 
-collectionCount$(likesCol)
+collectionCount(likesCol)
   .pipe(
     // re-fetch every 30 seconds.
     // Stop fetching after 100 re-fetches so we don't do too many reads
@@ -280,22 +280,22 @@ collectionCount$(likesCol)
   });
 ```
 
-### `collectionCountSnap$()`
+### `collectionCountSnap()`
 
 Create an observable that emits the server-calculated number of documents in a collection or query. [Learn more about count queries in the Firebase docs](https://firebase.google.com/docs/firestore/query-data/aggregation-queries).
 
 |                 |                                          |
 |-----------------|------------------------------------------|
-| **function**    | `collectionCountSnap$()`                           |
+| **function**    | `collectionCountSnap()`                           |
 | **params**      | query: `import('firebase/firestore').CollectionReference \| import('firebase/firestore').Query`|
 | **import path** | `rxfire/firestore` or `firebase/firestore/lite`                       |
 | **return**      | `Observable<CountSnapshot>`    |
 
 #### TypeScript Example
 ```ts
-import { collectionCountSnap$ } from 'rxfire/firestore';
+import { collectionCountSnap } from 'rxfire/firestore';
 // Also available in firestore/lite
-import { collectionCountSnap$ } from 'rxfire/firestore/lite';
+import { collectionCountSnap } from 'rxfire/firestore/lite';
 import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
