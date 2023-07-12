@@ -298,10 +298,10 @@ export function collectionData<T=DocumentData, U extends string=never>(
   );
 }
 
-export function collectionCountSnap$(query: Query<unknown>): Observable<CountSnapshot> {
+export function collectionCountSnap(query: Query<unknown>): Observable<CountSnapshot> {
   return from(getCountFromServer(query));
 }
 
-export function collectionCount$(query: Query<unknown>): Observable<number> {
-  return collectionCountSnap$(query).pipe(map((snap) => snap.data().count));
+export function collectionCount(query: Query<unknown>): Observable<number> {
+  return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }
