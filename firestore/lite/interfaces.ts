@@ -1,6 +1,11 @@
-export type DocumentReference<T> = import('firebase/firestore/lite').DocumentReference<T>;
-export type DocumentData = import('firebase/firestore/lite').DocumentData;
-export type Query<T> = import('firebase/firestore/lite').Query<T>;
-export type DocumentSnapshot<T> = import('firebase/firestore/lite').DocumentSnapshot<T>;
-export type QuerySnapshot<T> = import('firebase/firestore/lite').QuerySnapshot<T>;
-export type QueryDocumentSnapshot<T> = import('firebase/firestore/lite').QueryDocumentSnapshot<T>;
+import type * as lite from 'firebase/firestore/lite';
+
+export type DocumentReference<T> = lite.DocumentReference<T>;
+export type DocumentData = lite.DocumentData;
+export type Query<T> = lite.Query<T>;
+export type DocumentSnapshot<T> = lite.DocumentSnapshot<T>;
+export type QuerySnapshot<T> = lite.QuerySnapshot<T>;
+export type QueryDocumentSnapshot<T> = lite.QueryDocumentSnapshot<T>;
+export type CountSnapshot = lite.AggregateQuerySnapshot<{
+  count: lite.AggregateField<number>;
+}, any, DocumentData>;

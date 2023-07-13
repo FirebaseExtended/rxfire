@@ -6,8 +6,8 @@ export function fromRef<T=DocumentData>(ref: DocumentReference<T>): Observable<D
 export function fromRef<T=DocumentData>(ref: Query<T>): Observable<QuerySnapshot<T>>;
 export function fromRef<T=DocumentData>(ref: DocumentReference<T>|Query<T>): Observable<DocumentSnapshot<T> | QuerySnapshot<T>> {
   if (ref.type === 'document') {
-    return from(getDoc<T>(ref));
+    return from(getDoc<T, DocumentData>(ref));
   } else {
-    return from(getDocs<T>(ref));
+    return from(getDocs<T, DocumentData>(ref));
   }
 }

@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@
 import {Observable, from} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {snapToData} from '../document';
-import {Query, QueryDocumentSnapshot, DocumentData} from '../interfaces';
-import {getDocs} from 'firebase/firestore/lite';
+import {Query, QueryDocumentSnapshot, DocumentData, CountSnapshot} from '../interfaces';
+import {getDocs, getCount} from 'firebase/firestore/lite';
 
 /**
  * Return a stream of document snapshots on a query. These results are in sort order.
  * @param query
  */
 export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
-  return from(getDocs<T>(query)).pipe(
+  return from(getDocs<T, DocumentData>(query)).pipe(
       map((changes) => changes.docs),
   );
 }
@@ -46,4 +46,12 @@ export function collectionData<T=DocumentData>(
         return arr.map((snap) => snapToData(snap, options) as T);
       }),
   );
+}
+
+export function collectionCountSnap(query: Query<unknown>): Observable<CountSnapshot> {
+  return from(getCount(query));
+}
+
+export function collectionCount(query: Query<unknown>): Observable<number> {
+  return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }
