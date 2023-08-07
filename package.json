@@ -78,7 +78,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "firebase": "^9.0.0",
+    "firebase": "^10.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
