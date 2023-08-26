@@ -61,7 +61,7 @@ jobs:
     strategy:
       matrix:
         node: ["20"]
-        firebase: ["9"]
+        firebase: ["9", "10"]
         rxjs: ["6", "7"]
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
@@ -126,7 +126,7 @@ jobs:
     strategy:
       matrix:
         node: ["20"]
-        firebase: ["9"]
+        firebase: ["9", "10"]
         rxjs: ["7"]
       fail-fast: false
     name: Lint
