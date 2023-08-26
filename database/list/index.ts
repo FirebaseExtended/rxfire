@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-import { QueryChange, ListenEvent, Query } from '../interfaces';
-import { Observable, of, merge, from } from 'rxjs';
-import { validateEventsArray } from '../utils';
-import { fromRef } from '../fromRef';
-import { switchMap, scan, distinctUntilChanged, map } from 'rxjs/operators';
-import { changeToData } from '../object';
-import { get as databaseGet } from 'firebase/database';
+import {QueryChange, ListenEvent, Query} from '../interfaces';
+import {Observable, of, merge, from} from 'rxjs';
+import {validateEventsArray} from '../utils';
+import {fromRef} from '../fromRef';
+import {switchMap, scan, distinctUntilChanged, map} from 'rxjs/operators';
+import {changeToData} from '../object';
+import {get as databaseGet} from 'firebase/database';
 
 export function stateChanges(
-  query: Query,
-  options: {
+    query: Query,
+    options: {
     events?: ListenEvent[]
   } = {},
 ): Observable<QueryChange> {
@@ -36,29 +36,29 @@ export function stateChanges(
 
 function get(query: Query): Observable<QueryChange> {
   return from(databaseGet(query)).pipe(
-    map((snapshot) => {
-      const event = ListenEvent.value;
-      return { snapshot, prevKey: null, event };
-    }),
+      map((snapshot) => {
+        const event = ListenEvent.value;
+        return {snapshot, prevKey: null, event};
+      }),
   );
 }
 
 export function list(
-  query: Query,
-  options: {
+    query: Query,
+    options: {
     events?: ListenEvent[]
   } = {},
 ): Observable<QueryChange[]> {
   const events = validateEventsArray(options.events);
   return get(query).pipe(
-    switchMap((change) => {
-      const childEvent$ = [of(change)];
-      events.forEach((event) => {
-        childEvent$.push(fromRef(query, event));
-      });
-      return merge(...childEvent$).pipe(scan(buildView, []));
-    }),
-    distinctUntilChanged(),
+      switchMap((change) => {
+        const childEvent$ = [of(change)];
+        events.forEach((event) => {
+          childEvent$.push(fromRef(query, event));
+        });
+        return merge(...childEvent$).pipe(scan(buildView, []));
+      }),
+      distinctUntilChanged(),
   );
 }
 
@@ -68,15 +68,15 @@ export function list(
  * @param keyField map the object key to a specific field
  */
 export function listVal<T>(
-  query: Query,
-  options: {
+    query: Query,
+    options: {
     keyField?: string,
   } = {},
 ): Observable<T[]> {
   return list(query).pipe(
-    map((arr) => {
-      return arr.map((change) => changeToData(change, options) as T);
-    }),
+      map((arr) => {
+        return arr.map((change) => changeToData(change, options) as T);
+      }),
   );
 }
 
@@ -109,7 +109,7 @@ function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey || undefined);
 
-  if(change.snapshot.ref.parent!.key === 'empty-test') {
+  if (change.snapshot.ref.parent!.key === 'empty-test') {
     console.log(change.event);
     console.log(change.snapshot.val());
     console.log('-------------------------------');

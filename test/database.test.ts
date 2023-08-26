@@ -595,7 +595,7 @@ describe('RxFire Database', () => {
         let count = 0;
         const sub = listVal(aref)
             .subscribe((data) => {
-              if(count == 0) {
+              if (count == 0) {
                 expect(data).toEqual([]);
                 push(aref, {name: 'one'});
                 count = count + 1;
