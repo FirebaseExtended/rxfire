@@ -53,7 +53,6 @@ import {
 import {take, skip, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {default as TEST_PROJECT, databaseEmulatorPort} from './config';
-
 const rando = (): string => Math.random().toString(36).substring(5);
 
 const batch = (
@@ -589,6 +588,23 @@ describe('RxFire Database', () => {
               expect(data.length).toEqual(0);
             })
             .add(done);
+      });
+
+      it('should handle empty sets after items are added', (done) => {
+        const aref = builtRef(rando());
+        let count = 0;
+        const sub = listVal(aref)
+            .subscribe((data) => {
+              if(count == 0) {
+                expect(data).toEqual([]);
+                push(aref, {name: 'one'});
+                count = count + 1;
+              } else {
+                expect(data.length).toEqual(1);
+                sub.unsubscribe();
+                done();
+              }
+            });
       });
 
       /**
