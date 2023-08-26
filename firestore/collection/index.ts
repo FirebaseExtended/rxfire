@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright 2018 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import {
   OperatorFunction,
   pipe,
   UnaryFunction,
+  from,
 } from 'rxjs';
 import {
   map,
@@ -33,7 +34,8 @@ import {
 } from 'rxjs/operators';
 import {snapToData} from '../document';
 import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
-import {refEqual} from 'firebase/firestore';
+import {getCountFromServer, refEqual} from 'firebase/firestore';
+import {CountSnapshot} from '../lite/interfaces';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
@@ -294,4 +296,12 @@ export function collectionData<T=DocumentData, U extends string=never>(
         return arr.map((snap) => snapToData(snap, options)!);
       }),
   );
+}
+
+export function collectionCountSnap(query: Query<unknown>): Observable<CountSnapshot> {
+  return from(getCountFromServer(query));
+}
+
+export function collectionCount(query: Query<unknown>): Observable<number> {
+  return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }
