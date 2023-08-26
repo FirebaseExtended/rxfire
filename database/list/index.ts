@@ -109,12 +109,6 @@ function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey || undefined);
 
-  if (change.snapshot.ref.parent!.key === 'empty-test') {
-    console.log(change.event);
-    console.log(change.snapshot.val());
-    console.log('-------------------------------');
-  }
-
   switch (event) {
     case ListenEvent.value:
       if (change.snapshot && change.snapshot.exists()) {
