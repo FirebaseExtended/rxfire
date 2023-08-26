@@ -47,14 +47,11 @@ export function list(
     query: Query,
     options: {
     events?: ListenEvent[]
-  }={},
+  } = {},
 ): Observable<QueryChange[]> {
   const events = validateEventsArray(options.events);
   return get(query).pipe(
       switchMap((change) => {
-        if (!change.snapshot.exists()) {
-          return of([]);
-        }
         const childEvent$ = [of(change)];
         events.forEach((event) => {
           childEvent$.push(fromRef(query, event));
@@ -73,9 +70,9 @@ export function list(
 export function listVal<T>(
     query: Query,
     options: {
-      keyField?: string,
-    }={},
-): Observable<T[] | null> {
+    keyField?: string,
+  } = {},
+): Observable<T[]> {
   return list(query).pipe(
       map((arr) => {
         return arr.map((change) => changeToData(change, options) as T);
@@ -111,6 +108,7 @@ function buildView(current: QueryChange[], change: QueryChange): QueryChange[] {
   const {key} = snapshot;
   const currentKeyPosition = positionFor(current, key);
   const afterPreviousKeyPosition = positionAfter(current, prevKey || undefined);
+
   switch (event) {
     case ListenEvent.value:
       if (change.snapshot && change.snapshot.exists()) {

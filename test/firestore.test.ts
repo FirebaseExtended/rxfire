@@ -391,7 +391,7 @@ describe('RxFire Firestore', () => {
      */
 
     it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', (done) => {
-      pending('Not working against the emulator');
+      // pending('Not working against the emulator');
 
       const {colRef} = seedTest(firestore);
 
@@ -410,7 +410,7 @@ describe('RxFire Firestore', () => {
     });
 
     it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
-      pending('Not working against the emulator');
+      // pending('Not working against the emulator');
 
       const nonExistentCollection = firestoreCollection(firestore, createId());
 
@@ -426,7 +426,7 @@ describe('RxFire Firestore', () => {
   });
 
   describe('Aggregations', () => {
-    it('should provide an observable with a count aggregate snapshot', async (done) => {
+    it('should provide an observable with a count aggregate snapshot', async () => {
       const colRef = createRandomCol(firestore);
       const entries = [
         addDoc(colRef, {id: createId()}),
@@ -436,11 +436,10 @@ describe('RxFire Firestore', () => {
 
       collectionCountSnap(colRef).subscribe((snap) => {
         expect(snap.data().count).toEqual(entries.length);
-        done();
       });
     });
 
-    it('should provide an observable with a count aggregate number', async (done) => {
+    it('should provide an observable with a count aggregate number', async () => {
       const colRef = createRandomCol(firestore);
       const entries = [
         addDoc(colRef, {id: createId()}),
@@ -453,7 +452,6 @@ describe('RxFire Firestore', () => {
 
       collectionCount(colRef).subscribe((count) => {
         expect(count).toEqual(entries.length);
-        done();
       });
     });
   });
