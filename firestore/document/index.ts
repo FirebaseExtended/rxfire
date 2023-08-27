@@ -20,7 +20,7 @@ import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
 import {fromRef} from '../fromRef';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
-import { SnapshotOptions } from 'firebase/firestore';
+import {SnapshotOptions} from 'firebase/firestore';
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return fromRef(ref, {includeMetadataChanges: true});
