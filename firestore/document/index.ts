@@ -20,6 +20,7 @@ import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
 import {fromRef} from '../fromRef';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
+import { SnapshotOptions } from 'firebase/firestore';
 
 export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return fromRef(ref, {includeMetadataChanges: true});
@@ -33,8 +34,8 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
 export function docData<T=DocumentData, R extends T=T>(
     ref: DocumentReference<T>,
     options: {
-      idField?: keyof R
-    }={},
+      idField?: keyof R,
+    } & SnapshotOptions ={},
 ): Observable<T | R | undefined> {
   return doc(ref).pipe(map((snap) => snapToData(snap, options)));
 }
@@ -43,9 +44,9 @@ export function snapToData<T=DocumentData, R extends T=T>(
     snapshot: DocumentSnapshot<T>,
     options: {
       idField?: keyof R,
-    }={},
+    } & SnapshotOptions ={},
 ): T | R | undefined {
-  const data = snapshot.data();
+  const data = snapshot.data(options);
 
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
