@@ -34,7 +34,7 @@ import {
 } from 'rxjs/operators';
 import {snapToData} from '../document';
 import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
-import {getCountFromServer, refEqual} from 'firebase/firestore';
+import {SnapshotOptions, getCountFromServer, refEqual} from 'firebase/firestore';
 import {CountSnapshot} from '../lite/interfaces';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
@@ -289,7 +289,7 @@ export function collectionData<T=DocumentData, U extends string=never>(
     query: Query<T>,
     options: {
   idField?: ((U | keyof T) & keyof NonNullable<T>),
-}={},
+  } & SnapshotOptions={},
 ): Observable<((T & { [T in U]: string; }) | NonNullable<T>)[]> {
   return collection(query).pipe(
       map((arr) => {

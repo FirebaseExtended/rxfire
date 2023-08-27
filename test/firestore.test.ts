@@ -355,7 +355,7 @@ describe('RxFire Firestore', () => {
       const {colRef} = seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, {idField: 'userId'});
+      const unwrapped = collectionData(colRef, {idField: 'userId', serverTimestamps: 'estimate'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
@@ -373,6 +373,20 @@ describe('RxFire Firestore', () => {
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
       const unwrapped = docData(davidDoc, {idField: 'UID'});
+
+      unwrapped.subscribe((val) => {
+        const expectedDoc = {
+          name: 'David',
+          UID: 'david',
+        };
+        expect(val).toEqual(expectedDoc);
+        done();
+      });
+    });
+
+    it('docData should be able to provide SnapshotOptions', (done: jest.DoneCallback) => {
+      const {davidDoc} = seedTest(firestore);
+      const unwrapped = docData(davidDoc, {serverTimestamps: 'estimate', idField: 'UID'});
 
       unwrapped.subscribe((val) => {
         const expectedDoc = {
