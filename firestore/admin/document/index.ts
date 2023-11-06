@@ -34,7 +34,7 @@ export function docData<T = DocumentData, R extends T = T>(
     ref: DocumentReference<T>,
     options: {
         idField?: keyof R,
-    },
+    } = {},
 ): Observable<T | R | undefined> {
     return doc(ref).pipe(map((snap) => snapToData(snap, options)));
 }
@@ -43,7 +43,7 @@ export function snapToData<T = DocumentData, R extends T = T>(
     snapshot: DocumentSnapshot<T>,
     options: {
         idField?: keyof R,
-    },
+    } = {},
 ): T | R | undefined {
     const data = snapshot.data();
 

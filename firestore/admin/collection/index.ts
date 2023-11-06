@@ -244,7 +244,7 @@ export function collectionData<T = DocumentData, U extends string = never>(
     query: Query<T>,
     options: {
         idField?: ((U | keyof T) & keyof NonNullable<T>),
-    },
+    } = {},
 ): Observable<((T & { [T in U]: string; }) | NonNullable<T>)[]> {
     return collection(query).pipe(
         map((arr) => {

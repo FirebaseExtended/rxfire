@@ -1,8 +1,8 @@
 {
-  "name": "rxfire/firestore/lite",
-  "browser": "../../dist/firestore/lite/index.esm.js",
-  "main": "../../dist/firestore/lite/index.cjs.js",
-  "module": "../../dist/firestore/lite/index.esm.js",
-  "typings": "../../dist/firestore/lite/index.d.ts",
+  "name": "rxfire/firestore/admin",
+  "browser": "../../dist/firestore/admin/index.esm.js",
+  "main": "../../dist/firestore/admin/index.cjs.js",
+  "module": "../../dist/firestore/admin/index.esm.js",
+  "typings": "../../dist/firestore/admin/index.d.ts",
   "sideEffects": false
 }
