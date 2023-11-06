@@ -1,0 +1,8 @@
+{
+  "name": "rxfire/firestore/lite",
+  "browser": "../../dist/firestore/lite/index.esm.js",
+  "main": "../../dist/firestore/lite/index.cjs.js",
+  "module": "../../dist/firestore/lite/index.esm.js",
+  "typings": "../../dist/firestore/lite/index.d.ts",
+  "sideEffects": false
+}
