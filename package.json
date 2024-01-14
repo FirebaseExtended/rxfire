@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "6.0.5",
+  "version": "6.0.6",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -12,40 +12,49 @@
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "import": "./index.esm.js",
+      "require": "./index.cjs.js",
+      "types": "./index.d.ts"
     },
     "./auth": {
-      "import": "./dist/auth/index.esm.js",
-      "require": "./dist/auth/index.cjs.js"
+      "import": "./auth/index.esm.js",
+      "require": "./auth/index.cjs.js",
+      "types": "./auth/index.d.ts"
     },
     "./database": {
-      "import": "./dist/database/index.esm.js",
-      "require": "./dist/database/index.cjs.js"
+      "import": "./database/index.esm.js",
+      "require": "./database/index.cjs.js",
+      "types": "./database/index.d.ts"
     },
     "./firestore": {
-      "import": "./dist/firestore/index.esm.js",
-      "require": "./dist/firestore/index.cjs.js"
+      "import": "./firestore/index.esm.js",
+      "require": "./firestore/index.cjs.js",
+      "types": "./firestore/index.d.ts"
     },
     "./firestore/lite": {
-      "import": "./dist/firestore/lite/index.esm.js",
-      "require": "./dist/firestore/lite/index.cjs.js"
+      "import": "./firestore/lite/index.esm.js",
+      "require": "./firestore/lite/index.cjs.js",
+      "types": "./firestore/lite/index.d.ts"
     },
     "./functions": {
-      "import": "./dist/functions/index.esm.js",
-      "require": "./dist/functions/index.cjs.js"
+      "import": "./functions/index.esm.js",
+      "require": "./functions/index.cjs.js",
+      "types": "./functions/index.d.ts"
     },
     "./performance": {
-      "import": "./dist/performance/index.esm.js",
-      "require": "./dist/performance/index.cjs.js"
+      "import": "./performance/index.esm.js",
+      "require": "./performance/index.cjs.js",
+      "types": "./performance/index.d.ts"
     },
     "./remote-config": {
-      "import": "./dist/remote-config/index.esm.js",
-      "require": "./dist/remote-config/index.cjs.js"
+      "import": "./remote-config/index.esm.js",
+      "require": "./remote-config/index.cjs.js",
+      "types": "./remote-config/index.d.ts"
     },
     "./storage": {
-      "import": "./dist/storage/index.esm.js",
-      "require": "./dist/storage/index.cjs.js"
+      "import": "./storage/index.esm.js",
+      "require": "./storage/index.cjs.js",
+      "types": "./storage/index.d.ts"
     }
   },
   "sideEffects": false,
