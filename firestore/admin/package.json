@@ -1,0 +1,8 @@
+{
+  "name": "rxfire/firestore/admin",
+  "browser": "../../dist/firestore/admin/index.esm.js",
+  "main": "../../dist/firestore/admin/index.cjs.js",
+  "module": "../../dist/firestore/admin/index.esm.js",
+  "typings": "../../dist/firestore/admin/index.d.ts",
+  "sideEffects": false
+}

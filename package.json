@@ -31,6 +31,10 @@
       "require": "./firestore/index.cjs.js",
       "types": "./firestore/index.d.ts"
     },
+    "./firestore/admin": {
+      "import": "./dist/firestore/admin/index.esm.js",
+      "require": "./dist/firestore/admin/index.cjs.js"
+    },
     "./firestore/lite": {
       "import": "./firestore/lite/index.esm.js",
       "require": "./firestore/lite/index.cjs.js",
@@ -87,9 +91,9 @@
     "emulators": "firebase emulators:start --project=rxfire-test-c497c",
     "jest": "jest --detectOpenHandles"
   },
-  "dependencies": {},
   "peerDependencies": {
     "firebase": "^9.0.0 || ^10.0.0",
+    "firebase-admin": "^11.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
@@ -107,6 +111,7 @@
     "eslint": "^7.32.0",
     "eslint-config-google": "^0.14.0",
     "firebase": "^10.0.0",
+    "firebase-admin": "^11.0.0",
     "firebase-tools": "^12.5.2",
     "glob": "^7.1.6",
     "jest": "^29.6.4",
