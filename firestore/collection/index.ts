@@ -189,7 +189,7 @@ export function collectionChanges<T=DocumentData>(
     query: Query<T>,
     options: {
     events?: DocumentChangeType[],
-    includeMetadataChanges: boolean,
+    includeMetadataChanges: boolean
   }={includeMetadataChanges: true},
 ): Observable<DocumentChange<T>[]> {
   return fromRef(query, {includeMetadataChanges: options.includeMetadataChanges}).pipe(
