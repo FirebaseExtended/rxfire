@@ -188,10 +188,11 @@ const filterEmptyUnlessFirst = <T = unknown>(): UnaryFunction<
 export function collectionChanges<T=DocumentData>(
     query: Query<T>,
     options: {
-    events?: DocumentChangeType[]
-  }={},
+    events?: DocumentChangeType[],
+    includeMetadataChanges: boolean,
+  }={includeMetadataChanges: true},
 ): Observable<DocumentChange<T>[]> {
-  return fromRef(query, {includeMetadataChanges: true}).pipe(
+  return fromRef(query, {includeMetadataChanges: options.includeMetadataChanges}).pipe(
       windowwise(),
       map(([priorSnapshot, currentSnapshot]) => {
         const docChanges = currentSnapshot.docChanges();
