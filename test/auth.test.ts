@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 import {default as config, resolvedAuthEmulatorPort} from './config';
-import {initializeApp, FirebaseApp, deleteApp} from 'firebase/app';
+import {initializeApp, FirebaseApp} from 'firebase/app';
 import {getAuth, Auth, connectAuthEmulator, signInAnonymously} from 'firebase/auth';
 import {authState} from '../dist/auth';
 import {skip, take} from 'rxjs/operators';

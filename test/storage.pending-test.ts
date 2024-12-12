@@ -92,10 +92,6 @@ describe('RxFire Storage', () => {
     connectStorageEmulator(storage, 'localhost', await resolvedStorageEmulatorPort);
   });
 
-  afterAll(() => {
-    deleteApp(app).catch(() => undefined);
-  });
-
   // Mock these tests, so I can control progress
   describe('fromTask (mock)', () => {
     let mockTask: MockTask;

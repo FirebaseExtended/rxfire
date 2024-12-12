@@ -283,10 +283,8 @@ describe('RxFire Database', () => {
     const itemsObj = batch(items);
 
     describe('events', () => {
-
       // TODO figure this out
-      describe("FLAKY", () => {
-
+      describe('FLAKY', () => {
         jest.retryTimes(2, {logErrorsBeforeRetry: true});
 
         /**
@@ -296,17 +294,16 @@ describe('RxFire Database', () => {
         it('should stream value at first', (done) => {
           const someRef = builtRef(rando());
           const obs = list(someRef);
-          set(someRef, itemsObj).then((it) => {
+          set(someRef, itemsObj).then(() => {
             obs
-              .pipe(take(1))
-              .subscribe((changes) => {
-                const data = changes.map((change) => change.snapshot.val());
-                expect(data).toEqual(items);
-                done();
-              });
+                .pipe(take(1))
+                .subscribe((changes) => {
+                  const data = changes.map((change) => change.snapshot.val());
+                  expect(data).toEqual(items);
+                  done();
+                });
           }, done.fail);
         });
-
       });
 
       /**
@@ -458,7 +455,7 @@ describe('RxFire Database', () => {
       it('should process a new child_moved event', (done) => {
         const aref = builtRef(rando());
         list(aref, {events: [ListenEvent.added, ListenEvent.moved]})
-            .pipe(skip(2))
+            .pipe(skip(2), take(1))
             .subscribe((changes) => {
               const data = changes.map((change) => change.snapshot.val());
               // We moved the first item to the last item, so we check that
@@ -598,6 +595,7 @@ describe('RxFire Database', () => {
         const aref = builtRef(rando());
         let count = 0;
         const sub = listVal(aref)
+            .pipe(take(2))
             .subscribe((data) => {
               if (count == 0) {
                 expect(data).toEqual([]);
@@ -728,7 +726,7 @@ describe('RxFire Database', () => {
     it('objectVal should behave the same as snap.val() when an object doesn\'t exist', (done) => {
       const nonExistentRef = builtRef(rando());
       set(nonExistentRef, null);
-      const obs = objectVal(nonExistentRef);
+      const obs = objectVal(nonExistentRef).pipe(take(1));
 
       get(nonExistentRef).then((snap) => {
         obs.subscribe((val) => {
