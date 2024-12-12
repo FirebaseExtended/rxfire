@@ -299,18 +299,18 @@ describe('RxFire Firestore', () => {
      */
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       seedTest(firestore).then(({colRef, davidDoc}) => {
+        const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
         const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
+
+        firstAudit.pipe(take(1)).subscribe(() => {
+          updateDoc(davidDoc, {name: 'David!'});
+        });
 
         modifiedAudit.pipe(take(1)).subscribe((updateList) => {
           const expectedEvents = [{type: 'modified', name: 'David!'}];
           expect(updateList).toEqual(expectedEvents);
           done();
         });
-
-        // TODO figure out the race condition here
-        setTimeout(() => {
-          updateDoc(davidDoc, {name: 'David!'});
-        }, 10);
       });
     });
   });
@@ -348,15 +348,18 @@ describe('RxFire Firestore', () => {
      */
     it('should filter the trail of events by event type', (done: jest.DoneCallback) => {
       seedTest(firestore).then(({colRef, davidDoc}) => {
+        const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
         const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
+
+        firstAudit.pipe(take(1)).subscribe(() => {
+          updateDoc(davidDoc, {name: 'David!'});
+        });
 
         modifiedAudit.pipe(take(1)).subscribe((updateList) => {
           const expectedEvents = [{type: 'modified', name: 'David!'}];
           expect(updateList).toEqual(expectedEvents);
           done();
         });
-
-        updateDoc(davidDoc, {name: 'David!'});
       });
     });
   });
