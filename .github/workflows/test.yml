@@ -19,13 +19,13 @@ jobs:
     name: Build
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: node_modules cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         id: node_modules_cache
         with:
           path: ./node_modules
@@ -34,7 +34,7 @@ jobs:
             ${{ runner.os }}-20-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -67,15 +67,15 @@ jobs:
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -84,7 +84,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: test/functions node_modules cache
         id: functions_node_modules_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ./test/functions/node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-${{ hashFiles('test/functions/yarn.lock') }}
@@ -92,7 +92,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -110,12 +110,12 @@ jobs:
           cd test/functions
           yarn install --frozen-lockfile --prefer-offline
       - name: Firebase emulator cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: 'Download Artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Run tests
         run: |
           mv rxfire-${{ github.run_id }} dist
@@ -132,15 +132,15 @@ jobs:
     name: Lint
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -149,7 +149,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -171,12 +171,12 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
     steps:
       - name: Setup node
-        uses: actions/setup-node@v2-beta
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://wombat-dressing-room.appspot.com'
       - name: 'Download Artifacts'
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
       - name: Publish
         run: |
           cd ./rxfire-${{ github.run_id }}

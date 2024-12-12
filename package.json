@@ -1,6 +1,6 @@
 {
   "name": "rxfire",
-  "version": "6.0.6",
+  "version": "6.1.0",
   "private": true,
   "description": "Firebase JavaScript library RxJS",
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
@@ -87,9 +87,8 @@
     "emulators": "firebase emulators:start --project=rxfire-test-c497c",
     "jest": "jest --detectOpenHandles"
   },
-  "dependencies": {},
   "peerDependencies": {
-    "firebase": "^9.0.0 || ^10.0.0",
+    "firebase": "^9.0.0 || ^10.0.0 || ^11.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
