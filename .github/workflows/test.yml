@@ -29,9 +29,10 @@ jobs:
         id: node_modules_cache
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-20-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-20-node_modules-
+            ${{ runner.os }}-20-11-7-node_modules-
+            ${{ runner.os }}-20-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4
@@ -61,7 +62,7 @@ jobs:
     strategy:
       matrix:
         node: ["20"]
-        firebase: ["9", "10"]
+        firebase: ["9", "10", "11"]
         rxjs: ["6", "7"]
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
@@ -81,7 +82,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+            ${{ runner.os }}-${{ matrix.node }}-
       - name: test/functions node_modules cache
         id: functions_node_modules_cache
         uses: actions/cache@v4
@@ -123,12 +124,6 @@ jobs:
   
   lint:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ["20"]
-        firebase: ["9", "10", "11"]
-        rxjs: ["7"]
-      fail-fast: false
     name: Lint
     steps:
       - name: Checkout
@@ -136,17 +131,17 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: "20"
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
         uses: actions/cache@v4
         with:
           path: ./node_modules
-          key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
+          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-
-            ${{ runner.os }}-${{ matrix.node }}-node_modules-
+            ${{ runner.os }}-20-11-7-node_modules-
+            ${{ runner.os }}-20-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
         uses: actions/cache@v4
@@ -159,7 +154,6 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           yarn install --frozen-lockfile --prefer-offline
-          yarn add --dev firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} --prefer-offline
       - name: Run lint
         run: |
           yarn lint
