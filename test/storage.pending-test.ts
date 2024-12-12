@@ -29,7 +29,7 @@ import {
   uploadString,
 } from '../dist/storage';
 import {switchMap, take, reduce, concatMap} from 'rxjs/operators';
-import {default as TEST_PROJECT, storageEmulatorPort} from './config';
+import {default as TEST_PROJECT, resolvedStorageEmulatorPort} from './config';
 import 'cross-fetch/polyfill';
 import md5 from 'md5';
 
@@ -86,14 +86,10 @@ describe('RxFire Storage', () => {
   // I can't do beforeEach for whatever reason with the Firebase Emulator
   // storage seems to be tearing things down and canceling tasks early...
   // not sure what's up. All using the same app isn't a big deal IMO
-  beforeAll(() => {
+  beforeAll(async () => {
     app = initializeApp(TEST_PROJECT, rando());
     storage = getStorage(app, 'default-bucket');
-    connectStorageEmulator(storage, 'localhost', storageEmulatorPort);
-  });
-
-  afterAll(() => {
-    deleteApp(app).catch(() => undefined);
+    connectStorageEmulator(storage, 'localhost', await resolvedStorageEmulatorPort);
   });
 
   // Mock these tests, so I can control progress

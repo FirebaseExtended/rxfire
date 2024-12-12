@@ -30,10 +30,10 @@ import {
   collectionCountSnap,
   collectionCount,
 } from '../dist/firestore/lite';
-import {map} from 'rxjs/operators';
-import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
+import {map, take} from 'rxjs/operators';
+import {default as TEST_PROJECT, resolvedFirestoreEmulatorPort} from './config';
 import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot, addDoc} from 'firebase/firestore/lite';
-import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
+import {initializeApp, FirebaseApp} from 'firebase/app';
 
 const createId = (): string => Math.random().toString(36).substring(5);
 
@@ -76,16 +76,10 @@ describe('RxFire firestore/lite', () => {
    * Note that removing is less necessary since the tests are run
    * against the emulator
    */
-  beforeEach(() => {
+  beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    connectFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
-  });
-
-  afterEach((done) => {
-    deleteApp(app)
-        .then(() => done())
-        .catch(() => undefined);
+    connectFirestoreEmulator(firestore, 'localhost', await resolvedFirestoreEmulatorPort);
   });
 
   describe('collection', () => {
@@ -101,7 +95,7 @@ describe('RxFire firestore/lite', () => {
       const {colRef, expectedNames} = await seedTest(firestore);
 
       collection(colRef)
-          .pipe(map((docs) => docs.map((doc) => doc.data().name)))
+          .pipe(map((docs) => docs.map((doc) => doc.data().name)), take(1))
           .subscribe((names) => {
             expect(names).toEqual(expectedNames);
           });
@@ -137,6 +131,7 @@ describe('RxFire firestore/lite', () => {
       }
 
       collection(Folk.collection)
+          .pipe(take(1))
           .subscribe((docs) => {
             const names = docs.map((doc) => doc.data()?.name);
             const classes = docs.map((doc) => doc.data()?.constructor?.name);
@@ -156,7 +151,7 @@ describe('RxFire firestore/lite', () => {
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
       const unwrapped = collectionData(colRef, {idField: 'userId'});
 
-      unwrapped.subscribe((val) => {
+      unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
           name: 'David',
           userId: 'david',
@@ -172,7 +167,7 @@ describe('RxFire firestore/lite', () => {
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
       const unwrapped = docData(davidDoc, {idField: 'UID'});
 
-      unwrapped.subscribe((val) => {
+      unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
           name: 'David',
           UID: 'david',
@@ -199,7 +194,7 @@ describe('RxFire firestore/lite', () => {
       const unwrapped = docData(nonExistentDoc);
 
       getDoc(nonExistentDoc).then((snap) => {
-        unwrapped.subscribe((val) => {
+        unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toEqual(snap.data());
         });
       });
@@ -213,7 +208,7 @@ describe('RxFire firestore/lite', () => {
       const unwrapped = collectionData(nonExistentCollection);
 
       getDocs(nonExistentCollection).then((snap) => {
-        unwrapped.subscribe((val) => {
+        unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toEqual(snap.docs);
           done();
         });
@@ -230,7 +225,7 @@ describe('RxFire firestore/lite', () => {
       ];
       await Promise.all(entries);
 
-      collectionCountSnap(colRef).subscribe((snap) => {
+      collectionCountSnap(colRef).pipe(take(1)).subscribe((snap) => {
         expect(snap.data().count).toEqual(entries.length);
       });
     });
@@ -246,7 +241,7 @@ describe('RxFire firestore/lite', () => {
       ];
       await Promise.all(entries);
 
-      collectionCount(colRef).subscribe((count) => {
+      collectionCount(colRef).pipe(take(1)).subscribe((count) => {
         expect(count).toEqual(entries.length);
       });
     });
