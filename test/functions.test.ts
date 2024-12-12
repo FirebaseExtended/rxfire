@@ -20,7 +20,7 @@
 import {initializeApp, FirebaseApp, deleteApp} from 'firebase/app';
 import {getFunctions, connectFunctionsEmulator, Functions} from 'firebase/functions';
 import {httpsCallable} from '../dist/functions';
-import {default as TEST_PROJECT, functionsEmulatorPort} from './config';
+import {default as TEST_PROJECT, resolvedFunctionsEmulatorPort} from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
@@ -37,14 +37,10 @@ describe('RxFire Functions', () => {
    * Note that removing is less necessary since the tests are run
    * against the emulator.
    */
-  beforeEach(() => {
+  beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, rando());
     functions = getFunctions(app);
-    connectFunctionsEmulator(functions, 'localhost', functionsEmulatorPort);
-  });
-
-  afterEach(() => {
-    deleteApp(app).catch(() => undefined);
+    connectFunctionsEmulator(functions, 'localhost', await resolvedFunctionsEmulatorPort);
   });
 
   describe('httpsCallable', () => {

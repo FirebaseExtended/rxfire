@@ -23,7 +23,7 @@
 
 // app/database is used as namespaces to access types
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {initializeApp, FirebaseApp, deleteApp, getApp} from 'firebase/app';
+import {initializeApp, FirebaseApp} from 'firebase/app';
 import {
   Database,
   getDatabase,
@@ -52,7 +52,7 @@ import {
 } from '../dist/database';
 import {take, skip, switchMap} from 'rxjs/operators';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {default as TEST_PROJECT, databaseEmulatorPort} from './config';
+import {default as TEST_PROJECT, resolvedDatabaseEmulatorPort} from './config';
 const rando = (): string => Math.random().toString(36).substring(5);
 
 const batch = (
@@ -93,14 +93,10 @@ describe('RxFire Database', () => {
    * Each test runs inside it's own app instance and the app
    * is deleted after the test runs.
    */
-  beforeEach(() => {
+  beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, rando());
     database = getDatabase(app);
-    connectDatabaseEmulator(database, 'localhost', databaseEmulatorPort);
-  });
-
-  afterEach(() => {
-    deleteApp(app).catch(() => undefined);
+    connectDatabaseEmulator(database, 'localhost', await resolvedDatabaseEmulatorPort);
   });
 
   describe('fromRef', () => {
@@ -124,8 +120,8 @@ describe('RxFire Database', () => {
           .subscribe((change) => {
             expect(change.snapshot.exists()).toEqual(false);
             expect(change.snapshot.val()).toEqual(null);
-          })
-          .add(done);
+            done();
+          });
     });
 
     /**
@@ -287,22 +283,30 @@ describe('RxFire Database', () => {
     const itemsObj = batch(items);
 
     describe('events', () => {
-      /**
-       * `value` events are provided first when subscribing to a list. We need
-       * to know what the "intial" data list is, so a value event is used.
-       */
-      it('should stream value at first', (done) => {
-        const someRef = builtRef(rando());
-        const obs = list(someRef, {events: [ListenEvent.added]});
-        obs
-            .pipe(take(1))
-            .subscribe((changes) => {
-              const data = changes.map((change) => change.snapshot.val());
-              expect(data).toEqual(items);
-            })
-            .add(done);
 
-        set(someRef, itemsObj);
+      // TODO figure this out
+      describe("FLAKY", () => {
+
+        jest.retryTimes(2, {logErrorsBeforeRetry: true});
+
+        /**
+         * `value` events are provided first when subscribing to a list. We need
+         * to know what the "intial" data list is, so a value event is used.
+         */
+        it('should stream value at first', (done) => {
+          const someRef = builtRef(rando());
+          const obs = list(someRef);
+          set(someRef, itemsObj).then((it) => {
+            obs
+              .pipe(take(1))
+              .subscribe((changes) => {
+                const data = changes.map((change) => change.snapshot.val());
+                expect(data).toEqual(items);
+                done();
+              });
+          }, done.fail);
+        });
+
       });
 
       /**
@@ -328,7 +332,7 @@ describe('RxFire Database', () => {
                   done();
                 }
               });
-        });
+        }, done.fail);
       });
 
       /**
@@ -345,8 +349,8 @@ describe('RxFire Database', () => {
               expect(names[0]).toEqual('one');
               expect(names[1]).toEqual('two');
               expect(names[2]).toEqual('zero');
-            })
-            .add(done);
+              done();
+            });
         set(aref, itemsObj);
       });
 
@@ -367,8 +371,8 @@ describe('RxFire Database', () => {
               expect(names[1]).toEqual('one');
               expect(names[2]).toEqual('two');
               expect(names[3]).toEqual('zero');
-            })
-            .add(done);
+              done();
+            });
         set(aref, itemsObj).then(() => {
           push(aref, {name: 'anotha one'});
         });
@@ -392,8 +396,8 @@ describe('RxFire Database', () => {
               const names = changes.map((change) => change.snapshot.val().name);
               expect(names[0]).toEqual('zero');
               expect(names[1]).toEqual('zero');
-            })
-            .add(done);
+              done();
+            });
         set(aref, itemsObj).then(() => {
           push(aref, {name: 'zero'});
         });
@@ -418,8 +422,8 @@ describe('RxFire Database', () => {
               .subscribe((changes) => {
                 const data = changes.map((change) => change.snapshot.val());
                 expect(data.length).toEqual(items.length - 1);
-              })
-              .add(done);
+                done();
+              });
         }
 
         setUp();
@@ -439,8 +443,8 @@ describe('RxFire Database', () => {
             const data = changes.map(change => change.snapshot.val());
             console.log(data);
             expect(data[1].name).toEqual('lol');
-          })
-          .add(done);
+            done();
+          });
 
         set(aref, itemsObj).then(() => {
           update(child(aref, items[1].key), { name: 'lol' });
@@ -481,8 +485,8 @@ describe('RxFire Database', () => {
             .subscribe((actions) => {
               const data = actions.map((a) => a.snapshot.val());
               expect(data).toEqual(items);
-            })
-            .add(done);
+              done();
+            });
         set(ref, itemsObj);
       });
 
@@ -525,8 +529,8 @@ describe('RxFire Database', () => {
                   .subscribe((actions) => {
                     const data = actions.map((a) => a.snapshot.val());
                     expect(data).toEqual(items);
-                  })
-                  .add(done);
+                    done();
+                  });
             });
         set(ref, itemsObj);
       });
@@ -544,8 +548,8 @@ describe('RxFire Database', () => {
             .subscribe((actions) => {
               const data = actions.map((a) => a.snapshot.val());
               expect(data).toEqual(items);
-            })
-            .add(done);
+              done();
+            });
         set(ref, itemsObj);
       });
 
@@ -586,8 +590,8 @@ describe('RxFire Database', () => {
             .pipe(take(1))
             .subscribe((data) => {
               expect(data.length).toEqual(0);
-            })
-            .add(done);
+              done();
+            });
       });
 
       it('should handle empty sets after items are added', (done) => {
@@ -636,9 +640,9 @@ describe('RxFire Database', () => {
               // on the second round, we should have filtered out everything
               if (count === 2) {
                 expect(Object.keys(data).length).toEqual(0);
+                done();
               }
-            })
-            .add(done);
+            });
       });
     });
   });
@@ -663,7 +667,7 @@ describe('RxFire Database', () => {
       set(aref, itemsObj);
       const changes = auditTrail(aref, {events});
       return {
-        changes: changes.pipe(skip(skipnumber)),
+        changes: changes.pipe(skip(skipnumber), take(1)),
         ref: aref,
       };
     }

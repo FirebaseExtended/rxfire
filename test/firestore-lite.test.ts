@@ -31,7 +31,7 @@ import {
   collectionCount,
 } from '../dist/firestore/lite';
 import {map} from 'rxjs/operators';
-import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
+import {default as TEST_PROJECT, resolvedFirestoreEmulatorPort} from './config';
 import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot, addDoc} from 'firebase/firestore/lite';
 import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
 
@@ -76,16 +76,10 @@ describe('RxFire firestore/lite', () => {
    * Note that removing is less necessary since the tests are run
    * against the emulator
    */
-  beforeEach(() => {
+  beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    connectFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
-  });
-
-  afterEach((done) => {
-    deleteApp(app)
-        .then(() => done())
-        .catch(() => undefined);
+    connectFirestoreEmulator(firestore, 'localhost', await resolvedFirestoreEmulatorPort);
   });
 
   describe('collection', () => {

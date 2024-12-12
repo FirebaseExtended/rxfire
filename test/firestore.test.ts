@@ -34,7 +34,7 @@ import {
   collectionCount,
 } from '../dist/firestore';
 import {map, take, skip} from 'rxjs/operators';
-import {default as TEST_PROJECT, firestoreEmulatorPort} from './config';
+import {default as TEST_PROJECT, resolvedFirestoreEmulatorPort} from './config';
 import {getDocs, collection as firestoreCollection, getDoc, DocumentReference, doc as firestoreDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, updateDoc, connectFirestoreEmulator, doc, setDoc, DocumentChange, collection as baseCollection, QueryDocumentSnapshot, addDoc} from 'firebase/firestore';
 import {initializeApp, deleteApp, FirebaseApp} from 'firebase/app';
 
@@ -86,14 +86,10 @@ describe('RxFire Firestore', () => {
    * Note that removing is less necessary since the tests are run
    * against the emulator
    */
-  beforeEach(() => {
+  beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    connectFirestoreEmulator(firestore, 'localhost', firestoreEmulatorPort);
-  });
-
-  afterEach(() => {
-    deleteApp(app).catch(() => undefined);
+    connectFirestoreEmulator(firestore, 'localhost', await resolvedFirestoreEmulatorPort);
   });
 
   describe('collection', () => {
@@ -109,7 +105,7 @@ describe('RxFire Firestore', () => {
       const {colRef, expectedNames} = seedTest(firestore);
 
       collection(colRef)
-          .pipe(map((docs) => docs.map((doc) => doc.data().name)))
+          .pipe(take(1), map((docs) => docs.map((doc) => doc.data().name)))
           .subscribe((names) => {
             expect(names).toEqual(expectedNames);
             done();
@@ -145,13 +141,14 @@ describe('RxFire Firestore', () => {
       }
 
       collection(colRef.withConverter(Folk))
-          .subscribe((docs) => {
-            const names = docs.map((doc) => doc.data()?.name);
-            const classes = docs.map((doc) => doc.data()?.constructor?.name);
-            expect(names).toEqual(['David!', undefined]);
-            expect(classes).toEqual(['Folk', undefined]);
-            done();
-          });
+        .pipe(take(1))
+        .subscribe((docs) => {
+          const names = docs.map((doc) => doc.data()?.name);
+          const classes = docs.map((doc) => doc.data()?.constructor?.name);
+          expect(names).toEqual(['David!', undefined]);
+          expect(classes).toEqual(['Folk', undefined]);
+          done();
+        });
     });
   });
 
@@ -170,12 +167,12 @@ describe('RxFire Firestore', () => {
       const firstChange = collectionChanges(colRef).pipe(take(1));
       const secondChange = collectionChanges(colRef).pipe(skip(1));
 
-      firstChange.subscribe((change) => {
+      firstChange.pipe(take(1)).subscribe((change) => {
         expect(change[0].type).toBe('added');
         updateDoc(davidDoc, {name: 'David!'});
       });
 
-      secondChange.subscribe((change) => {
+      secondChange.pipe(take(1)).subscribe((change) => {
         expect(change[0].type).toBe('modified');
         done();
       });
@@ -203,7 +200,7 @@ describe('RxFire Firestore', () => {
 
       let previousData: Array<{}>;
 
-      addedChanges.subscribe((data) => {
+      addedChanges.pipe(take(1)).subscribe((data) => {
         const expectedNames = [
           {name: 'David', type: 'added'},
           {name: 'Shannon', type: 'added'},
@@ -213,7 +210,7 @@ describe('RxFire Firestore', () => {
         updateDoc(davidDoc, {name: 'David!'});
       });
 
-      modifiedChanges.subscribe((data) => {
+      modifiedChanges.pipe(take(1)).subscribe((data) => {
         const expectedNames = [
           {name: 'David!', type: 'modified'},
           {name: 'Shannon', type: 'added'},
@@ -238,13 +235,13 @@ describe('RxFire Firestore', () => {
           unwrapChange,
       );
 
-      addedChanges.subscribe((data) => {
+      addedChanges.pipe(take(1)).subscribe((data) => {
         // kick off the modifiedChanges observable
         expect(data).toEqual(expectedEvents);
         updateDoc(davidDoc, {name: 'David!'});
       });
 
-      modifiedChanges.subscribe((data) => {
+      modifiedChanges.pipe(take(1)).subscribe((data) => {
         const expectedModifiedEvent = [{name: 'David!', type: 'modified'}];
         expect(data).toEqual(expectedModifiedEvent);
         done();
@@ -265,12 +262,12 @@ describe('RxFire Firestore', () => {
       const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
       const secondAudit = auditTrail(colRef).pipe(unwrapChange, skip(1));
 
-      firstAudit.subscribe((list) => {
+      firstAudit.pipe(take(1)).subscribe((list) => {
         expect(list).toEqual(expectedEvents);
         updateDoc(davidDoc, {name: 'David!'});
       });
 
-      secondAudit.subscribe((list) => {
+      secondAudit.pipe(take(1)).subscribe((list) => {
         const modifiedList = [
           ...expectedEvents,
           {name: 'David!', type: 'modified'},
@@ -291,7 +288,7 @@ describe('RxFire Firestore', () => {
 
       const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
 
-      modifiedAudit.subscribe((updateList) => {
+      modifiedAudit.pipe(take(1)).subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
         expect(updateList).toEqual(expectedEvents);
         done();
@@ -314,12 +311,12 @@ describe('RxFire Firestore', () => {
       const firstAudit = auditTrail(colRef).pipe(unwrapChange, take(1));
       const secondAudit = auditTrail(colRef).pipe(unwrapChange, skip(1));
 
-      firstAudit.subscribe((list) => {
+      firstAudit.pipe(take(1)).subscribe((list) => {
         expect(list).toEqual(expectedEvents);
         updateDoc(davidDoc, {name: 'David!'});
       });
 
-      secondAudit.subscribe((list) => {
+      secondAudit.pipe(take(1)).subscribe((list) => {
         const modifiedList = [
           ...expectedEvents,
           {name: 'David!', type: 'modified'},
@@ -337,7 +334,7 @@ describe('RxFire Firestore', () => {
 
       const modifiedAudit = auditTrail(colRef, {events: ['modified']}).pipe(unwrapChange);
 
-      modifiedAudit.subscribe((updateList) => {
+      modifiedAudit.pipe(take(1)).subscribe((updateList) => {
         const expectedEvents = [{type: 'modified', name: 'David!'}];
         expect(updateList).toEqual(expectedEvents);
         done();
@@ -357,7 +354,7 @@ describe('RxFire Firestore', () => {
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
       const unwrapped = collectionData(colRef, {idField: 'userId', serverTimestamps: 'estimate'});
 
-      unwrapped.subscribe((val) => {
+      unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
           name: 'David',
           userId: 'david',
@@ -374,7 +371,7 @@ describe('RxFire Firestore', () => {
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
       const unwrapped = docData(davidDoc, {idField: 'UID'});
 
-      unwrapped.subscribe((val) => {
+      unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
           name: 'David',
           UID: 'david',
@@ -388,7 +385,7 @@ describe('RxFire Firestore', () => {
       const {davidDoc} = seedTest(firestore);
       const unwrapped = docData(davidDoc, {serverTimestamps: 'estimate', idField: 'UID'});
 
-      unwrapped.subscribe((val) => {
+      unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
           name: 'David',
           UID: 'david',
@@ -416,7 +413,7 @@ describe('RxFire Firestore', () => {
       const unwrapped = docData(nonExistentDoc);
 
       getDoc(nonExistentDoc).then((snap) => {
-        unwrapped.subscribe((val) => {
+        unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toEqual(snap.data());
           done();
         });
@@ -431,7 +428,7 @@ describe('RxFire Firestore', () => {
       const unwrapped = collectionData(nonExistentCollection);
 
       getDocs(nonExistentCollection).then((snap) => {
-        unwrapped.subscribe((val) => {
+        unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toEqual(snap.docs);
           done();
         });
@@ -448,7 +445,7 @@ describe('RxFire Firestore', () => {
       ];
       await Promise.all(entries);
 
-      collectionCountSnap(colRef).subscribe((snap) => {
+      collectionCountSnap(colRef).pipe(take(1)).subscribe((snap) => {
         expect(snap.data().count).toEqual(entries.length);
       });
     });
@@ -464,7 +461,7 @@ describe('RxFire Firestore', () => {
       ];
       await Promise.all(entries);
 
-      collectionCount(colRef).subscribe((count) => {
+      collectionCount(colRef).pipe(take(1)).subscribe((count) => {
         expect(count).toEqual(entries.length);
       });
     });

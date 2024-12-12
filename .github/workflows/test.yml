@@ -126,7 +126,7 @@ jobs:
     strategy:
       matrix:
         node: ["20"]
-        firebase: ["9", "10"]
+        firebase: ["9", "10", "11"]
         rxjs: ["7"]
       fail-fast: false
     name: Lint
