@@ -53,7 +53,7 @@ export const trace = <T = any>(name: string) => (source$: Observable<T>) => new 
   return source$.pipe(
     tap({
       next: () => traceSubscription.unsubscribe(),
-      error: () => {},
+      error: () => { },
       complete: () => traceSubscription.unsubscribe(),
     }),
   ).subscribe(subscriber);
@@ -75,12 +75,10 @@ export const traceUntil = <T = any>(
 ) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
-    tap(
-      (a) => test(a) && traceSubscription.unsubscribe(),
-      () => {
-      },
-      () => options && options.orComplete && traceSubscription.unsubscribe(),
-    ),
+    tap({
+      next: (a) => test(a) && traceSubscription.unsubscribe(),
+      complete: () => options && options.orComplete && traceSubscription.unsubscribe(),
+    }),
   ).subscribe(subscriber);
 });
 
@@ -101,8 +99,8 @@ export const traceWhile = <T = any>(
 ) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
   let traceSubscription: Subscription | undefined;
   return source$.pipe(
-    tap(
-      (a) => {
+    tap({
+      next: (a) => {
         if (test(a)) {
           traceSubscription = traceSubscription || trace$(name).subscribe();
         } else {
@@ -112,10 +110,8 @@ export const traceWhile = <T = any>(
           traceSubscription = undefined;
         }
       },
-      () => {
-      },
-      () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe(),
-    ),
+      complete: () => options && options.orComplete && traceSubscription && traceSubscription.unsubscribe(),
+    }),
   ).subscribe(subscriber);
 });
 
@@ -129,13 +125,9 @@ export const traceWhile = <T = any>(
 export const traceUntilComplete = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
-    tap(
-      () => {
-      },
-      () => {
-      },
-      () => traceSubscription.unsubscribe(),
-    ),
+    tap({
+      complete: () => traceSubscription.unsubscribe(),
+    }),
   ).subscribe(subscriber);
 });
 
@@ -149,12 +141,8 @@ export const traceUntilComplete = <T = any>(name: string) => (source$: Observabl
 export const traceUntilFirst = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
-    tap(
-      () => traceSubscription.unsubscribe(),
-      () => {
-      },
-      () => {
-      },
-    ),
+    tap({
+      next: () => traceSubscription.unsubscribe(),
+    }),
   ).subscribe(subscriber);
 });

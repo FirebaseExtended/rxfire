@@ -16,10 +16,12 @@ export default [
         languageOptions: {
           globals: {
             ...globals.browser,
-            ...globals.node
+            ...globals.node,
           },
           parser: tseslint.parser,
           parserOptions: {
+            projectService: true,
+            tsconfigRootDir: import.meta.dirname,
             ecmaVersion: 12,
             sourceType: 'module',
           },
@@ -29,5 +31,10 @@ export default [
   ]),
   {
     ignores: ['**/dist', 'eslint.config.mjs'],
+  },
+  {
+    rules: {
+      '@typescript-eslint/no-deprecated': 'error',
+    },
   },
 ];
