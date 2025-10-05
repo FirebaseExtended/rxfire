@@ -15,12 +15,17 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
-
-import {initializeApp, FirebaseApp} from 'firebase/app';
-import {getFunctions, connectFunctionsEmulator, Functions} from 'firebase/functions';
-import {httpsCallable} from '../dist/functions';
-import {default as TEST_PROJECT, resolvedFunctionsEmulatorPort} from './config';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import {
+  getFunctions,
+  connectFunctionsEmulator,
+  Functions,
+} from 'firebase/functions';
+import { httpsCallable } from '../dist/functions';
+import {
+  default as TEST_PROJECT,
+  resolvedFunctionsEmulatorPort,
+} from './config';
 
 const rando = (): string => Math.random().toString(36).substring(5);
 
@@ -40,15 +45,23 @@ describe('RxFire Functions', () => {
   beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, rando());
     functions = getFunctions(app);
-    connectFunctionsEmulator(functions, 'localhost', await resolvedFunctionsEmulatorPort);
+    connectFunctionsEmulator(
+      functions,
+      'localhost',
+      await resolvedFunctionsEmulatorPort
+    );
   });
 
   describe('httpsCallable', () => {
     it('should work', (done: jest.DoneCallback) => {
       const string = rando();
-      const reverseString = (it:String) => (it === '') ? '' : reverseString(it.substr(1)) + it.charAt(0);
-      httpsCallable<{string: String}, {reversed: String}>(functions, 'reverseString')({string}).subscribe((it) => {
-        expect(it).toEqual({reversed: reverseString(string)});
+      const reverseString = (it: string): string =>
+        it === '' ? '' : reverseString(it.substring(1)) + it.charAt(0);
+      httpsCallable<{ string: string }, { reversed: string }>(
+        functions,
+        'reverseString'
+      )({ string }).subscribe((it) => {
+        expect(it).toEqual({ reversed: reverseString(string) });
         done();
       });
     });

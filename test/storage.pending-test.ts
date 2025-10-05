@@ -18,8 +18,18 @@
 // TODO: re-enable eslint after updating to emulator tests
 /* eslint-disable */
 
-import {UploadTaskSnapshot, FirebaseStorage, getStorage, connectStorageEmulator, StorageReference, UploadTask, ref as _ref, uploadBytesResumable as _uploadBytesResumable, uploadString as _uploadString} from 'firebase/storage';
-import {FirebaseApp, initializeApp, deleteApp} from 'firebase/app';
+import {
+  UploadTaskSnapshot,
+  FirebaseStorage,
+  getStorage,
+  connectStorageEmulator,
+  StorageReference,
+  UploadTask,
+  ref as _ref,
+  uploadBytesResumable as _uploadBytesResumable,
+  uploadString as _uploadString,
+} from 'firebase/storage';
+import { FirebaseApp, initializeApp } from 'firebase/app';
 import {
   fromTask,
   getDownloadURL,
@@ -28,8 +38,8 @@ import {
   uploadBytesResumable,
   uploadString,
 } from '../dist/storage';
-import {switchMap, take, reduce, concatMap} from 'rxjs/operators';
-import {default as TEST_PROJECT, resolvedStorageEmulatorPort} from './config';
+import { switchMap, take, reduce, concatMap } from 'rxjs/operators';
+import { default as TEST_PROJECT, resolvedStorageEmulatorPort } from './config';
 import 'cross-fetch/polyfill';
 import md5 from 'md5';
 
@@ -37,17 +47,18 @@ if (typeof XMLHttpRequest === 'undefined') {
   global['XMLHttpRequest'] = require('xhr2');
 }
 
-const rando = (): string => [
-  Math.random().toString(36).substring(5),
-  Math.random().toString(36).substring(5),
-  Math.random().toString(36).substring(5),
-].join('');
+const rando = (): string =>
+  [
+    Math.random().toString(36).substring(5),
+    Math.random().toString(36).substring(5),
+    Math.random().toString(36).substring(5),
+  ].join('');
 
 class MockTask {
-  _resolve: (value: any) => void;
-  _reject: (reason?: any) => void;
-  _state_changed_cbs: Array<(snapshot: UploadTaskSnapshot) => {}> = []; // eslint-disable-line camelcase
-  _state_change = (progress: any) => { // eslint-disable-line camelcase
+  _resolve!: (value: any) => void;
+  _reject!: (reason?: any) => void;
+  _state_changed_cbs: Array<(snapshot: UploadTaskSnapshot) => {}> = [];
+  _state_change = (progress: any) => {
     this.snapshot = progress;
     this._state_changed_cbs.forEach((it) => it(progress));
     if (progress.state === 'canceled') {
@@ -67,8 +78,11 @@ class MockTask {
     }
     return this._unsubscribe;
   };
-  snapshot = {_something: rando()};
-  then: (onFulfilled: (value: unknown) => void, onRejected?: (reason?: any) => void) => void;
+  snapshot = { _something: rando() };
+  then: (
+    onFulfilled: (value: unknown) => void,
+    onRejected?: (reason?: any) => void
+  ) => void;
   cancel = () => {};
   constructor() {
     const promise = new Promise((resolve, reject) => {
@@ -77,7 +91,7 @@ class MockTask {
     });
     this.then = (a, b) => promise.then(a, b);
   }
-};
+}
 
 describe('RxFire Storage', () => {
   let app: FirebaseApp;
@@ -89,13 +103,17 @@ describe('RxFire Storage', () => {
   beforeAll(async () => {
     app = initializeApp(TEST_PROJECT, rando());
     storage = getStorage(app, 'default-bucket');
-    connectStorageEmulator(storage, 'localhost', await resolvedStorageEmulatorPort);
+    connectStorageEmulator(
+      storage,
+      'localhost',
+      await resolvedStorageEmulatorPort
+    );
   });
 
   // Mock these tests, so I can control progress
   describe('fromTask (mock)', () => {
     let mockTask: MockTask;
-    let spies: {[key:string]: jest.SpyInstance};
+    let spies: { [key: string]: jest.SpyInstance };
 
     beforeEach(() => {
       mockTask = new MockTask();
@@ -108,28 +126,30 @@ describe('RxFire Storage', () => {
     });
 
     it('should emit the current status and not cancel', (done) => {
-      fromTask(mockTask as any).pipe(take(1)).subscribe({
-        next: (it) => expect(it).toEqual(mockTask.snapshot),
-        error: (it) => {
-          throw (it);
-        },
-        complete: () => {
-          // teardown is out of band on unsubscribe, wait a tick
-          setTimeout(() => {
-            expect(spies.on).toHaveBeenCalledTimes(1);
-            expect(spies.unsubscribe).toHaveBeenCalledTimes(1);
-            expect(spies.then).toHaveBeenCalledTimes(1);
-            expect(spies.cancel).not.toHaveBeenCalled();
-            done();
-          }, 0);
-        },
-      });
+      fromTask(mockTask as any)
+        .pipe(take(1))
+        .subscribe({
+          next: (it) => expect(it).toEqual(mockTask.snapshot),
+          error: (it) => {
+            throw it;
+          },
+          complete: () => {
+            // teardown is out of band on unsubscribe, wait a tick
+            setTimeout(() => {
+              expect(spies.on).toHaveBeenCalledTimes(1);
+              expect(spies.unsubscribe).toHaveBeenCalledTimes(1);
+              expect(spies.then).toHaveBeenCalledTimes(1);
+              expect(spies.cancel).not.toHaveBeenCalled();
+              done();
+            }, 0);
+          },
+        });
     });
 
     it('should emit on progress change and complete when done', (done) => {
       let timesFired = 0;
-      const newSnapshot = {_something: rando()};
-      const completedSnapshot = {state: 'success'};
+      const newSnapshot = { _something: rando() };
+      const completedSnapshot = { state: 'success' };
       fromTask(mockTask as any).subscribe({
         next: (it) => {
           timesFired++;
@@ -151,7 +171,7 @@ describe('RxFire Storage', () => {
           }
         },
         error: (it) => {
-          throw (it);
+          throw it;
         },
         complete: () => {
           // teardown is out of band, wait a tick
@@ -165,8 +185,8 @@ describe('RxFire Storage', () => {
 
     it('should emit on progress change and error when canceled', (done) => {
       let timesFired = 0;
-      const newSnapshot = {_something: rando()};
-      const completedSnapshot = {state: 'canceled'};
+      const newSnapshot = { _something: rando() };
+      const completedSnapshot = { state: 'canceled' };
       fromTask(mockTask as any).subscribe({
         next: (it) => {
           timesFired++;
@@ -201,41 +221,45 @@ describe('RxFire Storage', () => {
     });
 
     it('should emit the current status when subscribed again (cold)', (done) => {
-      fromTask(mockTask as any).pipe(take(1)).subscribe({
-        next: (it) => expect(it).toEqual(mockTask.snapshot),
-        complete: () => {
-          fromTask(mockTask as any).pipe(take(1)).subscribe({
-            next: (it) => expect(it).toEqual(mockTask.snapshot),
-            complete: () => {
-              // teardown is out of band on unsubscribe, wait a tick
-              setTimeout(() => {
-                expect(spies.on).toHaveBeenCalledTimes(2);
-                expect(spies.unsubscribe).toHaveBeenCalledTimes(2);
-                expect(spies.then).toHaveBeenCalledTimes(2);
-                expect(spies.cancel).not.toHaveBeenCalled();
-                done();
-              }, 0);
-            },
-          });
-        },
-        error: (it) => {
-          throw it;
-        },
-      });
+      fromTask(mockTask as any)
+        .pipe(take(1))
+        .subscribe({
+          next: (it) => expect(it).toEqual(mockTask.snapshot),
+          complete: () => {
+            fromTask(mockTask as any)
+              .pipe(take(1))
+              .subscribe({
+                next: (it) => expect(it).toEqual(mockTask.snapshot),
+                complete: () => {
+                  // teardown is out of band on unsubscribe, wait a tick
+                  setTimeout(() => {
+                    expect(spies.on).toHaveBeenCalledTimes(2);
+                    expect(spies.unsubscribe).toHaveBeenCalledTimes(2);
+                    expect(spies.then).toHaveBeenCalledTimes(2);
+                    expect(spies.cancel).not.toHaveBeenCalled();
+                    done();
+                  }, 0);
+                },
+              });
+          },
+          error: (it) => {
+            throw it;
+          },
+        });
     });
 
     it('should emit on progress change and complete when done (hot)', (done) => {
-      const timesFired = {a: 0, b: 0, c: 0};
-      const completed = {a: false, b: false, c: false};
-      const completeAndDone = (id: string) => {
+      const timesFired = { a: 0, b: 0, c: 0 };
+      const completed = { a: false, b: false, c: false };
+      const completeAndDone = (id: 'a' | 'b' | 'c') => {
         completed[id] = true;
         if (Object.values(completed).every((it) => it)) {
           expect(spies.unsubscribe).toHaveBeenCalledTimes(2);
           done();
         }
       };
-      const newSnapshot = {_something: rando()};
-      const completedSnapshot = {state: 'sucess'};
+      const newSnapshot = { _something: rando() };
+      const completedSnapshot = { state: 'sucess' };
       fromTask(mockTask as any).subscribe({
         next: (it) => {
           timesFired['a']++;
@@ -282,7 +306,8 @@ describe('RxFire Storage', () => {
           timesFired['b']++;
           switch (timesFired['b']) {
             case 1:
-              expect(it).toEqual(mockTask.snapshot); 4;
+              expect(it).toEqual(mockTask.snapshot);
+              4;
               break;
             case 2:
               expect(it).toEqual(newSnapshot);
@@ -311,23 +336,26 @@ describe('RxFire Storage', () => {
 
     it('completed upload should fire success and complete', (done) => {
       let firedNext = false;
-      task.then(() => {
-        fromTask(task).subscribe({
-          next: (it) => {
-            firedNext = true;
-            expect(it.state).toEqual('success');
-          },
-          error: (it) => {
-            throw it;
-          },
-          complete: () => {
-            expect(firedNext).toBeTruthy();
-            done();
-          },
-        });
-      }, (err) => {
-        throw err;
-      });
+      task.then(
+        () => {
+          fromTask(task).subscribe({
+            next: (it) => {
+              firedNext = true;
+              expect(it.state).toEqual('success');
+            },
+            error: (it) => {
+              throw it;
+            },
+            complete: () => {
+              expect(firedNext).toBeTruthy();
+              done();
+            },
+          });
+        },
+        (err) => {
+          throw err;
+        }
+      );
     });
 
     it('canceled task should fire canceled and fail', (done) => {
@@ -392,13 +420,15 @@ describe('RxFire Storage', () => {
       const body = rando();
       const ref = _ref(storage, rando());
       _uploadString(ref, body).then((it) => {
-        getDownloadURL(ref).pipe(
+        getDownloadURL(ref)
+          .pipe(
             switchMap((url) => fetch(url)),
-            switchMap((it) => it.text()),
-        ).subscribe((it) => {
-          expect(it).toEqual(body);
-          done();
-        });
+            switchMap((it) => it.text())
+          )
+          .subscribe((it) => {
+            expect(it).toEqual(body);
+            done();
+          });
       });
     });
   });
@@ -407,13 +437,13 @@ describe('RxFire Storage', () => {
     it('works', (done) => {
       const body = rando();
       const base64body = btoa(body);
-      const md5Hash = btoa(md5(body, {asString: true}) as string);
+      const md5Hash = btoa(md5(body, { asString: true }) as string);
       const customMetadata = {
         a: rando(),
         b: rando(),
       };
       const ref = _ref(storage, rando());
-      _uploadString(ref, base64body, 'base64', {customMetadata}).then(() => {
+      _uploadString(ref, base64body, 'base64', { customMetadata }).then(() => {
         getMetadata(ref).subscribe((it) => {
           expect(it.md5Hash).toEqual(md5Hash);
           expect(it.customMetadata).toEqual(customMetadata);
@@ -434,24 +464,27 @@ describe('RxFire Storage', () => {
 
     it('completed upload should fire 100% and complete', (done) => {
       let firedNext = false;
-      task.then(() => {
-        percentage(task).subscribe({
-          next: (it) => {
-            firedNext = true;
-            expect(it.progress).toEqual(100);
-            expect(it.snapshot.state).toEqual('success');
-          },
-          error: (it) => {
-            throw it;
-          },
-          complete: () => {
-            expect(firedNext).toBeTruthy();
-            done();
-          },
-        });
-      }, (err) => {
-        throw err;
-      });
+      task.then(
+        () => {
+          percentage(task).subscribe({
+            next: (it) => {
+              firedNext = true;
+              expect(it.progress).toEqual(100);
+              expect(it.snapshot.state).toEqual('success');
+            },
+            error: (it) => {
+              throw it;
+            },
+            complete: () => {
+              expect(firedNext).toBeTruthy();
+              done();
+            },
+          });
+        },
+        (err) => {
+          throw err;
+        }
+      );
     });
 
     it('running should fire and complete', (done) => {
@@ -462,7 +495,9 @@ describe('RxFire Storage', () => {
       percentage(task).subscribe({
         next: (it) => {
           expect(typeof it.progress).toEqual('number');
-          expect(it.progress).toBeGreaterThanOrEqual(lastEmission?.progress ?? -1);
+          expect(it.progress).toBeGreaterThanOrEqual(
+            lastEmission?.progress ?? -1
+          );
           lastEmission = it;
         },
         error: (it) => {
@@ -523,34 +558,38 @@ describe('RxFire Storage', () => {
         a: rando(),
         b: rando(),
       };
-      uploadBytesResumable(ref, Buffer.from(body, 'utf8'), {customMetadata}).pipe(
+      uploadBytesResumable(ref, Buffer.from(body, 'utf8'), { customMetadata })
+        .pipe(
           reduce((_, it) => it),
-          concatMap(() => getMetadata(ref)),
-      ).subscribe((it) => {
-        // TODO(jamesdaniels) MD5 isn't matching, look into this
-        // expect(it.md5Hash).toEqual(md5Hash);
-        expect(it.customMetadata).toEqual(customMetadata);
-        done();
-      });
+          concatMap(() => getMetadata(ref))
+        )
+        .subscribe((it) => {
+          // TODO(jamesdaniels) MD5 isn't matching, look into this
+          // expect(it.md5Hash).toEqual(md5Hash);
+          expect(it.customMetadata).toEqual(customMetadata);
+          done();
+        });
     });
 
     it('should cancel when unsubscribed', (done) => {
       const ref = _ref(storage, rando());
-      uploadBytesResumable(ref, Buffer.from(rando(), 'utf8')).pipe(
+      uploadBytesResumable(ref, Buffer.from(rando(), 'utf8'))
+        .pipe(
           take(1),
-          switchMap(() => getDownloadURL(ref)),
-      ).subscribe({
-        next: () => {
-          throw 'expected failure';
-        },
-        complete: () => {
-          throw 'expected failure';
-        },
-        error: (err) => {
-          expect(err.code).toEqual('storage/object-not-found');
-          done();
-        },
-      });
+          switchMap(() => getDownloadURL(ref))
+        )
+        .subscribe({
+          next: () => {
+            throw 'expected failure';
+          },
+          complete: () => {
+            throw 'expected failure';
+          },
+          error: (err) => {
+            expect(err.code).toEqual('storage/object-not-found');
+            done();
+          },
+        });
     });
   });
 
@@ -559,38 +598,42 @@ describe('RxFire Storage', () => {
       const ref = _ref(storage, rando());
       const body = rando();
       const base64body = btoa(body);
-      const md5Hash = btoa(md5(body, {asString: true}) as string);
+      const md5Hash = btoa(md5(body, { asString: true }) as string);
       const customMetadata = {
         a: rando(),
         b: rando(),
       };
-      uploadString(ref, base64body, 'base64', {customMetadata}).pipe(
+      uploadString(ref, base64body, 'base64', { customMetadata })
+        .pipe(
           reduce((_, it) => it),
-          concatMap(() => getMetadata(ref)),
-      ).subscribe((it) => {
-        expect(it.md5Hash).toEqual(md5Hash);
-        expect(it.customMetadata).toEqual(customMetadata);
-        done();
-      });
+          concatMap(() => getMetadata(ref))
+        )
+        .subscribe((it) => {
+          expect(it.md5Hash).toEqual(md5Hash);
+          expect(it.customMetadata).toEqual(customMetadata);
+          done();
+        });
     });
 
     it('should cancel when unsubscribed', (done) => {
       const ref = _ref(storage, rando());
-      uploadString(ref, rando()).pipe(
+      uploadString(ref, rando())
+        .pipe(
           take(1),
-          switchMap(() => getDownloadURL(ref)),
-      ).subscribe({
-        next: () => {
-          throw 'expected failure';
-        },
-        complete: () => {
-          throw 'expected failure';
-        },
-        error: (err) => {
-          expect(err.code).toEqual('storage/object-not-found');
-          done();
-        },
-      });
+          switchMap(() => getDownloadURL(ref))
+        )
+        .subscribe({
+          next: () => {
+            throw 'expected failure';
+          },
+          complete: () => {
+            throw 'expected failure';
+          },
+          error: (err) => {
+            expect(err.code).toEqual('storage/object-not-found');
+            done();
+          },
+        });
     });
   });
 });

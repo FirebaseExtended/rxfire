@@ -14,6 +14,7 @@ export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
     let lastSnapshot: UploadTaskSnapshot | null = null;
     let complete = false;
     let hasError = false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let error: any = null;
 
     const emit = (snapshot: UploadTaskSnapshot) => {

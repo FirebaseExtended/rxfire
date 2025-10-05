@@ -1,0 +1,8 @@
+{
+  "name": "rxfire/ai",
+  "browser": "../dist/ai/index.esm.js",
+  "main": "../dist/ai/index.cjs.js",
+  "module": "../dist/ai/index.esm.js",
+  "typings": "../dist/ai/index.d.ts",
+  "sideEffects": false
+}
