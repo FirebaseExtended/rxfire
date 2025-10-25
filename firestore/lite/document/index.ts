@@ -16,12 +16,12 @@
  */
 
 // TODO fix the import
-import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
-import {map} from 'rxjs/operators';
-import {from, Observable} from 'rxjs';
-import {getDoc} from 'firebase/firestore/lite';
+import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
+import { map } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { getDoc } from 'firebase/firestore/lite';
 
-export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
+export function doc<T = DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return from(getDoc<T, DocumentData>(ref));
 }
 
@@ -29,30 +29,30 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T=DocumentData>(
-    ref: DocumentReference<T>,
-    options: {
+export function docData<T = DocumentData>(
+  ref: DocumentReference<T>,
+  options: {
     idField?: string
-  }={},
+  } = {},
 ): Observable<T> {
   return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
 }
 
-export function snapToData<T=DocumentData>(
-    snapshot: DocumentSnapshot<T>,
-    options: {
-      idField?: string,
-    }={},
-): {} | undefined {
-  // TODO clean up the typings
-  const data = snapshot.data() as any;
+export function snapToData<T = DocumentData>(
+  snapshot: DocumentSnapshot<T>,
+  options: {
+    idField?: string,
+  } = {},
+): T | undefined {
+  const data = snapshot.data();
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
   if (!snapshot.exists() || typeof data !== 'object' || data === null) {
     return data;
   }
+  const castedData = data as DocumentData;
   if (options.idField) {
-    data[options.idField] = snapshot.id;
+    castedData[options.idField] = snapshot.id;
   }
-  return data;
+  return castedData as T;
 }

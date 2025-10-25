@@ -1,5 +1,19 @@
 # rxfire
 
+## 7.0.0
+
+### Changes
+
+- Updated the peer dependencies to support Firebase v12 due to the renaming of
+  `firebase/vertexai` to `firebase/ai`. This is important to provide compatible
+  support at other packages like `@angular/fire` in its version 20.
+
+### Misc Changes
+
+- Updated the ESLint to version 9 and migrated to Flat config.
+- Updated several packages used for building (rollup plugins) but one of them (`@rollup/plugin-typescript`) has issues resolving the output declaration files in version 12.x.x, whereas the v11 works!
+
+
 ## 4.0.0
 ### Patch Changes
 

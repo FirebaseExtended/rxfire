@@ -6,55 +6,61 @@
   "author": "Firebase <firebase-support@google.com> (https://firebase.google.com/)",
   "license": "Apache-2.0",
   "homepage": "https://firebase.google.com/",
+  "type": "module",
   "browser": "dist/index.esm.js",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.esm.js",
-      "require": "./index.cjs.js",
-      "types": "./index.d.ts"
+      "require": "./index.cjs.js"
+    },
+    "./ai": {
+      "types": "./ai/index.d.ts",
+      "import": "./ai/index.esm.js",
+      "require": "./ai/index.cjs.js"
     },
     "./auth": {
+      "types": "./auth/index.d.ts",
       "import": "./auth/index.esm.js",
-      "require": "./auth/index.cjs.js",
-      "types": "./auth/index.d.ts"
+      "require": "./auth/index.cjs.js"
     },
     "./database": {
+      "types": "./database/index.d.ts",
       "import": "./database/index.esm.js",
-      "require": "./database/index.cjs.js",
-      "types": "./database/index.d.ts"
+      "require": "./database/index.cjs.js"
     },
     "./firestore": {
+      "types": "./firestore/index.d.ts",
       "import": "./firestore/index.esm.js",
-      "require": "./firestore/index.cjs.js",
-      "types": "./firestore/index.d.ts"
+      "require": "./firestore/index.cjs.js"
     },
     "./firestore/lite": {
+      "types": "./firestore/lite/index.d.ts",
       "import": "./firestore/lite/index.esm.js",
-      "require": "./firestore/lite/index.cjs.js",
-      "types": "./firestore/lite/index.d.ts"
+      "require": "./firestore/lite/index.cjs.js"
     },
     "./functions": {
+      "types": "./functions/index.d.ts",
       "import": "./functions/index.esm.js",
-      "require": "./functions/index.cjs.js",
-      "types": "./functions/index.d.ts"
+      "require": "./functions/index.cjs.js"
     },
     "./performance": {
+      "types": "./performance/index.d.ts",
       "import": "./performance/index.esm.js",
-      "require": "./performance/index.cjs.js",
-      "types": "./performance/index.d.ts"
+      "require": "./performance/index.cjs.js"
     },
     "./remote-config": {
+      "types": "./remote-config/index.d.ts",
       "import": "./remote-config/index.esm.js",
-      "require": "./remote-config/index.cjs.js",
-      "types": "./remote-config/index.d.ts"
+      "require": "./remote-config/index.cjs.js"
     },
     "./storage": {
+      "types": "./storage/index.d.ts",
       "import": "./storage/index.esm.js",
-      "require": "./storage/index.cjs.js",
-      "types": "./storage/index.d.ts"
+      "require": "./storage/index.cjs.js"
     }
   },
   "sideEffects": false,
@@ -73,8 +79,8 @@
     "url": "https://github.com/firebaseextended/rxfire.git"
   },
   "scripts": {
-    "lint": "eslint -c .eslintrc.js '**/*.ts' --ignore-path './.gitignore'",
-    "lint:fix": "eslint --fix -c .eslintrc.js '**/*.ts' --ignore-path './.gitignore'",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix .",
     "build": "run-s build:**",
     "build:clean": "rm -rf dist",
     "build:types": "tsc --emitDeclarationOnly",
@@ -87,35 +93,40 @@
     "emulators": "npx -y firebase-tools@latest emulators:start --project=rxfire-test-c497c",
     "jest": "jest --detectOpenHandles"
   },
+  "dependencies": {},
   "peerDependencies": {
-    "firebase": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "firebase": "^12.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
-    "@rollup/plugin-commonjs": "^15.1.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
-    "@rollup/plugin-typescript": "^8.1.0",
+    "@eslint/js": "^9.37.0",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.2",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/jest": "^29.5.4",
-    "@typescript-eslint/eslint-plugin": "^6.4.1",
-    "@typescript-eslint/parser": "^6.4.1",
+    "@types/md5": "^2.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
     "babel-jest": "^29.6.4",
-    "cross-fetch": "^3.1.4",
-    "eslint": "^7.32.0",
-    "eslint-config-google": "^0.14.0",
-    "firebase": "^10.0.0",
-    "glob": "^7.1.6",
+    "cross-fetch": "^4.0.0",
+    "eslint": "^9.37.0",
+    "firebase": "^12.0.0",
+    "glob": "^9.0.0",
+    "globals": "^16.4.0",
     "jest": "^29.6.4",
     "jest-environment-jsdom": "^29.6.4",
     "md5": "^2.3.0",
     "npm-run-all": "^4.1.5",
-    "rollup": "^2.33.2",
+    "rollup": "^4.52.4",
     "rollup-plugin-generate-package-json": "^3.2.0",
     "rxjs": "^7.0.0",
     "tslib": "^2.6.0",
-    "typescript": "^5.2.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.45.0",
     "xhr2": "^0.2.1"
   },
   "files": [
