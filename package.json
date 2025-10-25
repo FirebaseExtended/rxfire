@@ -13,54 +13,54 @@
   "typings": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./index.d.ts",
       "import": "./index.esm.js",
-      "require": "./index.cjs.js",
-      "types": "./index.d.ts"
+      "require": "./index.cjs.js"
     },
     "./ai": {
+      "types": "./ai/index.d.ts",
       "import": "./ai/index.esm.js",
-      "require": "./ai/index.cjs.js",
-      "types": "./ai/index.d.ts"
+      "require": "./ai/index.cjs.js"
     },
     "./auth": {
+      "types": "./auth/index.d.ts",
       "import": "./auth/index.esm.js",
-      "require": "./auth/index.cjs.js",
-      "types": "./auth/index.d.ts"
+      "require": "./auth/index.cjs.js"
     },
     "./database": {
+      "types": "./database/index.d.ts",
       "import": "./database/index.esm.js",
-      "require": "./database/index.cjs.js",
-      "types": "./database/index.d.ts"
+      "require": "./database/index.cjs.js"
     },
     "./firestore": {
+      "types": "./firestore/index.d.ts",
       "import": "./firestore/index.esm.js",
-      "require": "./firestore/index.cjs.js",
-      "types": "./firestore/index.d.ts"
+      "require": "./firestore/index.cjs.js"
     },
     "./firestore/lite": {
+      "types": "./firestore/lite/index.d.ts",
       "import": "./firestore/lite/index.esm.js",
-      "require": "./firestore/lite/index.cjs.js",
-      "types": "./firestore/lite/index.d.ts"
+      "require": "./firestore/lite/index.cjs.js"
     },
     "./functions": {
+      "types": "./functions/index.d.ts",
       "import": "./functions/index.esm.js",
-      "require": "./functions/index.cjs.js",
-      "types": "./functions/index.d.ts"
+      "require": "./functions/index.cjs.js"
     },
     "./performance": {
+      "types": "./performance/index.d.ts",
       "import": "./performance/index.esm.js",
-      "require": "./performance/index.cjs.js",
-      "types": "./performance/index.d.ts"
+      "require": "./performance/index.cjs.js"
     },
     "./remote-config": {
+      "types": "./remote-config/index.d.ts",
       "import": "./remote-config/index.esm.js",
-      "require": "./remote-config/index.cjs.js",
-      "types": "./remote-config/index.d.ts"
+      "require": "./remote-config/index.cjs.js"
     },
     "./storage": {
+      "types": "./storage/index.d.ts",
       "import": "./storage/index.esm.js",
-      "require": "./storage/index.cjs.js",
-      "types": "./storage/index.d.ts"
+      "require": "./storage/index.cjs.js"
     }
   },
   "sideEffects": false,
