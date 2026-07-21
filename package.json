@@ -88,7 +88,7 @@
     "jest": "jest --detectOpenHandles"
   },
   "peerDependencies": {
-    "firebase": "^9.0.0 || ^10.0.0 || ^11.0.0",
+    "firebase": "^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0",
     "rxjs": "^6.0.0 || ^7.0.0"
   },
   "devDependencies": {

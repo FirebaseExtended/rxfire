@@ -62,7 +62,7 @@ jobs:
     strategy:
       matrix:
         node: ["20"]
-        firebase: ["9", "10", "11"]
+        firebase: ["9", "10", "11", "12"]
         rxjs: ["6", "7"]
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
