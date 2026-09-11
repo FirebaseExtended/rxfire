@@ -416,6 +416,29 @@ describe('RxFire Firestore', () => {
       });
     });
 
+    it('docData should preserve converter instances when idField is set', (done: jest.DoneCallback) => {
+      class Folk {
+        constructor(public name: string) {}
+        static fromFirestore(snap: QueryDocumentSnapshot) {
+          return new Folk(snap.data().name);
+        }
+        static toFirestore(model: Folk) {
+          return model;
+        }
+      }
+
+      seedTest(firestore).then(({davidDoc}) => {
+        const unwrapped = docData(davidDoc.withConverter(Folk), {idField: 'UID'});
+
+        unwrapped.pipe(take(1)).subscribe((val) => {
+          expect(val).toBeInstanceOf(Folk);
+          expect((val as Folk).name).toBe('David');
+          expect((val as Folk & {UID: string}).UID).toBe('david');
+          done();
+        });
+      });
+    });
+
     /**
      * TODO(jamesdaniels)
      * Having trouble gettings these test green with the emulators

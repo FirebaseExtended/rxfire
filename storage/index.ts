@@ -7,14 +7,23 @@ import {
 import {Observable, from} from 'rxjs';
 import {map, shareReplay} from 'rxjs/operators';
 
-import type {UploadTaskSnapshot, StorageReference, UploadMetadata, StringFormat, UploadTask, UploadResult} from 'firebase/storage';
+import type {
+  UploadTaskSnapshot,
+  StorageReference,
+  UploadMetadata,
+  StringFormat,
+  UploadTask,
+  UploadResult,
+  FullMetadata,
+  StorageError,
+} from 'firebase/storage';
 
 export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>((subscriber) => {
     let lastSnapshot: UploadTaskSnapshot | null = null;
     let complete = false;
     let hasError = false;
-    let error: any = null;
+    let error: StorageError | null = null;
 
     const emit = (snapshot: UploadTaskSnapshot) => {
       lastSnapshot = snapshot;
@@ -74,9 +83,13 @@ export function getDownloadURL(ref: StorageReference): Observable<string> {
   return from(_getDownloadURL(ref));
 }
 
-// TODO: fix storage typing in firebase, then apply the same fix here
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getMetadata(ref: StorageReference): Observable<any> {
+/**
+ * Retrieves the metadata for a given storage reference.
+ * 
+ * @param ref The storage reference for which to retrieve metadata.
+ * @returns An observable that emits the metadata for the given reference.
+ */
+export function getMetadata(ref: StorageReference): Observable<FullMetadata> {
   return from(_getMetadata(ref));
 }
 
