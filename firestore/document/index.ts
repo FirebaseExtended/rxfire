@@ -56,6 +56,6 @@ export function snapToData<T=DocumentData, R extends T=T>(
 
   // Preserve converter instances and custom prototypes by mutating the original object
   // instead of creating a new one with spread syntax.
-  (data as Record<string, unknown>)[options.idField as string] = snapshot.id;
+  Object.assign(data, {[options.idField]: snapshot.id});
   return data;
 }
