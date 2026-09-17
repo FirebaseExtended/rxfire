@@ -428,12 +428,11 @@ describe('RxFire Firestore', () => {
       }
 
       seedTest(firestore).then(({davidDoc}) => {
-        const unwrapped = docData(davidDoc.withConverter(Folk), {idField: 'UID'});
+        const unwrapped = docData<Folk, Folk & {UID: string}>(davidDoc.withConverter(Folk), {idField: 'UID'});
 
         unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toBeInstanceOf(Folk);
-          expect((val as Folk).name).toBe('David');
-          expect((val as Folk & {UID: string}).UID).toBe('david');
+          expect(val).toEqual(expect.objectContaining({name: 'David', UID: 'david'}));
           done();
         });
       });
