@@ -33,9 +33,8 @@ import {
   pairwise,
 } from 'rxjs/operators';
 import {snapToData} from '../document';
-import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
+import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData, CountSnapshot} from '../interfaces';
 import {SnapshotOptions, getCountFromServer, refEqual} from 'firebase/firestore';
-import {CountSnapshot} from '../lite/interfaces';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
