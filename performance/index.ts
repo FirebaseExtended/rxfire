@@ -74,7 +74,7 @@ export const traceUntil = <T = any>(
   return source$
       .pipe(
           tap({
-            next: (a) => test(a) && traceSubscription.unsubscribe(),
+            next: (value) => test(value) && traceSubscription.unsubscribe(),
             complete: () =>
               options &&
           options.orComplete &&
@@ -101,8 +101,8 @@ export const traceWhile = <T = any>(
   return source$
       .pipe(
           tap({
-            next: (a) => {
-              if (test(a)) {
+            next: (value) => {
+              if (test(value)) {
                 traceSubscription =
               traceSubscription || trace$(name).subscribe();
               } else {
