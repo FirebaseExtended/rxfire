@@ -146,7 +146,7 @@ export const traceUntilFirst = <T = any>(name: string) => (source$: Observable<T
   const traceSubscription = trace$(name).subscribe();
   return source$.pipe(
       tap({
-        complete: () => traceSubscription.unsubscribe(),
+        next: () => traceSubscription.unsubscribe(),
       }),
   ).subscribe(subscriber);
 });
