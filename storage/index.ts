@@ -85,7 +85,7 @@ export function getDownloadURL(ref: StorageReference): Observable<string> {
 
 /**
  * Retrieves the metadata for a given storage reference.
- * 
+ *
  * @param ref The storage reference for which to retrieve metadata.
  * @returns An observable that emits the metadata for the given reference.
  */
