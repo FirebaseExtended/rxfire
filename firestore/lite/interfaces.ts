@@ -2,10 +2,7 @@ import type * as lite from 'firebase/firestore/lite';
 
 export type DocumentReference<T> = lite.DocumentReference<T>;
 export type DocumentData = lite.DocumentData;
-export type Query<
-  AppModelType,
-  DbModelType extends DocumentData = DocumentData,
-> = lite.Query<AppModelType, DbModelType>;
+export type Query<AppModelType> = lite.Query<AppModelType>;
 export type DocumentSnapshot<T> = lite.DocumentSnapshot<T>;
 export type QuerySnapshot<T> = lite.QuerySnapshot<T>;
 export type QueryDocumentSnapshot<T> = lite.QueryDocumentSnapshot<T>;

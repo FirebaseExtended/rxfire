@@ -50,13 +50,16 @@ export function collectionData<T=DocumentData, R extends T=T>(
 
 export function collectionCountSnap<
   AppModelType = DocumentData,
-  DbModelType extends DocumentData = DocumentData,
->(query: Query<AppModelType, DbModelType>): Observable<CountSnapshot<AppModelType, DbModelType>> {
+  // DbModelType extends DocumentData = DocumentData,
+>(query: Query<AppModelType>): Observable<CountSnapshot<AppModelType>> {
   return from(getCount(query));
 }
 
-export function collectionCount<AppModelType = DocumentData, DbModelType extends DocumentData = DocumentData>(
-    query: Query<AppModelType, DbModelType>,
+export function collectionCount<
+  AppModelType = DocumentData,
+  // DbModelType extends DocumentData = DocumentData
+>(
+    query: Query<AppModelType>,
 ): Observable<number> {
   return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }
