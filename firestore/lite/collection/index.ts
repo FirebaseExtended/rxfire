@@ -52,7 +52,7 @@ export function collectionCountSnap<
   AppModelType = DocumentData,
   DbModelType extends DocumentData = DocumentData,
 >(query: Query<AppModelType, DbModelType>): Observable<CountSnapshot<AppModelType, DbModelType>> {
-  return from(getCount(query) as Promise<CountSnapshot<AppModelType, DbModelType>>);
+  return from(getCount(query));
 }
 
 export function collectionCount<AppModelType = DocumentData, DbModelType extends DocumentData = DocumentData>(
