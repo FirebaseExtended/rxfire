@@ -35,10 +35,10 @@ export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDoc
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
  * @param query
  */
-export function collectionData<T=DocumentData, R extends T=T>(
+export function collectionData<T=DocumentData>(
     query: Query<T>,
     options: {
-    idField?: keyof R
+    idField?: string
   }={},
 ): Observable<T[]> {
   return collection(query).pipe(

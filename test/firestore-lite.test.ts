@@ -227,7 +227,7 @@ describe('RxFire firestore/lite', () => {
       }
 
       seedTest(firestore).then(({davidDoc}) => {
-        const unwrapped = docData<Folk, Folk & {UID: string}>(davidDoc.withConverter(Folk), {idField: 'UID'});
+        const unwrapped = docData(davidDoc.withConverter(Folk), {idField: 'UID'});
 
         unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toBeInstanceOf(Folk);

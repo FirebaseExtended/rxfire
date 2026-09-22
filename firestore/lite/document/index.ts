@@ -29,30 +29,32 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T=DocumentData, R extends T=T>(
+export function docData<T=DocumentData>(
     ref: DocumentReference<T>,
     options: {
-    idField?: keyof R,
+    idField?: string
   }={},
-): Observable<T | R | undefined> {
+): Observable<T> {
   return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
 }
 
-export function snapToData<T=DocumentData, R extends T=T>(
+export function snapToData<T=DocumentData>(
     snapshot: DocumentSnapshot<T>,
     options: {
-      idField?: keyof R,
+      idField?: string,
     }={},
-): T | R | undefined {
-  const data = snapshot.data();
+): {} | undefined {
+  // TODO clean up the typings
+  const data = snapshot.data() as any;
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists() || typeof data !== 'object' || data === null || !options.idField) {
+  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
     return data;
   }
-
-  // Preserve converter instances and custom prototypes by mutating the original object
-  // instead of creating a new one with spread syntax.
-  Object.assign(data, {[options.idField]: snapshot.id});
+  if (options.idField) {
+    // Preserve converter instances and custom prototypes by mutating the original object
+    // instead of creating a new one with spread syntax.
+    data[options.idField] = snapshot.id;
+  }
   return data;
 }
