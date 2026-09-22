@@ -90,7 +90,7 @@ getDownloadURL(davidRef)
 ```
 
 ### `getMetadata()`
-The `getMetadata()` function creates an observable that emits the full set of object metadata, including read-only properties..
+The `getMetadata()` function creates an observable that emits the full set of object metadata, including read-only properties.
 
 |                 |                                          |
 |-----------------|------------------------------------------|
