@@ -33,9 +33,8 @@ import {
   pairwise,
 } from 'rxjs/operators';
 import {snapToData} from '../document';
-import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData} from '../interfaces';
+import {DocumentChangeType, DocumentChange, Query, QueryDocumentSnapshot, QuerySnapshot, DocumentData, CountSnapshot} from '../interfaces';
 import {SnapshotOptions, getCountFromServer, refEqual} from 'firebase/firestore';
-import {CountSnapshot} from '../lite/interfaces';
 const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
@@ -298,10 +297,14 @@ export function collectionData<T=DocumentData, U extends string=never>(
   );
 }
 
-export function collectionCountSnap(query: Query<unknown>): Observable<CountSnapshot> {
+export function collectionCountSnap<AppModelType = DocumentData>(
+    query: Query<AppModelType>,
+): Observable<CountSnapshot<AppModelType>> {
   return from(getCountFromServer(query));
 }
 
-export function collectionCount(query: Query<unknown>): Observable<number> {
+export function collectionCount<AppModelType = DocumentData>(
+    query: Query<AppModelType>,
+): Observable<number> {
   return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }

@@ -7,3 +7,11 @@ export type QuerySnapshot<T> = import('firebase/firestore').QuerySnapshot<T>;
 export type DocumentChangeType = import('firebase/firestore').DocumentChangeType;
 export type DocumentChange<T> = import('firebase/firestore').DocumentChange<T>;
 export type QueryDocumentSnapshot<T> = import('firebase/firestore').QueryDocumentSnapshot<T>;
+export type CountSnapshot<
+  AppModelType = DocumentData,
+  DbModelType extends DocumentData = DocumentData,
+> = import('firebase/firestore').AggregateQuerySnapshot<
+  {count: import('firebase/firestore').AggregateField<number>},
+  AppModelType,
+  DbModelType
+>;

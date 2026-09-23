@@ -90,14 +90,14 @@ getDownloadURL(davidRef)
 ```
 
 ### `getMetadata()`
-The `getMetadata()` function creates an observable that emits the URL of the file's metadta.
+The `getMetadata()` function creates an observable that emits the full set of object metadata, including read-only properties.
 
 |                 |                                          |
 |-----------------|------------------------------------------|
 | **function**    | `getMetadata()`                          |
 | **params**      | `import('firebase/storage').StorageReference`                      |
 | **import path** | `rxfire/storage`                         |
-| **return**      | `Observable<Object>`                     |
+| **return**      | `Observable<FullMetadata>`                     |
 
 #### TypeScript Example
 ```ts

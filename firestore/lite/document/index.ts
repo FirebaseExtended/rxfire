@@ -52,6 +52,8 @@ export function snapToData<T=DocumentData>(
     return data;
   }
   if (options.idField) {
+    // Preserve converter instances and custom prototypes by mutating the original object
+    // instead of creating a new one with spread syntax.
     data[options.idField] = snapshot.id;
   }
   return data;
