@@ -22,14 +22,14 @@ import {DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentS
 
 const DEFAULT_OPTIONS = {includeMetadataChanges: false};
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;
 export function fromRef<T=DocumentData>(ref: Query<T>, options?: SnapshotListenOptions): Observable<QuerySnapshot<T>>;
 export function fromRef(
     ref: any,
     options: SnapshotListenOptions=DEFAULT_OPTIONS,
 ): Observable<any> {
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+   
   return new Observable((subscriber) => {
     const unsubscribe = onSnapshot(ref, options, {
       next: subscriber.next.bind(subscriber),

@@ -46,8 +46,8 @@ const rando = (): string => [
 class MockTask {
   _resolve: (value: any) => void;
   _reject: (reason?: any) => void;
-  _state_changed_cbs: Array<(snapshot: UploadTaskSnapshot) => {}> = []; // eslint-disable-line camelcase
-  _state_change = (progress: any) => { // eslint-disable-line camelcase
+  _state_changed_cbs: Array<(snapshot: UploadTaskSnapshot) => {}> = [];  
+  _state_change = (progress: any) => {  
     this.snapshot = progress;
     this._state_changed_cbs.forEach((it) => it(progress));
     if (progress.state === 'canceled') {

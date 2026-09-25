@@ -19,10 +19,10 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
+ 
 
 // app/database is used as namespaces to access types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 import {initializeApp, FirebaseApp} from 'firebase/app';
 import {
   Database,

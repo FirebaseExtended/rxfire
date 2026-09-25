@@ -16,7 +16,7 @@
  */
 
 // function is used as a namespace to access types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 import {httpsCallable as vanillaHttpsCallable} from 'firebase/functions';
 import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
