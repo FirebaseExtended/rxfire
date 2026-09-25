@@ -19,10 +19,10 @@
  * limitations under the License.
  */
 
-/* eslint-disable @typescript-eslint/no-floating-promises */
+ 
 
 // app is used as namespaces to access types
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 import {
   collection,
   collectionChanges,

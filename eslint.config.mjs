@@ -9,12 +9,6 @@ export default defineConfig([
     ignores: ['dist/**', 'node_modules/**', '.firebase/**', '.yarn/**'],
   },
   {
-    name: 'Project - Linter Options',
-    linterOptions: {
-      reportUnusedDisableDirectives: 'off',
-    },
-  },
-  {
     name: 'ESLint JS - Recommended',
     extends: [
       eslint.configs.recommended,
