@@ -19,11 +19,11 @@ import { resolve, dirname, relative, join } from 'path';
 import resolveModule from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from '@rollup/plugin-typescript';
-import { peerDependencies, dependencies } from './package.json';
-import { sync as globSync } from 'glob';
+import { globSync } from 'glob';
 import { readFileSync } from 'fs';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
+const { peerDependencies, dependencies } = JSON.parse(readFileSync('./package.json', { encoding: 'utf-8' }));
 const packageJsonPaths = globSync('**/package.json', { ignore: ['node_modules/**', 'dist/**', 'test/**'] });
 const packages = packageJsonPaths.reduce((acc, path) => {
   const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
@@ -120,7 +120,7 @@ export default Object.keys(packages)
         plugins: [
           ...plugins,
           // TS sourceMaps conflict with Rollup sourceMaps
-          typescript({ sourceMap: false }),
+          typescript({ sourceMap: false, compilerOptions: { declaration: false } }),
           generatePackageJson({ outputFolder, baseContents }),
         ],
         external
