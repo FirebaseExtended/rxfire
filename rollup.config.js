@@ -61,30 +61,6 @@ const external = [
   'rxjs/operators'
 ];
 
-const globals = {
-  //rxfire: GLOBAL_NAME,
-  rxjs: 'rxjs',
-  tslib: 'tslib',
-  ...Object.values(packages).reduce((acc, {name}) => (acc[name] = name.replace(/\//g, '.'), acc), {}),
-  'firebase/firestore': 'firebase.firestore',
-  'firebase/firestore/lite': 'firebase.firestore-lite',
-  'firebase/auth': 'firebase.auth',
-  'firebase/functions': 'firebase.functions',
-  'firebase/storage': 'firebase.storage',
-  'firebase/database': 'firebase.database',
-  'firebase/remote-config': 'firebase.remote-config',
-  'firebase/performance': 'firebase.performance',
-  '@firebase/firestore': 'firebase.firestore',
-  '@firebase/firestore/lite': 'firebase.firestore-lite',
-  '@firebase/auth': 'firebase.auth',
-  '@firebase/functions': 'firebase.functions',
-  '@firebase/storage': 'firebase.storage',
-  '@firebase/database': 'firebase.database',
-  '@firebase/remote-config': 'firebase.remote-config',
-  '@firebase/performance': 'firebase.performance',
-  'rxjs/operators': 'rxjs.operators',
-};
-
 export default Object.keys(packages)
   .map(component => {
     const baseContents = packages[component];
