@@ -104,6 +104,7 @@
     "babel-jest": "^29.6.4",
     "cross-fetch": "^3.1.4",
     "eslint": "^10.11.0",
+    "eslint-plugin-jsdoc": "^64.5.4",
     "firebase": "^10.0.0",
     "glob": "^7.1.6",
     "globals": "^17.12.0",
