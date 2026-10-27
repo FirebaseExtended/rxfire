@@ -19,10 +19,6 @@
  * limitations under the License.
  */
 
- 
-
-// app/database is used as namespaces to access types
- 
 import {initializeApp, FirebaseApp} from 'firebase/app';
 import {
   Database,

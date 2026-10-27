@@ -19,10 +19,6 @@
  * limitations under the License.
  */
 
- 
-
-// app is used as namespaces to access types
- 
 import {
   collection,
   collectionChanges,

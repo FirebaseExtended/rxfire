@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
-// function is used as a namespace to access types
- 
 import {httpsCallable as vanillaHttpsCallable} from 'firebase/functions';
 import {from, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';

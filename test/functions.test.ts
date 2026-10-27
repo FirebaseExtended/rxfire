@@ -15,8 +15,6 @@
  * limitations under the License.
  */
 
- 
-
 import {initializeApp, FirebaseApp} from 'firebase/app';
 import {getFunctions, connectFunctionsEmulator, Functions} from 'firebase/functions';
 import {httpsCallable} from '../dist/functions';
