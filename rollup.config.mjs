@@ -85,6 +85,9 @@ export default Object.keys(packages)
           {
             file: resolve(component, main),
             format: 'cjs',
+            dynamicImportInCjs: false,
+            esModule: true,
+            interop: 'auto',
             sourcemap: true
           },
           {
