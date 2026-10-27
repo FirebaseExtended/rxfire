@@ -19,14 +19,12 @@ export default defineConfig([
     name: 'Project - TypeScript',
     files: ['**/*.ts'],
     languageOptions: {
+      ecmaVersion: 2021,
       globals: {
         ...globals.browser,
         ...globals.node,
       },
-      parserOptions: {
-        ecmaVersion: 2021,
-        sourceType: 'module',
-      },
+      sourceType: 'module',
     },
     rules: {
       'max-len': 'off',
