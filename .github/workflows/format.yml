@@ -11,6 +11,7 @@ permissions: {}
 jobs:
   format:
     runs-on: ubuntu-latest
+    name: Formatting Check
     steps:
       - name: Checkout
         uses: actions/checkout@v4
