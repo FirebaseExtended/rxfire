@@ -1,8 +1,8 @@
 {
   "name": "rxfire/firestore",
-  "browser": "../dist/firestore/index.esm.js",
+  "sideEffects": false,
   "main": "../dist/firestore/index.cjs.js",
   "module": "../dist/firestore/index.esm.js",
-  "typings": "../dist/firestore/index.d.ts",
-  "sideEffects": false
+  "browser": "../dist/firestore/index.esm.js",
+  "typings": "../dist/firestore/index.d.ts"
 }

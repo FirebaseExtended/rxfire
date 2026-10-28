@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {ListenEvent} from './interfaces';
+import { ListenEvent } from "./interfaces";
 
 /**
  * Check the length of the provided array. If it is empty return an array
@@ -24,12 +24,7 @@ import {ListenEvent} from './interfaces';
  */
 export function validateEventsArray(events?: ListenEvent[]): ListenEvent[] {
   if (events == null || events.length === 0) {
-    events = [
-      ListenEvent.added,
-      ListenEvent.removed,
-      ListenEvent.changed,
-      ListenEvent.moved,
-    ];
+    events = [ListenEvent.added, ListenEvent.removed, ListenEvent.changed, ListenEvent.moved];
   }
   return events;
 }

@@ -25,11 +25,26 @@ import {
   collectionData,
   collectionCountSnap,
   collectionCount,
-} from '../dist/firestore/lite';
-import {map, take} from 'rxjs/operators';
-import {default as TEST_PROJECT, resolvedFirestoreEmulatorPort} from './config';
-import {doc as firestoreDoc, getDocs, collection as firestoreCollection, getDoc, Firestore as FirebaseFirestore, CollectionReference, getFirestore, DocumentReference, connectFirestoreEmulator, doc, setDoc, collection as baseCollection, QueryDocumentSnapshot, addDoc} from 'firebase/firestore/lite';
-import {initializeApp, FirebaseApp} from 'firebase/app';
+} from "../dist/firestore/lite";
+import { map, take } from "rxjs/operators";
+import { default as TEST_PROJECT, resolvedFirestoreEmulatorPort } from "./config";
+import {
+  doc as firestoreDoc,
+  getDocs,
+  collection as firestoreCollection,
+  getDoc,
+  Firestore as FirebaseFirestore,
+  CollectionReference,
+  getFirestore,
+  DocumentReference,
+  connectFirestoreEmulator,
+  doc,
+  setDoc,
+  collection as baseCollection,
+  QueryDocumentSnapshot,
+  addDoc,
+} from "firebase/firestore/lite";
+import { initializeApp, FirebaseApp } from "firebase/app";
 
 const createId = (): string => Math.random().toString(36).substring(5);
 
@@ -37,9 +52,8 @@ const createId = (): string => Math.random().toString(36).substring(5);
  * Create a collection with a random name. This helps sandbox offline tests and
  * makes sure tests don't interfere with each other as they run.
  */
-const createRandomCol = (
-    firestore: FirebaseFirestore,
-): CollectionReference => baseCollection(firestore, createId());
+const createRandomCol = (firestore: FirebaseFirestore): CollectionReference =>
+  baseCollection(firestore, createId());
 
 /**
  * Create an environment for the tests to run in. The information is returned
@@ -47,19 +61,19 @@ const createRandomCol = (
  */
 const seedTest = async (firestore: FirebaseFirestore) => {
   const colRef = createRandomCol(firestore);
-  const davidDoc = doc(colRef, 'david');
-  await setDoc(davidDoc, {name: 'David'});
-  const shannonDoc = doc(colRef, 'shannon');
-  await setDoc(shannonDoc, {name: 'Shannon'});
-  const expectedNames = ['David', 'Shannon'];
+  const davidDoc = doc(colRef, "david");
+  await setDoc(davidDoc, { name: "David" });
+  const shannonDoc = doc(colRef, "shannon");
+  await setDoc(shannonDoc, { name: "Shannon" });
+  const expectedNames = ["David", "Shannon"];
   const expectedEvents = [
-    {name: 'David', type: 'added'},
-    {name: 'Shannon', type: 'added'},
+    { name: "David", type: "added" },
+    { name: "Shannon", type: "added" },
   ];
-  return {colRef, davidDoc, shannonDoc, expectedNames, expectedEvents};
+  return { colRef, davidDoc, shannonDoc, expectedNames, expectedEvents };
 };
 
-describe('RxFire firestore/lite', () => {
+describe("RxFire firestore/lite", () => {
   let app: FirebaseApp;
   let firestore: FirebaseFirestore;
 
@@ -75,10 +89,10 @@ describe('RxFire firestore/lite', () => {
   beforeEach(async () => {
     app = initializeApp(TEST_PROJECT, createId());
     firestore = getFirestore(app);
-    connectFirestoreEmulator(firestore, 'localhost', await resolvedFirestoreEmulatorPort);
+    connectFirestoreEmulator(firestore, "localhost", await resolvedFirestoreEmulatorPort);
   });
 
-  describe('collection', () => {
+  describe("collection", () => {
     /**
      * This is a simple test to see if the collection() method
      * correctly emits snapshots.
@@ -87,18 +101,21 @@ describe('RxFire firestore/lite', () => {
      * creats an observable with the `collection()` method and
      * asserts that the two "people" are in the array.
      */
-    it('should emit snapshots', async () => {
-      const {colRef, expectedNames} = await seedTest(firestore);
+    it("should emit snapshots", async () => {
+      const { colRef, expectedNames } = await seedTest(firestore);
 
       collection(colRef)
-          .pipe(map((docs) => docs.map((doc) => doc.data().name)), take(1))
-          .subscribe((names) => {
-            expect(names).toEqual(expectedNames);
-          });
+        .pipe(
+          map((docs) => docs.map((doc) => doc.data().name)),
+          take(1),
+        )
+        .subscribe((names) => {
+          expect(names).toEqual(expectedNames);
+        });
     });
   });
 
-  describe('collection w/converter', () => {
+  describe("collection w/converter", () => {
     /**
      * This is a simple test to see if the collection() method
      * correctly emits snapshots.
@@ -107,14 +124,14 @@ describe('RxFire firestore/lite', () => {
      * creats an observable with the `collection()` method and
      * asserts that the two "people" are in the array.
      */
-    it('should emit snapshots', async () => {
-      const {colRef} = await seedTest(firestore);
+    it("should emit snapshots", async () => {
+      const { colRef } = await seedTest(firestore);
 
       class Folk {
-        constructor(public name: string) { }
+        constructor(public name: string) {}
         static fromFirestore(snap: QueryDocumentSnapshot) {
           const name = snap.data().name;
-          if (name !== 'Shannon') {
+          if (name !== "Shannon") {
             return new Folk(`${snap.data().name}!`);
           } else {
             return undefined;
@@ -127,46 +144,46 @@ describe('RxFire firestore/lite', () => {
       }
 
       collection(Folk.collection)
-          .pipe(take(1))
-          .subscribe((docs) => {
-            const names = docs.map((doc) => doc.data()?.name);
-            const classes = docs.map((doc) => doc.data()?.constructor?.name);
-            expect(names).toEqual(['David!', undefined]);
-            expect(classes).toEqual(['Folk', undefined]);
-          });
+        .pipe(take(1))
+        .subscribe((docs) => {
+          const names = docs.map((doc) => doc.data()?.name);
+          const classes = docs.map((doc) => doc.data()?.constructor?.name);
+          expect(names).toEqual(["David!", undefined]);
+          expect(classes).toEqual(["Folk", undefined]);
+        });
     });
   });
 
-  describe('Data Mapping Functions', () => {
+  describe("Data Mapping Functions", () => {
     /**
      * The `unwrap(id)` method will map a collection to its data payload and map the doc ID to a the specificed key.
      */
-    it('collectionData should map a QueryDocumentSnapshot[] to an array of plain objects', async () => {
-      const {colRef} = await seedTest(firestore);
+    it("collectionData should map a QueryDocumentSnapshot[] to an array of plain objects", async () => {
+      const { colRef } = await seedTest(firestore);
 
       // const unwrapped = collection(colRef).pipe(unwrap('userId'));
-      const unwrapped = collectionData(colRef, {idField: 'userId'});
+      const unwrapped = collectionData(colRef, { idField: "userId" });
 
       unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
-          name: 'David',
-          userId: 'david',
+          name: "David",
+          userId: "david",
         };
         expect(val).toBeInstanceOf(Array);
         expect(val[0]).toEqual(expectedDoc);
       });
     });
 
-    it('docData should map a QueryDocumentSnapshot to a plain object', async () => {
-      const {davidDoc} = await seedTest(firestore);
+    it("docData should map a QueryDocumentSnapshot to a plain object", async () => {
+      const { davidDoc } = await seedTest(firestore);
 
       // const unwrapped = doc(davidDoc).pipe(unwrap('UID'));
-      const unwrapped = docData(davidDoc, {idField: 'UID'});
+      const unwrapped = docData(davidDoc, { idField: "UID" });
 
       unwrapped.pipe(take(1)).subscribe((val) => {
         const expectedDoc = {
-          name: 'David',
-          UID: 'david',
+          name: "David",
+          UID: "david",
         };
         expect(val).toEqual(expectedDoc);
       });
@@ -178,14 +195,12 @@ describe('RxFire firestore/lite', () => {
      * FIRESTORE (8.5.0) INTERNAL ASSERTION FAILED: Unexpected state
      */
 
-    it('docData matches the result of docSnapShot.data() when the document doesn\'t exist', async () => {
+    it("docData matches the result of docSnapShot.data() when the document doesn't exist", async () => {
       // pending('Not working against the emulator');
 
-      const {colRef} = await seedTest(firestore);
+      const { colRef } = await seedTest(firestore);
 
-      const nonExistentDoc: DocumentReference = firestoreDoc(colRef,
-          createId(),
-      );
+      const nonExistentDoc: DocumentReference = firestoreDoc(colRef, createId());
 
       const unwrapped = docData(nonExistentDoc);
 
@@ -196,7 +211,7 @@ describe('RxFire firestore/lite', () => {
       });
     });
 
-    it('collectionData matches the result of querySnapShot.docs when the collection doesn\'t exist', (done) => {
+    it("collectionData matches the result of querySnapShot.docs when the collection doesn't exist", (done) => {
       // pending('Not working against the emulator');
 
       const nonExistentCollection = firestoreCollection(firestore, createId());
@@ -211,7 +226,7 @@ describe('RxFire firestore/lite', () => {
       });
     });
 
-    it('docData should preserve converter instances when idField is set', (done: jest.DoneCallback) => {
+    it("docData should preserve converter instances when idField is set", (done: jest.DoneCallback) => {
       class Folk {
         constructor(public name: string) {}
         static fromFirestore(snap: QueryDocumentSnapshot) {
@@ -222,46 +237,47 @@ describe('RxFire firestore/lite', () => {
         }
       }
 
-      seedTest(firestore).then(({davidDoc}) => {
-        const unwrapped = docData(davidDoc.withConverter(Folk), {idField: 'UID'});
+      seedTest(firestore).then(({ davidDoc }) => {
+        const unwrapped = docData(davidDoc.withConverter(Folk), { idField: "UID" });
 
         unwrapped.pipe(take(1)).subscribe((val) => {
           expect(val).toBeInstanceOf(Folk);
-          expect(val).toEqual(expect.objectContaining({name: 'David', UID: 'david'}));
+          expect(val).toEqual(expect.objectContaining({ name: "David", UID: "david" }));
           done();
         });
       });
     });
   });
 
-  describe('Aggregations', () => {
-    it('should provide an observable with a count aggregate', async () => {
+  describe("Aggregations", () => {
+    it("should provide an observable with a count aggregate", async () => {
       const colRef = createRandomCol(firestore);
-      const entries = [
-        addDoc(colRef, {id: createId()}),
-        addDoc(colRef, {id: createId()}),
-      ];
+      const entries = [addDoc(colRef, { id: createId() }), addDoc(colRef, { id: createId() })];
       await Promise.all(entries);
 
-      collectionCountSnap(colRef).pipe(take(1)).subscribe((snap) => {
-        expect(snap.data().count).toEqual(entries.length);
-      });
+      collectionCountSnap(colRef)
+        .pipe(take(1))
+        .subscribe((snap) => {
+          expect(snap.data().count).toEqual(entries.length);
+        });
     });
 
-    it('should provide an observable with a count aggregate number', async () => {
+    it("should provide an observable with a count aggregate number", async () => {
       const colRef = createRandomCol(firestore);
       const entries = [
-        addDoc(colRef, {id: createId()}),
-        addDoc(colRef, {id: createId()}),
-        addDoc(colRef, {id: createId()}),
-        addDoc(colRef, {id: createId()}),
-        addDoc(colRef, {id: createId()}),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
+        addDoc(colRef, { id: createId() }),
       ];
       await Promise.all(entries);
 
-      collectionCount(colRef).pipe(take(1)).subscribe((count) => {
-        expect(count).toEqual(entries.length);
-      });
+      collectionCount(colRef)
+        .pipe(take(1))
+        .subscribe((count) => {
+          expect(count).toEqual(entries.length);
+        });
     });
   });
 });

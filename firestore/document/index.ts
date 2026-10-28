@@ -16,14 +16,14 @@
  */
 
 // TODO fix the import
-import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
-import {fromRef} from '../fromRef';
-import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
-import {SnapshotOptions} from 'firebase/firestore';
+import { DocumentReference, DocumentSnapshot, DocumentData } from "../interfaces";
+import { fromRef } from "../fromRef";
+import { map } from "rxjs/operators";
+import { Observable } from "rxjs";
+import { SnapshotOptions } from "firebase/firestore";
 
-export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
-  return fromRef(ref, {includeMetadataChanges: true});
+export function doc<T = DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
+  return fromRef(ref, { includeMetadataChanges: true });
 }
 
 /**
@@ -31,31 +31,31 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * @param query
  * @param options
  */
-export function docData<T=DocumentData, R extends T=T>(
-    ref: DocumentReference<T>,
-    options: {
-      idField?: keyof R,
-    } & SnapshotOptions ={},
+export function docData<T = DocumentData, R extends T = T>(
+  ref: DocumentReference<T>,
+  options: {
+    idField?: keyof R;
+  } & SnapshotOptions = {},
 ): Observable<T | R | undefined> {
   return doc(ref).pipe(map((snap) => snapToData(snap, options)));
 }
 
-export function snapToData<T=DocumentData, R extends T=T>(
-    snapshot: DocumentSnapshot<T>,
-    options: {
-      idField?: keyof R,
-    } & SnapshotOptions ={},
+export function snapToData<T = DocumentData, R extends T = T>(
+  snapshot: DocumentSnapshot<T>,
+  options: {
+    idField?: keyof R;
+  } & SnapshotOptions = {},
 ): T | R | undefined {
   const data = snapshot.data(options);
 
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists() || typeof data !== 'object' || data === null || !options.idField) {
+  if (!snapshot.exists() || typeof data !== "object" || data === null || !options.idField) {
     return data;
   }
 
   // Preserve converter instances and custom prototypes by mutating the original object
   // instead of creating a new one with spread syntax.
-  Object.assign(data, {[options.idField]: snapshot.id});
+  Object.assign(data, { [options.idField]: snapshot.id });
   return data;
 }

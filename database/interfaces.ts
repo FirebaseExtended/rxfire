@@ -15,20 +15,26 @@
  * limitations under the License.
  */
 
-import {onChildAdded, onChildChanged, onChildMoved, onChildRemoved, onValue} from 'firebase/database';
+import {
+  onChildAdded,
+  onChildChanged,
+  onChildMoved,
+  onChildRemoved,
+  onValue,
+} from "firebase/database";
 
-export type Query = import('firebase/database').Query;
+export type Query = import("firebase/database").Query;
 
 export enum ListenEvent {
-  added = 'child_added',
-  removed = 'child_removed',
-  changed = 'child_changed',
-  moved = 'child_moved',
-  value = 'value'
+  added = "child_added",
+  removed = "child_removed",
+  changed = "child_changed",
+  moved = "child_moved",
+  value = "value",
 }
 
 export interface QueryChange {
-  snapshot: import('firebase/database').DataSnapshot;
+  snapshot: import("firebase/database").DataSnapshot;
   prevKey: string | null | undefined;
   event: ListenEvent;
 }

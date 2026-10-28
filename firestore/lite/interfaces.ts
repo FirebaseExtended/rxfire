@@ -1,4 +1,4 @@
-import type * as lite from 'firebase/firestore/lite';
+import type * as lite from "firebase/firestore/lite";
 
 export type DocumentReference<T> = lite.DocumentReference<T>;
 export type DocumentData = lite.DocumentData;

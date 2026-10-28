@@ -15,49 +15,47 @@
  * limitations under the License.
  */
 
-import {Observable, from} from 'rxjs';
-import {map} from 'rxjs/operators';
-import {snapToData} from '../document';
-import {Query, QueryDocumentSnapshot, DocumentData, CountSnapshot} from '../interfaces';
-import {getDocs, getCount} from 'firebase/firestore/lite';
+import { Observable, from } from "rxjs";
+import { map } from "rxjs/operators";
+import { snapToData } from "../document";
+import { Query, QueryDocumentSnapshot, DocumentData, CountSnapshot } from "../interfaces";
+import { getDocs, getCount } from "firebase/firestore/lite";
 
 /**
  * Return a stream of document snapshots on a query. These results are in sort order.
  * @param query
  */
-export function collection<T=DocumentData>(query: Query<T>): Observable<QueryDocumentSnapshot<T>[]> {
-  return from(getDocs<T, DocumentData>(query)).pipe(
-      map((changes) => changes.docs),
-  );
+export function collection<T = DocumentData>(
+  query: Query<T>,
+): Observable<QueryDocumentSnapshot<T>[]> {
+  return from(getDocs<T, DocumentData>(query)).pipe(map((changes) => changes.docs));
 }
 
 /**
  * Returns a stream of documents mapped to their data payload, and optionally the document ID
  * @param query
  */
-export function collectionData<T=DocumentData>(
-    query: Query<T>,
-    options: {
-    idField?: string
-  }={},
+export function collectionData<T = DocumentData>(
+  query: Query<T>,
+  options: {
+    idField?: string;
+  } = {},
 ): Observable<T[]> {
   return collection(query).pipe(
-      map((arr) => {
-        return arr.map((snap) => snapToData(snap, options) as T);
-      }),
+    map((arr) => {
+      return arr.map((snap) => snapToData(snap, options) as T);
+    }),
   );
 }
 
-export function collectionCountSnap<
-  AppModelType = DocumentData
->(query: Query<AppModelType>): Observable<CountSnapshot<AppModelType>> {
+export function collectionCountSnap<AppModelType = DocumentData>(
+  query: Query<AppModelType>,
+): Observable<CountSnapshot<AppModelType>> {
   return from(getCount(query));
 }
 
-export function collectionCount<
-  AppModelType = DocumentData
->(
-    query: Query<AppModelType>,
+export function collectionCount<AppModelType = DocumentData>(
+  query: Query<AppModelType>,
 ): Observable<number> {
   return collectionCountSnap(query).pipe(map((snap) => snap.data().count));
 }

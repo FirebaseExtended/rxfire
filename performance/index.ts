@@ -1,7 +1,7 @@
-import {EMPTY, from, Observable, Subscription} from 'rxjs';
-import {tap} from 'rxjs/operators';
+import { EMPTY, from, Observable, Subscription } from "rxjs";
+import { tap } from "rxjs/operators";
 
-type FirebaseApp = import('firebase/app').FirebaseApp;
+type FirebaseApp = import("firebase/app").FirebaseApp;
 
 /**
  * Lazy loads Firebase Performance monitoring and returns the instance as
@@ -9,9 +9,8 @@ type FirebaseApp = import('firebase/app').FirebaseApp;
  * @param app
  * @returns Observable<FirebasePerformance>
  */
-export const getPerformance$ = (app: FirebaseApp) => from(
-    import('firebase/performance').then((module) => module.getPerformance(app)),
-);
+export const getPerformance$ = (app: FirebaseApp) =>
+  from(import("firebase/performance").then((module) => module.getPerformance(app)));
 
 /**
  * Creates an observable that begins a trace with a given id. The trace is ended
@@ -21,8 +20,8 @@ export const getPerformance$ = (app: FirebaseApp) => from(
  * @returns Observable<void>
  */
 const trace$ = (traceId: string) => {
-  if (typeof window !== 'undefined' && window.performance) {
-    const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
+  if (typeof window !== "undefined" && window.performance) {
+    const entries = window.performance.getEntriesByName(traceId, "measure") || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
     const endMarkName = `_${traceId}End[${entries.length}]`;
     return new Observable<void>((emitter) => {
@@ -47,15 +46,20 @@ const trace$ = (traceId: string) => {
  * @param name
  * @returns (source$: Observable<T>) => Observable<T>
  */
-export const trace = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
-  const traceSubscription = trace$(name).subscribe();
-  return source$.pipe(
-      tap({
-        next: () => traceSubscription.unsubscribe(),
-        complete: () => traceSubscription.unsubscribe(),
-      }),
-  ).subscribe(subscriber);
-});
+export const trace =
+  <T = any>(name: string) =>
+  (source$: Observable<T>) =>
+    new Observable<T>((subscriber) => {
+      const traceSubscription = trace$(name).subscribe();
+      return source$
+        .pipe(
+          tap({
+            next: () => traceSubscription.unsubscribe(),
+            complete: () => traceSubscription.unsubscribe(),
+          }),
+        )
+        .subscribe(subscriber);
+    });
 
 /**
  * Creates a function that creates an observable that begins a trace with a given name. The trace runs until
@@ -65,23 +69,20 @@ export const trace = <T = any>(name: string) => (source$: Observable<T>) => new 
  * @param options
  * @returns (source$: Observable<T>) => Observable<T>
  */
-export const traceUntil = <T = any>(
-  name: string,
-  test: (a: T) => boolean,
-  options?: { orComplete?: boolean },
-) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
-  const traceSubscription = trace$(name).subscribe();
-  return source$
-      .pipe(
+export const traceUntil =
+  <T = any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean }) =>
+  (source$: Observable<T>) =>
+    new Observable<T>((subscriber) => {
+      const traceSubscription = trace$(name).subscribe();
+      return source$
+        .pipe(
           tap({
             next: (value) => test(value) && traceSubscription.unsubscribe(),
-            complete: () =>
-              options &&
-          options.orComplete &&
-          traceSubscription.unsubscribe(),
+            complete: () => options && options.orComplete && traceSubscription.unsubscribe(),
           }),
-      ).subscribe(subscriber);
-});
+        )
+        .subscribe(subscriber);
+    });
 
 /**
  * Creates a function that creates an observable that begins a trace with a given name. The trace runs while
@@ -92,19 +93,17 @@ export const traceUntil = <T = any>(
  * @param options
  * @returns (source$: Observable<T>) => Observable<T>
  */
-export const traceWhile = <T = any>(
-  name: string,
-  test: (a: T) => boolean,
-  options?: { orComplete?: boolean },
-) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
-  let traceSubscription: Subscription | undefined;
-  return source$
-      .pipe(
+export const traceWhile =
+  <T = any>(name: string, test: (a: T) => boolean, options?: { orComplete?: boolean }) =>
+  (source$: Observable<T>) =>
+    new Observable<T>((subscriber) => {
+      let traceSubscription: Subscription | undefined;
+      return source$
+        .pipe(
           tap({
             next: (value) => {
               if (test(value)) {
-                traceSubscription =
-              traceSubscription || trace$(name).subscribe();
+                traceSubscription = traceSubscription || trace$(name).subscribe();
               } else {
                 if (traceSubscription) {
                   traceSubscription.unsubscribe();
@@ -113,13 +112,11 @@ export const traceWhile = <T = any>(
               }
             },
             complete: () =>
-              options &&
-          options.orComplete &&
-          traceSubscription &&
-          traceSubscription.unsubscribe(),
+              options && options.orComplete && traceSubscription && traceSubscription.unsubscribe(),
           }),
-      ).subscribe(subscriber);
-});
+        )
+        .subscribe(subscriber);
+    });
 
 /**
  * Creates a function that creates an observable that begins a trace with a given name. The trace runs until the
@@ -127,14 +124,19 @@ export const traceWhile = <T = any>(
  * @param name
  * @returns (source$: Observable<T>) => Observable<T>
  */
-export const traceUntilComplete = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
-  const traceSubscription = trace$(name).subscribe();
-  return source$.pipe(
-      tap({
-        complete: () => traceSubscription.unsubscribe(),
-      }),
-  ).subscribe(subscriber);
-});
+export const traceUntilComplete =
+  <T = any>(name: string) =>
+  (source$: Observable<T>) =>
+    new Observable<T>((subscriber) => {
+      const traceSubscription = trace$(name).subscribe();
+      return source$
+        .pipe(
+          tap({
+            complete: () => traceSubscription.unsubscribe(),
+          }),
+        )
+        .subscribe(subscriber);
+    });
 
 /**
  * Creates a function that creates an observable that begins a trace with a given name.
@@ -142,11 +144,16 @@ export const traceUntilComplete = <T = any>(name: string) => (source$: Observabl
  * @param name
  * @returns (source$: Observable<T>) => Observable<T>
  */
-export const traceUntilFirst = <T = any>(name: string) => (source$: Observable<T>) => new Observable<T>((subscriber) => {
-  const traceSubscription = trace$(name).subscribe();
-  return source$.pipe(
-      tap({
-        next: () => traceSubscription.unsubscribe(),
-      }),
-  ).subscribe(subscriber);
-});
+export const traceUntilFirst =
+  <T = any>(name: string) =>
+  (source$: Observable<T>) =>
+    new Observable<T>((subscriber) => {
+      const traceSubscription = trace$(name).subscribe();
+      return source$
+        .pipe(
+          tap({
+            next: () => traceSubscription.unsubscribe(),
+          }),
+        )
+        .subscribe(subscriber);
+    });

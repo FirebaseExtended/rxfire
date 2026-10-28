@@ -1,8 +1,8 @@
 {
   "name": "rxfire/performance",
-  "browser": "../dist/performance/index.esm.js",
+  "sideEffects": false,
   "main": "../dist/performance/index.cjs.js",
   "module": "../dist/performance/index.esm.js",
-  "typings": "../dist/performance/index.d.ts",
-  "sideEffects": false
+  "browser": "../dist/performance/index.esm.js",
+  "typings": "../dist/performance/index.d.ts"
 }

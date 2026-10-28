@@ -7,7 +7,7 @@ on:
     paths-ignore:
       - "**/*.md"
   pull_request:
-    branches: 
+    branches:
       - "**"
   release:
     types:
@@ -23,7 +23,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
       - name: node_modules cache
         uses: actions/cache@v4
         id: node_modules_cache
@@ -49,7 +49,7 @@ jobs:
       - name: Build
         id: yarn-pack-dir
         run: ./build.sh
-      - name: 'Upload Artifact'
+      - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
           name: rxfire-${{ github.run_id }}
@@ -77,8 +77,8 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: "temurin"
+          java-version: "21"
       - name: node_modules cache
         id: node_modules_cache
         uses: actions/cache@v4
@@ -120,13 +120,13 @@ jobs:
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: 'Download Artifacts'
+      - name: "Download Artifacts"
         uses: actions/download-artifact@v4
       - name: Run tests
         run: |
           mv rxfire-${{ github.run_id }} dist
           yarn test
-  
+
   lint:
     runs-on: ubuntu-latest
     name: Lint
@@ -166,15 +166,15 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: ['build', 'test']
+    needs: ["build", "test"]
     if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
     steps:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          registry-url: 'https://wombat-dressing-room.appspot.com'
-      - name: 'Download Artifacts'
+          node-version: "20"
+          registry-url: "https://wombat-dressing-room.appspot.com"
+      - name: "Download Artifacts"
         uses: actions/download-artifact@v4
       - name: Publish
         run: |

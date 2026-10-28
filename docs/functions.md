@@ -21,9 +21,7 @@ import { initializeApp } from "firebase/app";
 import { getFunctions } from "firebase/functions";
 
 // Set up Firebase
-const app = initializeApp({
-  /* config */
-});
+const app = initializeApp({/* config */});
 const functions = getFunctions(app);
 
 // Assume an `uppercaser` function is deployed
