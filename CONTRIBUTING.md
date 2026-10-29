@@ -90,6 +90,8 @@ Before you start working on a larger contribution, you should get in touch with 
   npm test
   ```
 
+  We also run a formatter with `yarn fmt`; the repository has a pre-commit hook that will automatically rewrite staged files if they need formatting.
+
 - Push your branch to your fork on GitHub:
 
   ```shell
