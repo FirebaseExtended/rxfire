@@ -78,7 +78,7 @@
     }
   },
   "scripts": {
-    "build": "run-s build:**",
+    "build": "run-s build:clean build:types build:rollup build:docs",
     "build:clean": "rm -rf dist",
     "build:docs": "cp README.md ./dist/ && cp -r ./docs ./dist/",
     "build:rollup": "rollup -c rollup.config.mjs",
