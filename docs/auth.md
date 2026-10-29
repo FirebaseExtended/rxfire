@@ -55,9 +55,11 @@ import { getAuth } from 'firebase/auth';
 import { filter } from 'rxjs/operators';
 
 // Set up Firebase
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const auth = getAuth();
-user(auth).subscribe(u => { console.log(u); );
+user(auth).subscribe((u) => {
+  console.log(u);
+});
 ```
 
 ### `idToken()`
@@ -80,7 +82,9 @@ import { getAuth } from 'firebase/auth';
 import { filter } from 'rxjs/operators';
 
 // Set up Firebase
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const auth = getAuth();
-idToken(auth).subscribe(token => { console.log(token); );
+idToken(auth).subscribe((token) => {
+  console.log(token);
+});
 ```

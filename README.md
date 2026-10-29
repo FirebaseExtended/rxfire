@@ -114,9 +114,9 @@ RxFire is a set of functions. Most functions create observables and from there y
 ```ts
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref } from 'firebase/storage';
-import { getDownloadURL, put /* not used! */ } 'rxfire/storage';
+import { getDownloadURL, put /* not used! */ } from 'rxfire/storage';
 
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const storage = getStorage(app);
 const ref = ref(storage, 'data.json');
 

@@ -66,15 +66,15 @@ import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database
 ref.push({ name: 'David' });
 
-list(ref).subscribe(changes => {
-  changes.forEach(change => {
+list(ref).subscribe((changes) => {
+  changes.forEach((change) => {
     const { snapshot, event, prevKey } = change;
     console.log(event, ' the event that populated the array');
     console.log(prevKey, ' the previous key');
@@ -85,19 +85,32 @@ list(ref).subscribe(changes => {
 // Retrieve the data, key, and event
 list(ref)
   .pipe(
-    map(changes => changes.map(c => {
-      return { _key: c.snapshot.key, event: c.event, ...c.snapshot.val() }
-    })
+    map((changes) =>
+      changes.map((c) => {
+        return {
+          _key: c.snapshot.key,
+          event: c.event,
+          ...c.snapshot.val(),
+        };
+      }),
+    ),
   )
-  .subscribe(users => { console.log(users); })
+  .subscribe((users) => {
+    console.log(users);
+  });
 
 // Listen only to 'child_added' events
-list(ref, { events: [ListenEvent.added] } /* 'child_added' for js */)
-  .subscribe(addedChanges => { console.log(addedChanges); });
+list(ref, { events: [ListenEvent.added] } /* 'child_added' for js */).subscribe((addedChanges) => {
+  console.log(addedChanges);
+});
 
 // Listen only to 'child_added' and 'child_removed' events
-list(ref, { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */)
-  .subscribe(addedChanges => { console.log(addedChanges); });
+list(
+  ref,
+  { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */,
+).subscribe((addedChanges) => {
+  console.log(addedChanges);
+});
 ```
 
 ### `stateChanges()`
@@ -120,38 +133,48 @@ import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const db = getDatabase(app);
 const ref = db.ref('users');
 
 // Seed the database
 ref.push({ name: 'David' });
 
-stateChanges(ref).subscribe(change => {
+stateChanges(ref).subscribe((change) => {
   const { event, snapshot, prevKey } = change;
   console.log(event, ' the event type that just occurred');
   console.log(snapshot.val(), ' the value of the change');
 });
 
 // Retrieve the data, event, and key
-stateChanges(ref).pipe(
-  map(change => {
-    return {
-      _key: change.snapshot.key,
-      event: change.event,
-      ...change.snapshot.val();
-    };
-  })
-).subscribe(data => { console.log(data); });
+stateChanges(ref)
+  .pipe(
+    map((change) => {
+      return {
+        _key: change.snapshot.key,
+        event: change.event,
+        ...change.snapshot.val(),
+      };
+    }),
+  )
+  .subscribe((data) => {
+    console.log(data);
+  });
 
 // Listen only to 'child_added' events
-stateChanges(ref, { events: [ListenEvent.added] } /* 'child_added' for js */)
-  .subscribe(addedChanges => { console.log(addedChanges); });
+stateChanges(ref, { events: [ListenEvent.added] } /* 'child_added' for js */).subscribe(
+  (addedChanges) => {
+    console.log(addedChanges);
+  },
+);
 
 // Listen only to 'child_added' and 'child_removed' events
-stateChanges(ref, { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */)
-  .subscribe(addedChanges => { console.log(addedChanges); });
-
+stateChanges(
+  ref,
+  { events: [ListenEvent.added, ListenEvent.removed] } /* 'child_added', 'child_removed' for js */,
+).subscribe((addedChanges) => {
+  console.log(addedChanges);
+});
 ```
 
 ### `auditTrail()`
@@ -174,7 +197,7 @@ import { getDatabase } from 'firebase/database';
 import { map } from 'rxjs/operators';
 
 // Set up Firebase
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const db = getDatabase(app);
 const ref = db.ref('users');
 
@@ -182,17 +205,19 @@ const ref = db.ref('users');
 const davidRef = ref.push();
 davidRef.set({ name: 'David' });
 
-auditTrail(ref).pipe(
-  map(change => {
-    return {
-      _key: change.snapshot.key,
-      event: change.event,
-      ...change.snapshot.val();
-    };
-  })
-).subscribe(stateTrail => {
-  console.log(stateTrail);
-  /**
+auditTrail(ref)
+  .pipe(
+    map((change) => {
+      return {
+        _key: change.snapshot.key,
+        event: change.event,
+        ...change.snapshot.val(),
+      };
+    }),
+  )
+  .subscribe((stateTrail) => {
+    console.log(stateTrail);
+    /**
   first emission:
     [{ _key: '3qtWqaKga8jA; name: 'David', event: 'child_added' }]
 
@@ -202,7 +227,7 @@ auditTrail(ref).pipe(
       { _key: '3qtWqaKga8jA; name: 'David', event: 'child_removed' }
     ]
   */
-});
+  });
 
 // When more events occur the trail still contains the previous events
 // In this case we'll remove the only item
