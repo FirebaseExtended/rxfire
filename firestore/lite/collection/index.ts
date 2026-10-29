@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { Observable, from } from "rxjs";
-import { map } from "rxjs/operators";
-import { snapToData } from "../document";
-import { Query, QueryDocumentSnapshot, DocumentData, CountSnapshot } from "../interfaces";
-import { getDocs, getCount } from "firebase/firestore/lite";
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { snapToData } from '../document';
+import { Query, QueryDocumentSnapshot, DocumentData, CountSnapshot } from '../interfaces';
+import { getDocs, getCount } from 'firebase/firestore/lite';
 
 /**
  * Return a stream of document snapshots on a query. These results are in sort order.

@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-import { QueryChange, ListenEvent, Query } from "../interfaces";
-import { fromRef } from "../fromRef";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { fromRef } from '../fromRef';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * Get the snapshot changes of an object
@@ -48,7 +48,7 @@ export function changeToData(change: QueryChange, options: { keyField?: string }
   }
 
   // val can be a primitive type
-  if (typeof val !== "object") {
+  if (typeof val !== 'object') {
     return val;
   }
 

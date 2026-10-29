@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-import { Auth } from "firebase/auth";
-import { onAuthStateChanged, onIdTokenChanged, getIdToken } from "firebase/auth";
-import { Observable, from, of } from "rxjs";
-import { switchMap } from "rxjs/operators";
+import { Auth } from 'firebase/auth';
+import { onAuthStateChanged, onIdTokenChanged, getIdToken } from 'firebase/auth';
+import { Observable, from, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 
-type User = import("firebase/auth").User;
+type User = import('firebase/auth').User;
 
 /**
  * Create an observable of authentication state. The observer is only

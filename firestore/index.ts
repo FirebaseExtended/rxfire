@@ -15,6 +15,6 @@
  * limitations under the License.
  */
 
-export * from "./collection";
-export * from "./document";
-export * from "./fromRef";
+export * from './collection';
+export * from './document';
+export * from './fromRef';

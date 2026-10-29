@@ -1,7 +1,7 @@
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs';
 
-type RemoteConfig = import("firebase/remote-config").RemoteConfig;
-type RemoteConfigValue = import("firebase/remote-config").Value;
+type RemoteConfig = import('firebase/remote-config').RemoteConfig;
+type RemoteConfigValue = import('firebase/remote-config').Value;
 
 import {
   ensureInitialized,
@@ -10,7 +10,7 @@ import {
   getNumber as baseGetNumber,
   getBoolean as baseGetBoolean,
   getAll as baseGetAll,
-} from "firebase/remote-config";
+} from 'firebase/remote-config';
 
 export type AllParameters = {
   [key: string]: RemoteConfigValue;
@@ -56,5 +56,5 @@ export function getBoolean(remoteConfig: RemoteConfig, key: string) {
 export function getAll(remoteConfig: RemoteConfig) {
   const getter = baseGetAll;
   // No key is needed for getAll()
-  return parameter$<AllParameters>({ remoteConfig, key: "", getter });
+  return parameter$<AllParameters>({ remoteConfig, key: '', getter });
 }

@@ -16,8 +16,8 @@
  */
 
 // TODO figure out what is wrong with the types...
-import { onSnapshot } from "firebase/firestore";
-import { Observable } from "rxjs";
+import { onSnapshot } from 'firebase/firestore';
+import { Observable } from 'rxjs';
 import {
   DocumentReference,
   DocumentData,
@@ -25,7 +25,7 @@ import {
   Query,
   DocumentSnapshot,
   QuerySnapshot,
-} from "./interfaces";
+} from './interfaces';
 
 const DEFAULT_OPTIONS = { includeMetadataChanges: false };
 

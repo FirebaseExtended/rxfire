@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-import { QueryChange, ListenEvent, Query } from "../interfaces";
-import { Observable, of, merge, from } from "rxjs";
-import { validateEventsArray } from "../utils";
-import { fromRef } from "../fromRef";
-import { switchMap, scan, distinctUntilChanged, map } from "rxjs/operators";
-import { changeToData } from "../object";
-import { get as databaseGet } from "firebase/database";
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { Observable, of, merge, from } from 'rxjs';
+import { validateEventsArray } from '../utils';
+import { fromRef } from '../fromRef';
+import { switchMap, scan, distinctUntilChanged, map } from 'rxjs/operators';
+import { changeToData } from '../object';
+import { get as databaseGet } from 'firebase/database';
 
 export function stateChanges(
   query: Query,

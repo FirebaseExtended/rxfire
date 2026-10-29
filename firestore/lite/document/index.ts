@@ -16,10 +16,10 @@
  */
 
 // TODO fix the import
-import { DocumentReference, DocumentSnapshot, DocumentData } from "../interfaces";
-import { map } from "rxjs/operators";
-import { from, Observable } from "rxjs";
-import { getDoc } from "firebase/firestore/lite";
+import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
+import { map } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { getDoc } from 'firebase/firestore/lite';
 
 export function doc<T = DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return from(getDoc<T, DocumentData>(ref));
@@ -48,7 +48,7 @@ export function snapToData<T = DocumentData>(
   const data = snapshot.data() as any;
   // match the behavior of the JS SDK when the snapshot doesn't exist
   // it's possible with data converters too that the user didn't return an object
-  if (!snapshot.exists() || typeof data !== "object" || data === null) {
+  if (!snapshot.exists() || typeof data !== 'object' || data === null) {
     return data;
   }
   if (options.idField) {

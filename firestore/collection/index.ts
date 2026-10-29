@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { fromRef } from "../fromRef";
+import { fromRef } from '../fromRef';
 import {
   Observable,
   MonoTypeOperatorFunction,
@@ -23,9 +23,9 @@ import {
   pipe,
   UnaryFunction,
   from,
-} from "rxjs";
-import { map, filter, scan, distinctUntilChanged, startWith, pairwise } from "rxjs/operators";
-import { snapToData } from "../document";
+} from 'rxjs';
+import { map, filter, scan, distinctUntilChanged, startWith, pairwise } from 'rxjs/operators';
+import { snapToData } from '../document';
 import {
   DocumentChangeType,
   DocumentChange,
@@ -34,9 +34,9 @@ import {
   QuerySnapshot,
   DocumentData,
   CountSnapshot,
-} from "../interfaces";
-import { SnapshotOptions, getCountFromServer, refEqual } from "firebase/firestore";
-const ALL_EVENTS: DocumentChangeType[] = ["added", "modified", "removed"];
+} from '../interfaces';
+import { SnapshotOptions, getCountFromServer, refEqual } from 'firebase/firestore';
+const ALL_EVENTS: DocumentChangeType[] = ['added', 'modified', 'removed'];
 
 /**
  * Create an operator that determines if a the stream of document changes
@@ -78,7 +78,7 @@ function processIndividualChange<T>(
   change: DocumentChange<T>,
 ): DocumentChange<T>[] {
   switch (change.type) {
-    case "added":
+    case 'added':
       if (
         combined[change.newIndex] &&
         refEqual(combined[change.newIndex].doc.ref, change.doc.ref)
@@ -89,7 +89,7 @@ function processIndividualChange<T>(
         return sliceAndSplice(combined, change.newIndex, 0, change);
       }
       break;
-    case "modified":
+    case 'modified':
       if (
         combined[change.oldIndex] == null ||
         refEqual(combined[change.oldIndex].doc.ref, change.doc.ref)
@@ -106,7 +106,7 @@ function processIndividualChange<T>(
         }
       }
       break;
-    case "removed":
+    case 'removed':
       if (
         combined[change.oldIndex] &&
         refEqual(combined[change.oldIndex].doc.ref, change.doc.ref)
@@ -207,7 +207,7 @@ export function collectionChanges<T = DocumentData>(
           docChanges.push({
             oldIndex: currentIndex,
             newIndex: currentIndex,
-            type: "modified",
+            type: 'modified',
             doc: currentDocSnapshot,
           });
         });

@@ -15,29 +15,29 @@
  * limitations under the License.
  */
 
-import { resolve, dirname, relative, join } from "path";
-import resolveModule from "@rollup/plugin-node-resolve";
-import commonjs from "@rollup/plugin-commonjs";
-import typescript from "@rollup/plugin-typescript";
-import { globSync } from "glob";
-import { readFileSync } from "fs";
-import generatePackageJson from "rollup-plugin-generate-package-json";
+import { resolve, dirname, relative, join } from 'path';
+import resolveModule from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from '@rollup/plugin-typescript';
+import { globSync } from 'glob';
+import { readFileSync } from 'fs';
+import generatePackageJson from 'rollup-plugin-generate-package-json';
 
 const { peerDependencies, dependencies } = JSON.parse(
-  readFileSync("./package.json", { encoding: "utf-8" }),
+  readFileSync('./package.json', { encoding: 'utf-8' }),
 );
-const packageJsonPaths = globSync("**/package.json", {
-  ignore: ["node_modules/**", "dist/**", "test/**"],
+const packageJsonPaths = globSync('**/package.json', {
+  ignore: ['node_modules/**', 'dist/**', 'test/**'],
 });
 const packages = packageJsonPaths.reduce((acc, path) => {
-  const pkg = JSON.parse(readFileSync(path, { encoding: "utf-8" }));
+  const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8' }));
   const component = dirname(path);
-  if (component === ".") {
+  if (component === '.') {
     Object.keys(pkg.exports).forEach((exportName) => {
-      pkg.exports[exportName].import = pkg.exports[exportName].import.replace(/^\.\/dist\//, "./");
+      pkg.exports[exportName].import = pkg.exports[exportName].import.replace(/^\.\/dist\//, './');
       pkg.exports[exportName].require = pkg.exports[exportName].require.replace(
         /^\.\/dist\//,
-        "./",
+        './',
       );
     });
   }
@@ -49,23 +49,23 @@ const plugins = [resolveModule(), commonjs()];
 
 const external = [
   ...Object.keys({ ...peerDependencies, ...dependencies }),
-  "firebase/firestore",
-  "firebase/firestore/lite",
-  "firebase/auth",
-  "firebase/functions",
-  "firebase/storage",
-  "firebase/database",
-  "firebase/remote-config",
-  "firebase/performance",
-  "@firebase/firestore",
-  "@firebase/firestore/lite",
-  "@firebase/auth",
-  "@firebase/functions",
-  "@firebase/storage",
-  "@firebase/database",
-  "@firebase/remote-config",
-  "@firebase/performance",
-  "rxjs/operators",
+  'firebase/firestore',
+  'firebase/firestore/lite',
+  'firebase/auth',
+  'firebase/functions',
+  'firebase/storage',
+  'firebase/database',
+  'firebase/remote-config',
+  'firebase/performance',
+  '@firebase/firestore',
+  '@firebase/firestore/lite',
+  '@firebase/auth',
+  '@firebase/functions',
+  '@firebase/storage',
+  '@firebase/database',
+  '@firebase/remote-config',
+  '@firebase/performance',
+  'rxjs/operators',
 ];
 
 export default Object.keys(packages)
@@ -74,12 +74,12 @@ export default Object.keys(packages)
     const { browser, main, module, typings } = baseContents;
     // rewrite the paths for dist folder
     // TODO error if any of these don't match convention
-    const outputFolder = join("dist", component);
+    const outputFolder = join('dist', component);
     baseContents.browser = relative(outputFolder, resolve(component, browser));
     baseContents.main = relative(outputFolder, resolve(component, main));
     baseContents.module = relative(outputFolder, resolve(component, module));
     baseContents.typings = relative(outputFolder, resolve(component, typings));
-    if (component === ".") {
+    if (component === '.') {
       baseContents.scripts = {};
       delete baseContents.files;
       baseContents.devDependencies = {};
@@ -91,15 +91,15 @@ export default Object.keys(packages)
         output: [
           {
             file: resolve(component, main),
-            format: "cjs",
+            format: 'cjs',
             dynamicImportInCjs: false,
             esModule: true,
-            interop: "auto",
+            interop: 'auto',
             sourcemap: true,
           },
           {
             file: resolve(component, module),
-            format: "es",
+            format: 'es',
             sourcemap: true,
           },
         ],

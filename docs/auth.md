@@ -16,16 +16,16 @@ The `authState()` function creates an observable that emits authentication chang
 #### TypeScript Example
 
 ```ts
-import { authState } from "rxfire/auth";
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { filter } from "rxjs/operators";
+import { authState } from 'rxfire/auth';
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { filter } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const auth = getAuth();
 authState(auth).subscribe((user) => {
-  console.log(user, " will be null if logged out");
+  console.log(user, ' will be null if logged out');
 });
 
 // Listen only for logged in state

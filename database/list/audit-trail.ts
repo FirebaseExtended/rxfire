@@ -15,11 +15,11 @@
  * limitations under the License.
  */
 
-import { Observable } from "rxjs";
-import { QueryChange, ListenEvent, Query } from "../interfaces";
-import { fromRef } from "../fromRef";
-import { map, withLatestFrom, scan, skipWhile } from "rxjs/operators";
-import { stateChanges } from "./index";
+import { Observable } from 'rxjs';
+import { QueryChange, ListenEvent, Query } from '../interfaces';
+import { fromRef } from '../fromRef';
+import { map, withLatestFrom, scan, skipWhile } from 'rxjs/operators';
+import { stateChanges } from './index';
 
 interface LoadedMetadata {
   data: QueryChange;

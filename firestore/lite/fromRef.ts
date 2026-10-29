@@ -1,12 +1,12 @@
-import { getDoc, getDocs } from "firebase/firestore/lite";
-import { from, Observable } from "rxjs";
+import { getDoc, getDocs } from 'firebase/firestore/lite';
+import { from, Observable } from 'rxjs';
 import {
   DocumentReference,
   DocumentData,
   Query,
   DocumentSnapshot,
   QuerySnapshot,
-} from "./interfaces";
+} from './interfaces';
 
 export function fromRef<T = DocumentData>(
   ref: DocumentReference<T>,
@@ -15,7 +15,7 @@ export function fromRef<T = DocumentData>(ref: Query<T>): Observable<QuerySnapsh
 export function fromRef<T = DocumentData>(
   ref: DocumentReference<T> | Query<T>,
 ): Observable<DocumentSnapshot<T> | QuerySnapshot<T>> {
-  if (ref.type === "document") {
+  if (ref.type === 'document') {
     return from(getDoc<T, DocumentData>(ref));
   } else {
     return from(getDocs<T, DocumentData>(ref));

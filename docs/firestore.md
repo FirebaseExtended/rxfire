@@ -14,17 +14,17 @@ The `doc()` function creates an observable that emits document changes. Returns 
 #### TypeScript Example
 
 ```ts
-import { doc } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { doc } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const davidDocRef = doc(db, "users/david");
+const davidDocRef = doc(db, 'users/david');
 
 // Seed the firestore
-setDoc(davidDocRef, { name: "David" });
+setDoc(davidDocRef, { name: 'David' });
 
 doc(davidDocRef).subscribe((snapshot) => {
   console.log(snapshot.id);
@@ -46,19 +46,19 @@ The `docData()` function creates an observable that returns a stream of a docume
 #### TypeScript Example
 
 ```ts
-import { docData } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
+import { docData } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const davidDocRef = doc(db, "users/david");
+const davidDocRef = doc(db, 'users/david');
 
 // Seed the firestore
-setDoc(davidDocRef, { name: "David" });
+setDoc(davidDocRef, { name: 'David' });
 
-docData(davidDocRef, { idField: "uid" }).subscribe((userData) => {
+docData(davidDocRef, { idField: 'uid' }).subscribe((userData) => {
   console.log(`${userData.name} has id ${userData.uid}`);
 });
 ```
@@ -79,14 +79,14 @@ The `collection()` function creates an observable that emits changes to the spec
 #### TypeScript Example
 
 ```ts
-import { collection } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection } from "firebase/firestore";
+import { collection } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
+const collectionRef = collection(db, 'users');
 
 collection(collectionRef)
   .pipe(map((docs) => docs.map((d) => d.data())))
@@ -109,16 +109,16 @@ The `collectionData()` function creates an observable that emits a stream of doc
 #### TypeScript Example
 
 ```ts
-import { collectionData } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection } from "firebase/firestore";
+import { collectionData } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
+const collectionRef = collection(db, 'users');
 
-collectionData(collectionRef, { idField: "uid" }).subscribe((users) => {
+collectionData(collectionRef, { idField: 'uid' }).subscribe((users) => {
   console.log(users);
 });
 ```
@@ -137,15 +137,15 @@ The `collectionChanges()` function creates an observable that emits the changes 
 #### TypeScript Example
 
 ```ts
-import { collectionChanges } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection } from "firebase/firestore";
-import { map } from "rxjs/operators";
+import { collectionChanges } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
+const collectionRef = collection(db, 'users');
 
 // Listen to all events
 collectionChanges(collectionRef).subscribe((changes) => {
@@ -153,7 +153,7 @@ collectionChanges(collectionRef).subscribe((changes) => {
 });
 
 // Listen to only 'added' events
-collectionChanges(collectionRef, { events: ["added"] }).subscribe((addedEvents) => {
+collectionChanges(collectionRef, { events: ['added'] }).subscribe((addedEvents) => {
   console.log(addedEvents);
 });
 ```
@@ -172,15 +172,15 @@ The `sortedChanges()` function creates an observable that emits the reduced stat
 #### TypeScript Example
 
 ```ts
-import { sortedChanges } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection } from "firebase/firestore";
-import { map } from "rxjs/operators";
+import { sortedChanges } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
+const collectionRef = collection(db, 'users');
 
 // Listen to all events
 sortedChanges(collectionRef).subscribe((changes) => {
@@ -188,7 +188,7 @@ sortedChanges(collectionRef).subscribe((changes) => {
 });
 
 // Listen to only 'added' events
-docChanges(collectionRef, { events: ["added"] }).subscribe((addedEvents) => {
+docChanges(collectionRef, { events: ['added'] }).subscribe((addedEvents) => {
   console.log(addedEvents);
 });
 ```
@@ -207,16 +207,16 @@ The `auditTrail()` function creates an observable that emits the entire state tr
 #### TypeScript Example
 
 ```ts
-import { auditTrail } from "rxfire/firestore";
-import { firestore } from "firebase";
-import { getFirestore, collection, doc, setDoc, deleteDoc } from "firebase/firestore";
-import { map } from "rxjs/operators";
+import { auditTrail } from 'rxfire/firestore';
+import { firestore } from 'firebase';
+import { getFirestore, collection, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
-const davidDocRef = doc(collectionRef, "david");
+const collectionRef = collection(db, 'users');
+const davidDocRef = doc(collectionRef, 'david');
 
 // Start the audit trail
 auditTrail(collectionRef)
@@ -234,7 +234,7 @@ auditTrail(collectionRef)
   });
 
 // Seed Firestore
-setDoc(davidDocRef, { name: "David" });
+setDoc(davidDocRef, { name: 'David' });
 
 // Remove the document
 deleteDoc(davidDocRef);
@@ -267,14 +267,14 @@ Create an observable that emits the server-calculated number of documents in a c
 #### TypeScript Example
 
 ```ts
-import { collectionCount } from "rxfire/firestore";
+import { collectionCount } from 'rxfire/firestore';
 // Also available in firestore/lite
-import { collectionCount } from "rxfire/firestore/lite";
+import { collectionCount } from 'rxfire/firestore/lite';
 
-import { getFirestore, collection } from "firebase/firestore";
+import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
-const likesCol = collection(db, "posts/post_id_123/likes");
+const likesCol = collection(db, 'posts/post_id_123/likes');
 
 collectionCount(likesCol).subscribe((count) => {
   console.log(count);
@@ -284,13 +284,13 @@ collectionCount(likesCol).subscribe((count) => {
 Note that the observable will complete after the first fetch. This is not a long-lived subscription. To update the count value over time, use the `repeat` operator:
 
 ```ts
-import { repeat } from "rxjs";
+import { repeat } from 'rxjs';
 
-import { collectionCount } from "rxfire/firestore";
-import { getFirestore, collection } from "firebase/firestore";
+import { collectionCount } from 'rxfire/firestore';
+import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
-const likesCol = collection(db, "posts/post_id_123/likes");
+const likesCol = collection(db, 'posts/post_id_123/likes');
 
 collectionCount(likesCol)
   .pipe(
@@ -317,13 +317,13 @@ Create an observable that emits the server-calculated number of documents in a c
 #### TypeScript Example
 
 ```ts
-import { collectionCountSnap } from "rxfire/firestore";
+import { collectionCountSnap } from 'rxfire/firestore';
 // Also available in firestore/lite
-import { collectionCountSnap } from "rxfire/firestore/lite";
-import { getFirestore, collection } from "firebase/firestore";
+import { collectionCountSnap } from 'rxfire/firestore/lite';
+import { getFirestore, collection } from 'firebase/firestore';
 
 const db = getFirestore();
-const likesCol = collection(db, "posts/post_id_123/likes");
+const likesCol = collection(db, 'posts/post_id_123/likes');
 
 // One version with the snapshot
 countSnap$(likesCol).subscribe((snapshot) => {
@@ -347,18 +347,18 @@ The `fromDocRef()` function creates an observable that emits document changes. T
 #### TypeScript Example
 
 ```ts
-import { fromDocRef } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, setDoc } from "firebase/firestore";
-import { map } from "rxjs/operators";
+import { fromDocRef } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, setDoc } from 'firebase/firestore';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const davidDocRef = doc(db, "users/david");
+const davidDocRef = doc(db, 'users/david');
 
 // Seed Firestore
-setDoc(davidDocRef, { name: "David" });
+setDoc(davidDocRef, { name: 'David' });
 
 fromDocRef(davidDocRef).subscribe((snap) => {
   console.log(snap);
@@ -379,15 +379,15 @@ The `fromCollectionRef()` function creates an observable that emits changes to t
 #### TypeScript Example
 
 ```ts
-import { fromCollectionRef } from "rxfire/firestore";
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection } from "firebase/firestore";
-import { map } from "rxjs/operators";
+import { fromCollectionRef } from 'rxfire/firestore';
+import { initializeApp } from 'firebase/app';
+import { getFirestore, collection } from 'firebase/firestore';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getFirestore(app);
-const collectionRef = collection(db, "users");
+const collectionRef = collection(db, 'users');
 
 fromCollectionRef(collectionRef).subscribe((snap) => {
   console.log(snap.docs);

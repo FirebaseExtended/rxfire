@@ -16,24 +16,24 @@ The `object()` function creates an observable that emits object changes.
 #### TypeScript Example
 
 ```ts
-import { object } from "rxfire/database";
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
-import { map } from "rxjs/operators";
+import { object } from 'rxfire/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getDatabase(app);
-const ref = db.ref("users/david");
+const ref = db.ref('users/david');
 
 // Seed the database
-ref.set({ name: "David" });
+ref.set({ name: 'David' });
 
 object(ref).subscribe((change) => {
   const { event, snapshot, prevKey } = change;
-  console.log(event, " will always be value");
-  console.log(prevKey, " the previous key");
-  console.log(snapshot.val(), " this is the data");
+  console.log(event, ' will always be value');
+  console.log(prevKey, ' the previous key');
+  console.log(snapshot.val(), ' this is the data');
 });
 
 // Retrieve the data and key
@@ -225,19 +225,19 @@ The `fromRef()` function creates an observable that emits reference changes.
 #### TypeScript Example
 
 ```ts
-import { fromRef, ListenEvent } from "rxfire/database";
-import { initializeApp } from "firebase/app";
-import { getDatabase } from "firebase/database";
-import { merge } from "rxjs";
-import { map } from "rxjs/operators";
+import { fromRef, ListenEvent } from 'rxfire/database';
+import { initializeApp } from 'firebase/app';
+import { getDatabase } from 'firebase/database';
+import { merge } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 // Set up Firebase
 const app = initializeApp({/* config */});
 const db = getDatabase(app);
-const ref = db.ref("users");
+const ref = db.ref('users');
 
 // Seed the database
-ref.child("david").set({ name: "David" });
+ref.child('david').set({ name: 'David' });
 
 // Subscribe to events
 fromRef(ref, ListenEvent.value /* 'value' for js users */).subscribe((change) => {

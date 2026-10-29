@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ListenEvent } from "./interfaces";
+import { ListenEvent } from './interfaces';
 
 /**
  * Check the length of the provided array. If it is empty return an array

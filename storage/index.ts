@@ -3,9 +3,9 @@ import {
   getMetadata as _getMetadata,
   uploadBytesResumable as _uploadBytesResumable,
   uploadString as _uploadString,
-} from "firebase/storage";
-import { Observable, from } from "rxjs";
-import { map, shareReplay } from "rxjs/operators";
+} from 'firebase/storage';
+import { Observable, from } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 import type {
   UploadTaskSnapshot,
@@ -16,7 +16,7 @@ import type {
   UploadResult,
   FullMetadata,
   StorageError,
-} from "firebase/storage";
+} from 'firebase/storage';
 
 export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>((subscriber) => {
@@ -57,7 +57,7 @@ export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
     emit(task.snapshot);
 
     // Take each update and schedule them to be emitted (see `emit`)
-    subscriber.add(task.on("state_changed", emit) as () => void);
+    subscriber.add(task.on('state_changed', emit) as () => void);
 
     // task is a promise, so we can convert that to an observable,
     // this is done for the ergonomics around making sure we don't

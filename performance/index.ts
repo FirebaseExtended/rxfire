@@ -1,7 +1,7 @@
-import { EMPTY, from, Observable, Subscription } from "rxjs";
-import { tap } from "rxjs/operators";
+import { EMPTY, from, Observable, Subscription } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
-type FirebaseApp = import("firebase/app").FirebaseApp;
+type FirebaseApp = import('firebase/app').FirebaseApp;
 
 /**
  * Lazy loads Firebase Performance monitoring and returns the instance as
@@ -10,7 +10,7 @@ type FirebaseApp = import("firebase/app").FirebaseApp;
  * @returns Observable<FirebasePerformance>
  */
 export const getPerformance$ = (app: FirebaseApp) =>
-  from(import("firebase/performance").then((module) => module.getPerformance(app)));
+  from(import('firebase/performance').then((module) => module.getPerformance(app)));
 
 /**
  * Creates an observable that begins a trace with a given id. The trace is ended
@@ -20,8 +20,8 @@ export const getPerformance$ = (app: FirebaseApp) =>
  * @returns Observable<void>
  */
 const trace$ = (traceId: string) => {
-  if (typeof window !== "undefined" && window.performance) {
-    const entries = window.performance.getEntriesByName(traceId, "measure") || [];
+  if (typeof window !== 'undefined' && window.performance) {
+    const entries = window.performance.getEntriesByName(traceId, 'measure') || [];
     const startMarkName = `_${traceId}Start[${entries.length}]`;
     const endMarkName = `_${traceId}End[${entries.length}]`;
     return new Observable<void>((emitter) => {

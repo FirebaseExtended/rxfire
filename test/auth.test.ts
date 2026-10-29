@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { default as config, resolvedAuthEmulatorPort } from "./config";
-import { initializeApp, FirebaseApp } from "firebase/app";
-import { getAuth, Auth, connectAuthEmulator, signInAnonymously } from "firebase/auth";
-import { authState } from "../dist/auth";
-import { skip, take } from "rxjs/operators";
+import { default as config, resolvedAuthEmulatorPort } from './config';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth, connectAuthEmulator, signInAnonymously } from 'firebase/auth';
+import { authState } from '../dist/auth';
+import { skip, take } from 'rxjs/operators';
 
-describe("RxFire Auth", () => {
+describe('RxFire Auth', () => {
   let app: FirebaseApp;
   let auth: Auth;
 
@@ -32,8 +32,8 @@ describe("RxFire Auth", () => {
     });
   });
 
-  describe("Authentication state", () => {
-    it("should initially be unauthenticated", (done) => {
+  describe('Authentication state', () => {
+    it('should initially be unauthenticated', (done) => {
       authState(auth)
         .pipe(take(1))
         .subscribe((state) => {
@@ -42,7 +42,7 @@ describe("RxFire Auth", () => {
         .add(done);
     });
 
-    it("should trigger an authenticated state", (done) => {
+    it('should trigger an authenticated state', (done) => {
       authState(auth)
         .pipe(skip(1), take(1))
         .subscribe((state) => {
