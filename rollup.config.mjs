@@ -23,15 +23,22 @@ import { globSync } from 'glob';
 import { readFileSync } from 'fs';
 import generatePackageJson from 'rollup-plugin-generate-package-json';
 
-const { peerDependencies, dependencies } = JSON.parse(readFileSync('./package.json', { encoding: 'utf-8' }));
-const packageJsonPaths = globSync('**/package.json', { ignore: ['node_modules/**', 'dist/**', 'test/**'] });
+const { peerDependencies, dependencies } = JSON.parse(
+  readFileSync('./package.json', { encoding: 'utf-8' }),
+);
+const packageJsonPaths = globSync('**/package.json', {
+  ignore: ['node_modules/**', 'dist/**', 'test/**'],
+});
 const packages = packageJsonPaths.reduce((acc, path) => {
-  const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8'} ));
+  const pkg = JSON.parse(readFileSync(path, { encoding: 'utf-8' }));
   const component = dirname(path);
   if (component === '.') {
-    Object.keys(pkg.exports).forEach(exportName => {
+    Object.keys(pkg.exports).forEach((exportName) => {
       pkg.exports[exportName].import = pkg.exports[exportName].import.replace(/^\.\/dist\//, './');
-      pkg.exports[exportName].require = pkg.exports[exportName].require.replace(/^\.\/dist\//, './');
+      pkg.exports[exportName].require = pkg.exports[exportName].require.replace(
+        /^\.\/dist\//,
+        './',
+      );
     });
   }
   acc[component] = pkg;
@@ -58,11 +65,11 @@ const external = [
   '@firebase/database',
   '@firebase/remote-config',
   '@firebase/performance',
-  'rxjs/operators'
+  'rxjs/operators',
 ];
 
 export default Object.keys(packages)
-  .map(component => {
+  .map((component) => {
     const baseContents = packages[component];
     const { browser, main, module, typings } = baseContents;
     // rewrite the paths for dist folder
@@ -88,13 +95,13 @@ export default Object.keys(packages)
             dynamicImportInCjs: false,
             esModule: true,
             interop: 'auto',
-            sourcemap: true
+            sourcemap: true,
           },
           {
             file: resolve(component, module),
             format: 'es',
-            sourcemap: true
-          }
+            sourcemap: true,
+          },
         ],
         plugins: [
           ...plugins,
@@ -102,7 +109,8 @@ export default Object.keys(packages)
           typescript({ sourceMap: false, compilerOptions: { declaration: false } }),
           generatePackageJson({ outputFolder, baseContents }),
         ],
-        external
+        external,
       },
     ];
-  }).flat();
+  })
+  .flat();

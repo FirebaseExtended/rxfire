@@ -20,7 +20,15 @@ const resolvedEmulatorHubResponse = (async () => {
 })();
 
 export const resolvedAuthEmulatorPort = resolvedEmulatorHubResponse.then((it) => it.auth.port);
-export const resolvedDatabaseEmulatorPort = resolvedEmulatorHubResponse.then((it) => it.database.port);
-export const resolvedFirestoreEmulatorPort = resolvedEmulatorHubResponse.then((it) => it.firestore.port);
-export const resolvedStorageEmulatorPort = resolvedEmulatorHubResponse.then((it) => it.storage.port);
-export const resolvedFunctionsEmulatorPort = resolvedEmulatorHubResponse.then((it) => it.functions.port);
+export const resolvedDatabaseEmulatorPort = resolvedEmulatorHubResponse.then(
+  (it) => it.database.port,
+);
+export const resolvedFirestoreEmulatorPort = resolvedEmulatorHubResponse.then(
+  (it) => it.firestore.port,
+);
+export const resolvedStorageEmulatorPort = resolvedEmulatorHubResponse.then(
+  (it) => it.storage.port,
+);
+export const resolvedFunctionsEmulatorPort = resolvedEmulatorHubResponse.then(
+  (it) => it.functions.port,
+);

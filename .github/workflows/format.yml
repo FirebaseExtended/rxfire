@@ -1,0 +1,29 @@
+name: Format
+
+on:
+  pull_request:
+  push:
+    branches:
+      - '**'
+
+permissions: {}
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    name: Formatting Check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile --prefer-offline
+
+      - name: Check formatting
+        run: yarn fmt:check

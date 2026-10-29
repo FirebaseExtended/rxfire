@@ -31,18 +31,15 @@ import { getFirestore, collection, where, query } from 'firebase/firestore';
 import { collectionData } from 'rxfire/firestore';
 import { tap } from 'rxjs/operators';
 
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const firestore = getFirestore(app);
-const citiesRef = query(
-    collection(firestore, 'cities'),
-    where('state', '==', 'CO')
-);
+const citiesRef = query(collection(firestore, 'cities'), where('state', '==', 'CO'));
 
 collectionData(citiesRef, { idField: 'id' })
-  .pipe(
-    tap(cities => console.log('This is just an observable!'))
-  )
-  .subscribe(cities => { /* update UI */ })
+  .pipe(tap((cities) => console.log('This is just an observable!')))
+  .subscribe((cities) => {
+    /* update UI */
+  });
 ```
 
 ## Easily combine multiple Firebase data sources
@@ -60,25 +57,24 @@ import { getDownloadURL } from 'rxfire/storage';
 import { combineLatest } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const firestore = getFirestore(app);
 const storage = getStorage(app);
-const citiesRef = query(
-    collection(firestore, 'cities'),
-    where('state', '==', 'CO')
-);
+const citiesRef = query(collection(firestore, 'cities'), where('state', '==', 'CO'));
 
 collectionData(citiesRef, { idField: 'id' })
   .pipe(
-    switchMap(cities => {
-      return combineLatest(...cities.map(c => {
-        const ref = ref(storage, `/cities/${c.id}.png`);
-        return getDownloadURL(ref).pipe(map(imageURL => ({ imageURL, ...c })));
-      }));
-    })
+    switchMap((cities) => {
+      return combineLatest(
+        ...cities.map((c) => {
+          const ref = ref(storage, `/cities/${c.id}.png`);
+          return getDownloadURL(ref).pipe(map((imageURL) => ({ imageURL, ...c })));
+        }),
+      );
+    }),
   )
-  .subscribe(cities => {
-    cities.forEach(c => console.log(c.imageURL));
+  .subscribe((cities) => {
+    cities.forEach((c) => console.log(c.imageURL));
   });
 ```
 
@@ -91,7 +87,7 @@ import { initializeApp } from 'firebase/app';
 import { getStorage, ref } from 'firebase/storage';
 import { getDownloadURL } from 'rxfire/storage';
 
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const storage = getStorage(app);
 const ref = ref(storage, 'data.json');
 
@@ -102,24 +98,25 @@ const url$ = getDownloadURL(ref);
 RxFire contains multiple entry points for module imports. Each Firebase library is an entry point.
 
 ```ts
-import { } from 'rxfire/firestore';
-import { } from 'rxfire/database';
-import { } from 'rxfire/storage';
-import { } from 'rxfire/auth';
-import { } from 'rxfire/functions';
-import { } from 'rxfire/performance';
-import { } from 'rxfire/remote-config';
+import {} from 'rxfire/firestore';
+import {} from 'rxfire/database';
+import {} from 'rxfire/storage';
+import {} from 'rxfire/auth';
+import {} from 'rxfire/functions';
+import {} from 'rxfire/performance';
+import {} from 'rxfire/remote-config';
 ```
 
 ## Simple functions
+
 RxFire is a set of functions. Most functions create observables and from there you can use regular RxJS operators. Some functions are custom operators. But at the end of the day, it's all just functions. This is important for **tree shaking**. Any unused functions are stripped from your final build if you use a module bundler like Webpack or Rollup.
 
 ```ts
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref } from 'firebase/storage';
-import { getDownloadURL, put /* not used! */ } 'rxfire/storage';
+import { getDownloadURL, put /* not used! */ } from 'rxfire/storage';
 
-const app = initializeApp({ /* config */ });
+const app = initializeApp({/* config */});
 const storage = getStorage(app);
 const ref = ref(storage, 'data.json');
 

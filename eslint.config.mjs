@@ -10,10 +10,7 @@ export default defineConfig([
   },
   {
     name: 'ESLint JS - Recommended',
-    extends: [
-      eslint.configs.recommended,
-      ...tseslint.configs.recommended,
-    ],
+    extends: [eslint.configs.recommended, ...tseslint.configs.recommended],
   },
   {
     name: 'Project - TypeScript',

@@ -16,17 +16,30 @@
  */
 
 // TODO figure out what is wrong with the types...
-import {onSnapshot} from 'firebase/firestore';
-import {Observable} from 'rxjs';
-import {DocumentReference, DocumentData, SnapshotListenOptions, Query, DocumentSnapshot, QuerySnapshot} from './interfaces';
+import { onSnapshot } from 'firebase/firestore';
+import { Observable } from 'rxjs';
+import {
+  DocumentReference,
+  DocumentData,
+  SnapshotListenOptions,
+  Query,
+  DocumentSnapshot,
+  QuerySnapshot,
+} from './interfaces';
 
-const DEFAULT_OPTIONS = {includeMetadataChanges: false};
+const DEFAULT_OPTIONS = { includeMetadataChanges: false };
 
-export function fromRef<T=DocumentData>(ref: DocumentReference<T>, options?: SnapshotListenOptions): Observable<DocumentSnapshot<T>>;
-export function fromRef<T=DocumentData>(ref: Query<T>, options?: SnapshotListenOptions): Observable<QuerySnapshot<T>>;
+export function fromRef<T = DocumentData>(
+  ref: DocumentReference<T>,
+  options?: SnapshotListenOptions,
+): Observable<DocumentSnapshot<T>>;
+export function fromRef<T = DocumentData>(
+  ref: Query<T>,
+  options?: SnapshotListenOptions,
+): Observable<QuerySnapshot<T>>;
 export function fromRef(
-    ref: any,
-    options: SnapshotListenOptions=DEFAULT_OPTIONS,
+  ref: any,
+  options: SnapshotListenOptions = DEFAULT_OPTIONS,
 ): Observable<any> {
   return new Observable((subscriber) => {
     const unsubscribe = onSnapshot(ref, options, {
@@ -34,6 +47,6 @@ export function fromRef(
       error: subscriber.error.bind(subscriber),
       complete: subscriber.complete.bind(subscriber),
     });
-    return {unsubscribe};
+    return { unsubscribe };
   });
 }

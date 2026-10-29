@@ -2,11 +2,11 @@
 
 We'd love for you to contribute to our source code and to help make RxFire even better than it is today! Here are the guidelines we'd like you to follow:
 
- - [Code of Conduct](#coc)
- - [Question or Problem?](#question)
- - [Issues and Bugs](#issue)
- - [Feature Requests](#feature)
- - [Submission Guidelines](#submit)
+- [Code of Conduct](#coc)
+- [Question or Problem?](#question)
+- [Issues and Bugs](#issue)
+- [Feature Requests](#feature)
+- [Submission Guidelines](#submit)
 
 ## <a name="coc"></a> Code of Conduct
 
@@ -18,7 +18,7 @@ We promise to extend courtesy and respect to everyone involved in this project r
 
 If any member of the community violates this code of conduct, the maintainers of the RxFire project may take action, removing issues, comments, and PRs or blocking accounts as deemed appropriate.
 
-If you are subject to or witness unacceptable behavior, or have any other concerns, please drop us a line at firebase-code-of-conduct@google.com. 
+If you are subject to or witness unacceptable behavior, or have any other concerns, please drop us a line at firebase-code-of-conduct@google.com.
 
 ## <a name="question"></a> Got a Question?
 
@@ -32,22 +32,22 @@ See [below](#submit) for some guidelines.
 
 ## <a name="other-issue"></a> Production Issues
 
-If you have a production issue, please [contact Firebase support][support] who will work with you to resolve the issue. 
+If you have a production issue, please [contact Firebase support][support] who will work with you to resolve the issue.
 
 ## <a name="submit"></a> Submission Guidelines
 
 ### Submitting an Issue
 
-Before you submit your issue, try searching [past issues][archive], [StackOverflow][stackoverflow], and the [Firebase Google Group][firebase-google-group] for issues similar to your own. You can help us to maximize the effort we spend fixing issues, and adding new features, by not reporting duplicate issues. 
+Before you submit your issue, try searching [past issues][archive], [StackOverflow][stackoverflow], and the [Firebase Google Group][firebase-google-group] for issues similar to your own. You can help us to maximize the effort we spend fixing issues, and adding new features, by not reporting duplicate issues.
 
 If your issue appears to be a bug, and hasn't been reported, open a new issue. Providing the following information will increase the chances of your issue being dealt with quickly:
 
-* **Description of the Issue** - if an error is being thrown a non-minified stack trace helps
-* **Motivation for or Use Case** - explain why this is a bug for you
-* **Related Issues** - has a similar issue been reported before?
-* **Environment Configuration** - is this a problem with Node.js, or only a specific browser? Is this only in a specific version of the SDK?
-* **Reproduce the Error** - provide a live example (like [JSBin][jsbin]), a Github repo, or an unambiguous set of steps
-* **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be causing the problem (line of code or commit)
+- **Description of the Issue** - if an error is being thrown a non-minified stack trace helps
+- **Motivation for or Use Case** - explain why this is a bug for you
+- **Related Issues** - has a similar issue been reported before?
+- **Environment Configuration** - is this a problem with Node.js, or only a specific browser? Is this only in a specific version of the SDK?
+- **Reproduce the Error** - provide a live example (like [JSBin][jsbin]), a Github repo, or an unambiguous set of steps
+- **Suggest a Fix** - if you can't fix the bug yourself, perhaps you can point to what might be causing the problem (line of code or commit)
 
 There is an issue template provided to help capture all of this information. Following the template will also help us to route your issue to the appropriate teams faster, helping us to better help you!
 
@@ -65,38 +65,41 @@ Before you start working on a larger contribution, you should get in touch with 
 
 #### Pull Request Guidelines
 
-* Search [GitHub](https://github.com/firebaseextended/rxfire/pulls) for an open or closed Pull Request that relates to your submission. You don't want to duplicate effort.
-* Create an issue to discuss a change before submitting a PR. We'd hate to have to turn down your contributions because of something that could have been communicated early on.
-* [Create a fork of the GitHub repo][fork-repo] to ensure that you can push your changes for us to review.
-* Make your changes in a new git branch:
+- Search [GitHub](https://github.com/firebaseextended/rxfire/pulls) for an open or closed Pull Request that relates to your submission. You don't want to duplicate effort.
+- Create an issue to discuss a change before submitting a PR. We'd hate to have to turn down your contributions because of something that could have been communicated early on.
+- [Create a fork of the GitHub repo][fork-repo] to ensure that you can push your changes for us to review.
+- Make your changes in a new git branch:
 
   ```shell
   git checkout -b my-fix-branch master
   ```
 
-* Create your patch, **including appropriate test cases**. Patches with tests are more likely to be merged.
-* Avoid checking in files that shouldn't be tracked (e.g `node_modules`, `gulp-cache`, `.tmp`, `.idea`). If your development setup automatically creates some of these files, please add them to the `.gitignore` at the root of the package (click [here][gitignore] to read more on how to add entries to the `.gitignore`).
-* Commit your changes using a commit message that follows our [commit message guidelines](#commit-message-guidelines).
+- Create your patch, **including appropriate test cases**. Patches with tests are more likely to be merged.
+- Avoid checking in files that shouldn't be tracked (e.g `node_modules`, `gulp-cache`, `.tmp`, `.idea`). If your development setup automatically creates some of these files, please add them to the `.gitignore` at the root of the package (click [here][gitignore] to read more on how to add entries to the `.gitignore`).
+- Commit your changes using a commit message that follows our [commit message guidelines](#commit-message-guidelines).
 
-     ```shell
-     git commit -a
-     ```
+  ```shell
+  git commit -a
+  ```
+
   _Note: the optional commit `-a` command line option will automatically "add" and "rm" edited files._
 
-* Test your changes locally to ensure everything is in good working order:
+- Test your changes locally to ensure everything is in good working order:
 
-    ```shell
-   npm test
-    ```
+  ```shell
+  npm test
+  ```
 
-* Push your branch to your fork on GitHub:
+  We also run a formatter with `yarn fmt`; the repository has a pre-commit hook that will automatically rewrite staged files if they need formatting.
 
-    ```shell
-    git push origin my-fix-branch
-    ```
+- Push your branch to your fork on GitHub:
 
-* In GitHub, send a pull request to `rxfire:main`.
-* All pull requests must be reviewed by an RxFire maintainer, who will merge it when/if they feel it is good to go.
+  ```shell
+  git push origin my-fix-branch
+  ```
+
+- In GitHub, send a pull request to `rxfire:main`.
+- All pull requests must be reviewed by an RxFire maintainer, who will merge it when/if they feel it is good to go.
 
 That's it! Thank you for your contribution!
 

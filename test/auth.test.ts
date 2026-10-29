@@ -1,4 +1,3 @@
-
 /**
  * @license
  * Copyright 2021 Google LLC
@@ -15,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {default as config, resolvedAuthEmulatorPort} from './config';
-import {initializeApp, FirebaseApp} from 'firebase/app';
-import {getAuth, Auth, connectAuthEmulator, signInAnonymously} from 'firebase/auth';
-import {authState} from '../dist/auth';
-import {skip, take} from 'rxjs/operators';
+import { default as config, resolvedAuthEmulatorPort } from './config';
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth, connectAuthEmulator, signInAnonymously } from 'firebase/auth';
+import { authState } from '../dist/auth';
+import { skip, take } from 'rxjs/operators';
 
 describe('RxFire Auth', () => {
   let app: FirebaseApp;
@@ -28,27 +27,29 @@ describe('RxFire Auth', () => {
   beforeEach(async () => {
     app = initializeApp(config);
     auth = getAuth(app);
-    connectAuthEmulator(auth, `http://localhost:${await resolvedAuthEmulatorPort}`, {disableWarnings: true});
+    connectAuthEmulator(auth, `http://localhost:${await resolvedAuthEmulatorPort}`, {
+      disableWarnings: true,
+    });
   });
 
   describe('Authentication state', () => {
     it('should initially be unauthenticated', (done) => {
       authState(auth)
-          .pipe(take(1))
-          .subscribe((state) => {
-            expect(state).toBeNull();
-          })
-          .add(done);
+        .pipe(take(1))
+        .subscribe((state) => {
+          expect(state).toBeNull();
+        })
+        .add(done);
     });
 
     it('should trigger an authenticated state', (done) => {
       authState(auth)
-          .pipe(skip(1), take(1))
-          .subscribe((state) => {
-            expect(state).not.toBeNull();
-            expect(state.isAnonymous).toEqual(true);
-          })
-          .add(done);
+        .pipe(skip(1), take(1))
+        .subscribe((state) => {
+          expect(state).not.toBeNull();
+          expect(state.isAnonymous).toEqual(true);
+        })
+        .add(done);
 
       signInAnonymously(auth);
     });

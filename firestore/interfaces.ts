@@ -11,7 +11,7 @@ export type CountSnapshot<
   AppModelType = DocumentData,
   DbModelType extends DocumentData = DocumentData,
 > = import('firebase/firestore').AggregateQuerySnapshot<
-  {count: import('firebase/firestore').AggregateField<number>},
+  { count: import('firebase/firestore').AggregateField<number> },
   AppModelType,
   DbModelType
 >;

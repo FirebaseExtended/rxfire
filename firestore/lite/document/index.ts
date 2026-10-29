@@ -16,12 +16,12 @@
  */
 
 // TODO fix the import
-import {DocumentReference, DocumentSnapshot, DocumentData} from '../interfaces';
-import {map} from 'rxjs/operators';
-import {from, Observable} from 'rxjs';
-import {getDoc} from 'firebase/firestore/lite';
+import { DocumentReference, DocumentSnapshot, DocumentData } from '../interfaces';
+import { map } from 'rxjs/operators';
+import { from, Observable } from 'rxjs';
+import { getDoc } from 'firebase/firestore/lite';
 
-export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
+export function doc<T = DocumentData>(ref: DocumentReference<T>): Observable<DocumentSnapshot<T>> {
   return from(getDoc<T, DocumentData>(ref));
 }
 
@@ -29,20 +29,20 @@ export function doc<T=DocumentData>(ref: DocumentReference<T>): Observable<Docum
  * Returns a stream of a document, mapped to its data payload and optionally the document ID
  * @param query
  */
-export function docData<T=DocumentData>(
-    ref: DocumentReference<T>,
-    options: {
-    idField?: string
-  }={},
+export function docData<T = DocumentData>(
+  ref: DocumentReference<T>,
+  options: {
+    idField?: string;
+  } = {},
 ): Observable<T> {
   return doc(ref).pipe(map((snap) => snapToData(snap, options) as T));
 }
 
-export function snapToData<T=DocumentData>(
-    snapshot: DocumentSnapshot<T>,
-    options: {
-      idField?: string,
-    }={},
+export function snapToData<T = DocumentData>(
+  snapshot: DocumentSnapshot<T>,
+  options: {
+    idField?: string;
+  } = {},
 ): {} | undefined {
   // TODO clean up the typings
   const data = snapshot.data() as any;

@@ -15,17 +15,17 @@
  * limitations under the License.
  */
 
-import {httpsCallable as vanillaHttpsCallable} from 'firebase/functions';
-import {from, Observable} from 'rxjs';
-import {map} from 'rxjs/operators';
+import { httpsCallable as vanillaHttpsCallable } from 'firebase/functions';
+import { from, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 type Functions = import('firebase/functions').Functions;
 type HttpsCallableOptions = import('firebase/functions').HttpsCallableOptions;
 
 export function httpsCallable<RequestData = unknown, ResponseData = unknown>(
-    functions: Functions,
-    name: string,
-    options?: HttpsCallableOptions,
+  functions: Functions,
+  name: string,
+  options?: HttpsCallableOptions,
 ): (data?: RequestData | null) => Observable<ResponseData> {
   const callable = vanillaHttpsCallable<RequestData, ResponseData>(functions, name, options);
   return (data) => {

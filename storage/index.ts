@@ -4,8 +4,8 @@ import {
   uploadBytesResumable as _uploadBytesResumable,
   uploadString as _uploadString,
 } from 'firebase/storage';
-import {Observable, from} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 import type {
   UploadTaskSnapshot,
@@ -63,18 +63,18 @@ export function fromTask(task: UploadTask): Observable<UploadTaskSnapshot> {
     // this is done for the ergonomics around making sure we don't
     // try to push errors or completions through closed subscribers
     subscriber.add(
-        from(task as unknown as Promise<UploadTaskSnapshot>).subscribe({
-          next: emit,
-          error: (err) => {
-            hasError = true;
-            error = err;
-            schedule();
-          },
-          complete: () => {
-            complete = true;
-            schedule();
-          },
-        }),
+      from(task as unknown as Promise<UploadTaskSnapshot>).subscribe({
+        next: emit,
+        error: (err) => {
+          hasError = true;
+          error = err;
+          schedule();
+        },
+        complete: () => {
+          complete = true;
+          schedule();
+        },
+      }),
     );
   });
 }
@@ -95,9 +95,9 @@ export function getMetadata(ref: StorageReference): Observable<FullMetadata> {
 
 // MARK: Breaking change (renaming put to uploadBytesResumable)
 export function uploadBytesResumable(
-    ref: StorageReference,
-    data: Blob | Uint8Array | ArrayBuffer,
-    metadata?: UploadMetadata,
+  ref: StorageReference,
+  data: Blob | Uint8Array | ArrayBuffer,
+  metadata?: UploadMetadata,
 ): Observable<UploadTaskSnapshot> {
   return new Observable<UploadTaskSnapshot>((subscriber) => {
     const task = _uploadBytesResumable(ref, data, metadata);
@@ -106,15 +106,15 @@ export function uploadBytesResumable(
       subscription.unsubscribe();
       task.cancel();
     };
-  }).pipe(shareReplay({bufferSize: 1, refCount: true}));
+  }).pipe(shareReplay({ bufferSize: 1, refCount: true }));
 }
 
 // MARK: Breaking change (renaming put to uploadString)
 export function uploadString(
-    ref: StorageReference,
-    data: string,
-    format?: StringFormat,
-    metadata?: UploadMetadata,
+  ref: StorageReference,
+  data: string,
+  format?: StringFormat,
+  metadata?: UploadMetadata,
 ): Observable<UploadResult> {
   return from(_uploadString(ref, data, format, metadata));
 }
@@ -124,9 +124,9 @@ export function percentage(task: UploadTask): Observable<{
   snapshot: UploadTaskSnapshot;
 }> {
   return fromTask(task).pipe(
-      map((snapshot) => ({
-        progress: (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
-        snapshot,
-      })),
+    map((snapshot) => ({
+      progress: (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
+      snapshot,
+    })),
   );
 }

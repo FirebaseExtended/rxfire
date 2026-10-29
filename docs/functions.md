@@ -16,18 +16,16 @@ The `httpsCallable()` function returns an observable that calls a [callable func
 #### TypeScript Example
 
 ```ts
-import { httpsCallable } from "rxfire/functions";
-import { initializeApp } from "firebase/app";
-import { getFunctions } from "firebase/functions";
+import { httpsCallable } from 'rxfire/functions';
+import { initializeApp } from 'firebase/app';
+import { getFunctions } from 'firebase/functions';
 
 // Set up Firebase
-const app = initializeApp({
-  /* config */
-});
+const app = initializeApp({/* config */});
 const functions = getFunctions(app);
 
 // Assume an `uppercaser` function is deployed
-const capitalizedText$ = httpsCallable<string, string>(functions, "uppercaser")("hello world");
+const capitalizedText$ = httpsCallable<string, string>(functions, 'uppercaser')('hello world');
 capitalizedText$.subscribe((text) => {
   console.log(text);
 }); // logs "HELLO WORLD"
