@@ -19,9 +19,37 @@ jobs:
     needs: build
     strategy:
       matrix:
-        node: ["20"]
-        firebase: ["9", "10", "11", "12"]
-        rxjs: ["6", "7"]
+        include:
+          - node: "20"
+            firebase: "9"
+            rxjs: "6"
+          - node: "20"
+            firebase: "9"
+            rxjs: "7"
+          - node: "20"
+            firebase: "10"
+            rxjs: "6"
+          - node: "20"
+            firebase: "10"
+            rxjs: "7"
+          - node: "20"
+            firebase: "11"
+            rxjs: "6"
+          - node: "20"
+            firebase: "11"
+            rxjs: "7"
+          - node: "20"
+            firebase: "12"
+            rxjs: "6"
+          - node: "20"
+            firebase: "12"
+            rxjs: "7"
+          - node: "24.12.0"
+            firebase: "13"
+            rxjs: "6"
+          - node: "24.12.0"
+            firebase: "13"
+            rxjs: "7"
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
     steps:
