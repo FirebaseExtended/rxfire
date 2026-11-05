@@ -28,7 +28,7 @@ jobs:
           check-latest: true
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ./node_modules
           key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-20-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}

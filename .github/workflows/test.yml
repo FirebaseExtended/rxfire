@@ -39,7 +39,7 @@ jobs:
           java-version: '21'
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -48,7 +48,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-
       - name: test/functions node_modules cache
         id: functions_node_modules_cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ./test/functions/node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-${{ hashFiles('test/functions/yarn.lock') }}
@@ -56,7 +56,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -74,12 +74,12 @@ jobs:
           cd test/functions
           yarn install --frozen-lockfile --prefer-offline
       - name: Firebase emulator cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       - name: Run tests
         run: |
           mv rxfire-${{ github.run_id }} dist
