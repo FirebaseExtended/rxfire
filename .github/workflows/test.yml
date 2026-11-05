@@ -1,4 +1,4 @@
-name: Test and publish
+name: Test
 
 on:
   push:
@@ -7,54 +7,12 @@ on:
     paths-ignore:
       - "**/*.md"
   pull_request:
-    branches: 
+    branches:
       - "**"
-  release:
-    types:
-      - published
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: node_modules cache
-        uses: actions/cache@v4
-        id: node_modules_cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-20-11-7-node_modules-
-            ${{ runner.os }}-20-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
-      - name: Build
-        id: yarn-pack-dir
-        run: ./build.sh
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rxfire-${{ github.run_id }}
-          path: dist
-          retention-days: 1
+    uses: ./.github/workflows/reusable-build.yml
 
   test:
     runs-on: ubuntu-latest
@@ -68,9 +26,9 @@ jobs:
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
@@ -120,66 +78,9 @@ jobs:
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: 'Download Artifacts'
+      - name: Download artifacts
         uses: actions/download-artifact@v4
       - name: Run tests
         run: |
           mv rxfire-${{ github.run_id }} dist
           yarn test
-  
-  lint:
-    runs-on: ubuntu-latest
-    name: Lint
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          check-latest: true
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@v4
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-20-11-7-node_modules-
-            ${{ runner.os }}-20-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline
-      - name: Run lint
-        run: |
-          yarn lint
-
-  publish:
-    runs-on: ubuntu-latest
-    name: Publish (NPM)
-    needs: ['build', 'test']
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
-    steps:
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://wombat-dressing-room.appspot.com'
-      - name: 'Download Artifacts'
-        uses: actions/download-artifact@v4
-      - name: Publish
-        run: |
-          cd ./rxfire-${{ github.run_id }}
-          chmod +x publish.sh
-          ./publish.sh
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

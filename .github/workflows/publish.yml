@@ -1,0 +1,34 @@
+name: Publish (NPM)
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    uses: ./.github/workflows/reusable-build.yml
+
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish (NPM)
+    needs: build
+    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
+    steps:
+      - name: Setup node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '20'
+          registry-url: 'https://wombat-dressing-room.appspot.com'
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+      - name: Publish
+        run: |
+          cd ./rxfire-${{ github.run_id }}
+          chmod +x publish.sh
+          ./publish.sh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
