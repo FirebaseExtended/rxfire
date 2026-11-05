@@ -11,13 +11,9 @@ on:
       - "**"
 
 jobs:
-  build:
-    uses: ./.github/workflows/reusable-build.yml
-
   lint:
     runs-on: ubuntu-latest
     name: Lint
-    needs: build
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
