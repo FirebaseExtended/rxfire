@@ -1,7 +1,9 @@
 name: Publish (NPM)
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Test"]
+    types: [completed]
     branches:
       - main
   release:
@@ -9,25 +11,38 @@ on:
       - published
 
 jobs:
-  build:
-    uses: ./.github/workflows/reusable-build.yml
-
   publish:
+    if: ${{ github.event_name == 'release' || (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository) }}
     runs-on: ubuntu-latest
     name: Publish (NPM)
-    needs: build
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
     steps:
       - name: Setup node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: '20'
           registry-url: 'https://wombat-dressing-room.appspot.com'
-      - name: Download artifacts
+
+      - name: Download artifacts from successful test workflow
+        if: ${{ github.event_name == 'workflow_run' }}
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: rxfire-${{ github.event.workflow_run.id }}
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build package for release
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          yarn install --frozen-lockfile --prefer-offline
+          ./build.sh
+
       - name: Publish
         run: |
-          cd ./rxfire-${{ github.run_id }}
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            cd "./rxfire-${{ github.event.workflow_run.id }}"
+          else
+            test -d dist || ./build.sh
+          fi
           chmod +x publish.sh
           ./publish.sh
         env:
