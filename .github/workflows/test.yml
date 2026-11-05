@@ -100,7 +100,11 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           cd test/functions
-          yarn install --frozen-lockfile --prefer-offline
+          if [ "${{ matrix.node }}" = "24.12.0" ]; then
+            yarn install --frozen-lockfile --prefer-offline --ignore-engines
+          else
+            yarn install --frozen-lockfile --prefer-offline
+          fi
       - name: Firebase emulator cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
