@@ -23,7 +23,24 @@ yarn add rxfire firebase rxjs
 
 Make sure to install Firebase and RxJS individually as they are peer dependencies of RxFire.
 
-## Example use:
+## Compatibility
+
+RxFire v6 releases are aligned with the Firebase and RxJS major versions they support. Node.js is not a peer dependency of RxFire, so the minimum supported Node.js version is determined by the Firebase JS SDK version you install.
+
+| Version | Firebase  | RxJS                 | NodeJS              |
+| ------- | --------- | -------------------- | ------------------- |
+| 6.3.x   | v9 to v13 | `^6.0.0 \|\| ^7.0.0` | `>=10` for v9/v10   |
+|         |           |                      | `>=18` for v11      |
+|         |           |                      | `>=20` for v12      |
+|         |           |                      | `>=24.12.0` for v13 |
+| 6.2.x   | v9 to v12 | `^6.0.0 \|\| ^7.0.0` | `>=10` for v9/v10   |
+|         |           |                      | `>=18` for v11      |
+|         |           |                      | `>=20` for v12      |
+| 6.1.x   | v9 to v11 | `^6.0.0 \|\| ^7.0.0` | `>=10` for v9/v10   |
+|         |           |                      | `>=18` for v11      |
+| 6.0.x   | v9 to v10 | `^6.0.0 \|\| ^7.0.0` | `>=10`              |
+
+## Example usage
 
 ```ts
 import { initializeApp } from 'firebase/app';
