@@ -1,4 +1,7 @@
-name: Test and publish
+name: Test
+
+permissions:
+  contents: read
 
 on:
   push:
@@ -7,70 +10,56 @@ on:
     paths-ignore:
       - "**/*.md"
   pull_request:
-    branches: 
+    branches:
       - "**"
-  release:
-    types:
-      - published
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: node_modules cache
-        uses: actions/cache@v4
-        id: node_modules_cache
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-20-11-7-node_modules-
-            ${{ runner.os }}-20-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn config set yarn-offline-mirror-pruning true
-          yarn install --frozen-lockfile --prefer-offline
-      - name: Build
-        id: yarn-pack-dir
-        run: ./build.sh
-      - name: 'Upload Artifact'
-        uses: actions/upload-artifact@v4
-        with:
-          name: rxfire-${{ github.run_id }}
-          path: dist
-          retention-days: 1
+    uses: ./.github/workflows/reusable-build.yml
 
   test:
     runs-on: ubuntu-latest
     needs: build
     strategy:
       matrix:
-        node: ["20"]
-        firebase: ["9", "10", "11", "12"]
-        rxjs: ["6", "7"]
+        include:
+          - node: "20"
+            firebase: "9"
+            rxjs: "6"
+          - node: "20"
+            firebase: "9"
+            rxjs: "7"
+          - node: "20"
+            firebase: "10"
+            rxjs: "6"
+          - node: "20"
+            firebase: "10"
+            rxjs: "7"
+          - node: "20"
+            firebase: "11"
+            rxjs: "6"
+          - node: "20"
+            firebase: "11"
+            rxjs: "7"
+          - node: "20"
+            firebase: "12"
+            rxjs: "6"
+          - node: "20"
+            firebase: "12"
+            rxjs: "7"
+          - node: "24.12.0"
+            firebase: "13"
+            rxjs: "6"
+          - node: "24.12.0"
+            firebase: "13"
+            rxjs: "7"
       fail-fast: false
     name: Test firebase@${{ matrix.firebase }} rxjs@${{ matrix.rxjs }} on Node.js ${{ matrix.node }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node }}
           check-latest: true
@@ -81,7 +70,7 @@ jobs:
           java-version: '21'
       - name: node_modules cache
         id: node_modules_cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ./node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-${{ matrix.firebase }}-${{ matrix.rxjs }}-node_modules-${{ hashFiles('yarn.lock') }}
@@ -90,7 +79,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-
       - name: test/functions node_modules cache
         id: functions_node_modules_cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ./test/functions/node_modules
           key: ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-${{ hashFiles('test/functions/yarn.lock') }}
@@ -98,7 +87,7 @@ jobs:
             ${{ runner.os }}-${{ matrix.node }}-functions_node_modules-
       - name: Yarn offline cache
         if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.npm-packages-offline-cache
           key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
@@ -114,72 +103,19 @@ jobs:
         run: |
           yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
           cd test/functions
-          yarn install --frozen-lockfile --prefer-offline
+          if [ "${{ matrix.node }}" = "24.12.0" ]; then
+            yarn install --frozen-lockfile --prefer-offline --ignore-engines
+          else
+            yarn install --frozen-lockfile --prefer-offline
+          fi
       - name: Firebase emulator cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
         with:
           path: ~/.cache/firebase/emulators
           key: firebase_emulators
-      - name: 'Download Artifacts'
-        uses: actions/download-artifact@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
       - name: Run tests
         run: |
           mv rxfire-${{ github.run_id }} dist
           yarn test
-  
-  lint:
-    runs-on: ubuntu-latest
-    name: Lint
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          check-latest: true
-      - name: node_modules cache
-        id: node_modules_cache
-        uses: actions/cache@v4
-        with:
-          path: ./node_modules
-          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-20-11-7-node_modules-
-            ${{ runner.os }}-20-
-      - name: Yarn offline cache
-        if: steps.node_modules_cache.outputs.cache-hit != 'true' || steps.functions_node_modules_cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm-packages-offline-cache
-          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: yarn-offline
-      - name: Install deps
-        if: steps.node_modules_cache.outputs.cache-hit != 'true'
-        run: |
-          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
-          yarn install --frozen-lockfile --prefer-offline
-      - name: Run lint
-        run: |
-          yarn lint
-
-  publish:
-    runs-on: ubuntu-latest
-    name: Publish (NPM)
-    needs: ['build', 'test']
-    if: ${{ github.ref == 'refs/heads/main' || github.event_name == 'release' }}
-    steps:
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://wombat-dressing-room.appspot.com'
-      - name: 'Download Artifacts'
-        uses: actions/download-artifact@v4
-      - name: Publish
-        run: |
-          cd ./rxfire-${{ github.run_id }}
-          chmod +x publish.sh
-          ./publish.sh
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

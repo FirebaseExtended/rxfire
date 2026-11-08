@@ -1,0 +1,49 @@
+name: Reusable build
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Setup node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '20'
+      - name: node_modules cache
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        id: node_modules_cache
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-20-11-7-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-20-11-7-node_modules-
+            ${{ runner.os }}-20-
+      - name: Yarn offline cache
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf # v4.2.2
+        with:
+          path: ~/.npm-packages-offline-cache
+          key: yarn-offline-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: yarn-offline
+      - name: Install deps
+        if: steps.node_modules_cache.outputs.cache-hit != 'true'
+        run: |
+          yarn config set yarn-offline-mirror ~/.npm-packages-offline-cache
+          yarn config set yarn-offline-mirror-pruning true
+          yarn install --frozen-lockfile --prefer-offline
+      - name: Build
+        run: ./build.sh
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: rxfire-${{ github.run_id }}
+          path: dist
+          retention-days: 1
