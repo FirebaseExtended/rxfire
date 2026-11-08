@@ -1,5 +1,8 @@
 name: Reusable build
 
+permissions:
+  contents: read
+
 on:
   workflow_call:
 
